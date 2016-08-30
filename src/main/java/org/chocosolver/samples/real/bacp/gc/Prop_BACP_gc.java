@@ -37,7 +37,9 @@ public class Prop_BACP_gc extends Propagator<IntVar> {
       FileReader fr = null;
       String model = "";
       try {
-        fr = new FileReader(new File(instance));
+        ClassLoader classLoader = getClass().getClassLoader();
+        File file = new File(classLoader.getResource(instance).getFile()); 
+        fr = new FileReader(file);
         char[] buffer = new char[1000];
         while(fr.read(buffer) > -1){
               model += new String(buffer);

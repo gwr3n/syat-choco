@@ -78,14 +78,16 @@ import org.chocosolver.solver.variables.VariableFactory;
  */
 public class BACP_Var_RealMean extends AbstractProblem {
     
-    String instance = "./resources/BACP/bacp-10"
+    String instance = "BACP/bacp-10"
                       + ".mzn";
    
     public void loadInstance(){
        FileReader fr = null;
        String model = "";
        try {
-         fr = new FileReader(new File(instance));
+         ClassLoader classLoader = getClass().getClassLoader();
+         File file = new File(classLoader.getResource(instance).getFile()); 
+         fr = new FileReader(file);
          char[] buffer = new char[1000];
          while(fr.read(buffer) > -1){
                model += new String(buffer);
@@ -129,7 +131,9 @@ public class BACP_Var_RealMean extends AbstractProblem {
        FileReader fr = null;
        String model = "";
        try {
-         fr = new FileReader(new File(instance));
+         ClassLoader classLoader = getClass().getClassLoader();
+         File file = new File(classLoader.getResource(instance).getFile()); 
+         fr = new FileReader(file);
          char[] buffer = new char[1000];
          while(fr.read(buffer) > -1){
                model += new String(buffer);

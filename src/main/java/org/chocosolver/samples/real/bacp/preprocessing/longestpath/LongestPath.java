@@ -20,7 +20,9 @@ public class LongestPath {
       FileReader fr = null;
       String model = "";
       try {
-        fr = new FileReader(new File(instance));
+        ClassLoader classLoader = getClass().getClassLoader();
+        File file = new File(classLoader.getResource(instance).getFile()); 
+        fr = new FileReader(file);
         char[] buffer = new char[1000];
         while(fr.read(buffer) > -1){
               model += new String(buffer);
@@ -101,7 +103,7 @@ public class LongestPath {
    
    public static void main(String[] args) {
       
-      String instance = "./resources/BACP/bacp-10.mzn";
+      String instance = "BACP/bacp-10.mzn";
       
       /*Graph g = new Graph(6);
       g.addEdge(0, 1, 5);

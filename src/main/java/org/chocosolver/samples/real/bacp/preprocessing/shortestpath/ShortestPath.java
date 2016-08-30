@@ -21,7 +21,9 @@ public class ShortestPath {
       FileReader fr = null;
       String model = "";
       try {
-        fr = new FileReader(new File(instance));
+        ClassLoader classLoader = getClass().getClassLoader();
+        File file = new File(classLoader.getResource(instance).getFile()); 
+        fr = new FileReader(file);
         char[] buffer = new char[1000];
         while(fr.read(buffer) > -1){
               model += new String(buffer);
@@ -99,7 +101,7 @@ public class ShortestPath {
    public static void main(String args[]){
       ShortestPath path = new ShortestPath();
       for(int i = 1; i < 50; i++){
-         System.out.print(path.computeLB("./resources/BACP/bacp-20.mzn", i) + " ");
+         System.out.print(path.computeLB("BACP/bacp-20.mzn", i) + " ");
       }
    }
 }
