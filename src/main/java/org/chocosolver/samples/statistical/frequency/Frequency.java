@@ -3,6 +3,7 @@ package org.chocosolver.samples.statistical.frequency;
 import org.chocosolver.samples.AbstractProblem;
 import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.constraints.IntConstraintFactorySt;
+import org.chocosolver.solver.exception.ContradictionException;
 import org.chocosolver.solver.search.strategy.IntStrategyFactory;
 import org.chocosolver.solver.search.strategy.strategy.AbstractStrategy;
 import org.chocosolver.solver.variables.IntVar;
@@ -28,17 +29,17 @@ public class Frequency extends AbstractProblem {
    public void buildModel() {
       setUp();
       valueVariables = new IntVar[3];
-      valueVariables[0] = VariableFactory.bounded("Value "+0, 0, 3, solver);
-      valueVariables[1] = VariableFactory.bounded("Value "+1, 3, 3, solver);
-      valueVariables[2] = VariableFactory.bounded("Value "+2, 1, 3, solver);
+      valueVariables[0] = VariableFactory.enumerated("Value "+1, new int[]{3,4}, solver);
+      valueVariables[1] = VariableFactory.enumerated("Value "+2, new int[]{1,2,4}, solver);
+      valueVariables[2] = VariableFactory.enumerated("Value "+3, new int[]{2,3,4}, solver);
       
       binVariables = new IntVar[2];
-      binVariables[0] = VariableFactory.bounded("Bin "+0, 0, 4, solver);
-      binVariables[1] = VariableFactory.bounded("Bin "+1, 0, 4, solver);
+      binVariables[0] = VariableFactory.bounded("Bin "+1, 1, 3, solver);
+      binVariables[1] = VariableFactory.bounded("Bin "+2, 0, 1, solver);
       
-      binBounds = new int[]{0,2,4};
+      binBounds = new int[]{1,3,5};
       
-      solver.post(IntConstraintFactorySt.frequencySt(valueVariables, binVariables, binBounds));
+      solver.post(IntConstraintFactorySt.frequencySt(valueVariables, binVariables, binBounds));      
    }
    
    private static IntVar[] mergeArrays(IntVar[] var1, IntVar[] var2){
@@ -57,10 +58,21 @@ public class Frequency extends AbstractProblem {
    
    @Override
    public void solve() {
+     LoggerFactory.getLogger("bench").info("---");
+     this.prettyOut();
+     try {
+      solver.propagate();
+     } catch (ContradictionException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+     }
+     LoggerFactory.getLogger("bench").info("---");
+     this.prettyOut();
+     
      StringBuilder st = new StringBuilder();
      boolean solution = solver.findSolution();
      do{
-        st.append("---\n");
+        st.append("\n---SOLUTION---\n");
         if(solution) {
            for(int i = 0; i < valueVariables.length; i++){
               st.append(valueVariables[i].getValue()+", ");
@@ -79,7 +91,16 @@ public class Frequency extends AbstractProblem {
    
    @Override
    public void prettyOut() {
-       
+      StringBuilder st = new StringBuilder();
+      st.append("\n");
+      for(int i = 0; i < valueVariables.length; i++){
+         st.append(valueVariables[i].toString()+", ");
+      }
+      st.append("\n");
+      for(int i = 0; i < binVariables.length; i++){
+         st.append(binVariables[i].toString()+", ");
+      }
+      LoggerFactory.getLogger("bench").info(st.toString());
    }
 
    public static void main(String[] args) {

@@ -15,7 +15,7 @@ import org.chocosolver.util.ESat;
 import org.chocosolver.util.iterators.DisposableValueIterator;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
-import org.ojalgo.optimisation.Optimisation;
+import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.Variable;
 
 import gnu.trove.map.hash.THashMap;
@@ -74,24 +74,40 @@ public class PropFrequencySt extends Propagator<IntVar> {
       for(int k = 0; k < n*m; k++){
          int i = k / m;
          int j = k % m;
-         if((int) models[k].minimise().getValue() == 1){
+         Result result = models[k].minimise();
+         if(!result.getState().isFeasible()){
+            this.vars[i].wipeOut(aCause);
+         }else if((int) result.getValue() == 1){
             for(int l = 0; l < m; l++){
                if(l != j)
                   this.vars[i].removeInterval(getBinLB(l), getBinUB(l), aCause);
             }
          }
          
-         if((int) models[k].maximise().getValue() == 0){
+         result = models[k].maximise();
+         if(!result.getState().isFeasible()){
+            this.vars[i].wipeOut(aCause);
+         }else if((int) result.getValue() == 0){
             this.vars[i].removeInterval(getBinLB(j), getBinUB(j), aCause);
          }
       }
       
       for(int k = n*m; k < n*m + m; k++){
          int j = k-n*m;
-         int lb = (int) models[k].minimise().getValue();
-         int ub = (int) models[k].maximise().getValue();
-         this.vars[j+n].updateLowerBound(lb, aCause);
-         this.vars[j+n].updateUpperBound(ub, aCause);
+         Result result = models[k].minimise();
+         if(result.getState().isFeasible()){
+            int lb = (int) result.getValue();
+            this.vars[j+n].updateLowerBound(lb, aCause);
+         }else{
+            this.vars[j+n].wipeOut(aCause);
+         }
+         result = models[k].maximise();
+         if(result.getState().isFeasible()){
+            int ub = (int) models[k].maximise().getValue();
+            this.vars[j+n].updateUpperBound(ub, aCause);
+         }else{
+            this.vars[j+n].wipeOut(aCause);
+         }
       }
    }
 
