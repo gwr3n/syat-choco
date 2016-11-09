@@ -1,4 +1,4 @@
-package org.chocosolver.solver.constraints.statistical.frequency;
+package org.chocosolver.solver.constraints.statistical.bincounts;
 
 import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.constraints.Propagator;
@@ -20,7 +20,15 @@ import org.ojalgo.optimisation.Variable;
 
 import gnu.trove.map.hash.THashMap;
 
-public class PropFrequencySt extends Propagator<IntVar> {
+/**
+ * This propagator for the Bincounts constraint operates under the 
+ * assumption that, if there exist values that do not fall into any 
+ * available bin, the constraint.is inconsistent
+ * 
+ * @author Roberto Rossi
+ *
+ */
+public class PropBincountsEQSt extends Propagator<IntVar> {
    
    int m, n;
    int[] binBounds;
@@ -33,12 +41,12 @@ public class PropFrequencySt extends Propagator<IntVar> {
       return variables;
    }
    
-   public PropFrequencySt(IntVar[] valueVariables, IntVar[] binVariables, int[] binBounds){
+   public PropBincountsEQSt(IntVar[] valueVariables, IntVar[] binVariables, int[] binBounds){
       super(joinVariables(valueVariables, binVariables), PropagatorPriority.LINEAR, true);
       this.n = valueVariables.length;
       this.m = binVariables.length;
       this.binBounds = binBounds.clone();
-      this.prepare();
+      //this.prepare();
    }
    
    protected void prepare() {
@@ -50,7 +58,7 @@ public class PropFrequencySt extends Propagator<IntVar> {
    @Override
    public void propagate(int evtmask) throws ContradictionException {
       if (PropagatorEventType.isFullPropagation(evtmask)) {
-         //prepare();
+         prepare();
          updateDomains();
       }
    }

@@ -1,4 +1,4 @@
-package org.chocosolver.solver.constraints.statistical.frequency.deprecated;
+package org.chocosolver.solver.constraints.statistical.bincounts.deprecated;
 
 import java.util.ArrayList;
 import java.util.Arrays;

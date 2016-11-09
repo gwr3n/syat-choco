@@ -2,7 +2,7 @@ package org.chocosolver.solver.constraints;
 
 import org.chocosolver.solver.constraints.Operator;
 import org.chocosolver.solver.constraints.statistical.ArithmeticSt;
-import org.chocosolver.solver.constraints.statistical.frequency.FrequencySt;
+import org.chocosolver.solver.constraints.statistical.bincounts.BincountsSt;
 import org.chocosolver.solver.variables.IntVar;
 import org.chocosolver.solver.variables.statistical.distributions.DistributionVar;
 
@@ -38,6 +38,6 @@ public class IntConstraintFactorySt extends IntConstraintFactory {
    }
 
    public static Constraint frequencySt(IntVar[] valueVariables, IntVar[] binVariables, int[] binBounds){
-      return new FrequencySt(valueVariables, binVariables, binBounds);
+      return new BincountsSt(valueVariables, binVariables, binBounds);
    }
 }

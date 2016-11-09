@@ -1,4 +1,4 @@
-package org.chocosolver.solver.constraints.statistical.frequency.deprecated;
+package org.chocosolver.solver.constraints.statistical.bincounts.deprecated;
 
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;

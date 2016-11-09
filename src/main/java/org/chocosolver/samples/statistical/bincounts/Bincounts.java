@@ -1,4 +1,4 @@
-package org.chocosolver.samples.statistical.frequency;
+package org.chocosolver.samples.statistical.bincounts;
 
 import org.chocosolver.samples.AbstractProblem;
 import org.chocosolver.solver.Solver;
@@ -10,7 +10,7 @@ import org.chocosolver.solver.variables.IntVar;
 import org.chocosolver.solver.variables.VariableFactory;
 import org.slf4j.LoggerFactory;
 
-public class Frequency extends AbstractProblem {
+public class Bincounts extends AbstractProblem {
    
    public IntVar[] valueVariables;
    public IntVar[] binVariables;
@@ -105,7 +105,7 @@ public class Frequency extends AbstractProblem {
 
    public static void main(String[] args) {
      String[] str={"-log","SILENT"};
-       new Frequency().execute(str);
+       new Bincounts().execute(str);
    }
 
 }

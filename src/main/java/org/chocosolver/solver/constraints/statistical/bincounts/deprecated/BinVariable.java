@@ -1,4 +1,4 @@
-package org.chocosolver.solver.constraints.statistical.frequency.deprecated;
+package org.chocosolver.solver.constraints.statistical.bincounts.deprecated;
 
 public class BinVariable extends DecisionVariable{
    
