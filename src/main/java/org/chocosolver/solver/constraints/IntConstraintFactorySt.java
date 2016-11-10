@@ -37,7 +37,7 @@ public class IntConstraintFactorySt extends IntConstraintFactory {
       return new ScalarSt(VARS, SAMPLES, SCALAR, confidence);
    }
 
-   public static Constraint frequencySt(IntVar[] valueVariables, IntVar[] binVariables, int[] binBounds){
+   public static Constraint bincountsSt(IntVar[] valueVariables, IntVar[] binVariables, int[] binBounds){
       return new BincountsSt(valueVariables, binVariables, binBounds);
    }
 }

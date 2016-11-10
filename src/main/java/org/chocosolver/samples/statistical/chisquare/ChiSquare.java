@@ -61,7 +61,7 @@ public class ChiSquare extends AbstractProblem {
       
       chiSqStatistics = VF.real("chiSqStatistics", 0, 5, precision, solver);
       
-      solver.post(IntConstraintFactorySt.frequencySt(valueVariables, binVariables, binBounds));
+      solver.post(IntConstraintFactorySt.bincountsSt(valueVariables, binVariables, binBounds));
       
       RealVar[] realViews = VF.real(binVariables, precision);
       
@@ -80,7 +80,10 @@ public class ChiSquare extends AbstractProblem {
    
    @Override
    public void configureSearch() {
-       solver.set(new RealStrategy(allRV, new Cyclic(), new RealDomainMiddle()));
+       solver.set(
+             new RealStrategy(allRV, new Cyclic(), new RealDomainMiddle()),
+             new RealStrategy(new RealVar[]{chiSqStatistics}, new Cyclic(), new RealDomainMiddle())
+       );
        SearchMonitorFactory.limitTime(solver,10000);
    }
    

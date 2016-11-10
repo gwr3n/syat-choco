@@ -77,9 +77,9 @@ import org.chocosolver.solver.variables.VariableFactory;
  * @author Charles Prud'homme
  * @since 20/07/12
  */
-public class BACP_Var_Frequency extends AbstractProblem {
+public class BACP_Var_Bincounts extends AbstractProblem {
     
-    String instance = "BACP/bacp-10"
+    String instance = "BACP/bacp-12"
                       + ".mzn";
    
     public void loadInstance(){
@@ -248,7 +248,7 @@ public class BACP_Var_Frequency extends AbstractProblem {
            binVariables[i] = VariableFactory.bounded("Bin "+i, 0, n_periods, solver);
         }
         
-        solver.post(IntConstraintFactorySt.frequencySt(load, binVariables, binBounds));
+        solver.post(IntConstraintFactorySt.bincountsSt(load, binVariables, binBounds));
         
         variance = VariableFactory.real("variance", 0, Math.pow((load_per_period_ub-load_per_period_lb),2)*binVariables.length, precision, solver);
         
@@ -405,6 +405,6 @@ public class BACP_Var_Frequency extends AbstractProblem {
 
     public static void main(String[] args) {
        String[] str={"-log","SOLUTION"};
-       new BACP_Var_Frequency().execute(str);
+       new BACP_Var_Bincounts().execute(str);
     }
 }

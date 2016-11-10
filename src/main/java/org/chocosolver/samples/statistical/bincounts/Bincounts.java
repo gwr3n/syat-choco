@@ -39,7 +39,7 @@ public class Bincounts extends AbstractProblem {
       
       binBounds = new int[]{1,3,5};
       
-      solver.post(IntConstraintFactorySt.frequencySt(valueVariables, binVariables, binBounds));      
+      solver.post(IntConstraintFactorySt.bincountsSt(valueVariables, binVariables, binBounds));      
    }
    
    private static IntVar[] mergeArrays(IntVar[] var1, IntVar[] var2){
