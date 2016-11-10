@@ -8,10 +8,10 @@ import org.chocosolver.solver.search.strategy.IntStrategyFactory;
 import org.chocosolver.solver.search.strategy.strategy.AbstractStrategy;
 import org.chocosolver.solver.variables.IntVar;
 import org.chocosolver.solver.variables.VariableFactory;
+import org.chocosolver.util.iterators.DisposableValueIterator;
 import org.slf4j.LoggerFactory;
 
-public class Bincounts extends AbstractProblem {
-  
+public class BincountsDomainReduction extends AbstractProblem {
    public IntVar[] valueVariables;
    public IntVar[] binVariables;
    
@@ -19,17 +19,17 @@ public class Bincounts extends AbstractProblem {
    int[][] values;
    int[] binBounds;
    
-   public Bincounts(int[][] values,
-                    int[][] binCounts, 
-                    int[] binBounds){
+   public BincountsDomainReduction(int[][] values,
+                                   int[][] binCounts, 
+                                   int[] binBounds){
       this.values = values.clone();
       this.binCounts = binCounts.clone();
       this.binBounds = binBounds.clone();
    }
    
-   /*public void setUp() {
+   public void setUp() {
        // read data
-   }*/
+   }
    
    @Override
    public void createSolver() {
@@ -77,7 +77,7 @@ public class Bincounts extends AbstractProblem {
      LoggerFactory.getLogger("bench").info("---");
      this.prettyOut();
      
-     StringBuilder st = new StringBuilder();
+     /*StringBuilder st = new StringBuilder();
      boolean solution = solver.findSolution();
      do{
         st.append("\n---SOLUTION---\n");
@@ -94,7 +94,52 @@ public class Bincounts extends AbstractProblem {
            st.append("No solution!");
         }
      }while(solution = solver.nextSolution());
-     LoggerFactory.getLogger("bench").info(st.toString());
+     LoggerFactory.getLogger("bench").info(st.toString());*/
+   }
+   
+   public double getPercentDomainReduction(int[][] values, int[][] binCounts){
+      double totalCount = 0;
+      double totalFilteredCount = 0;
+      
+      {
+         int[][] filteredValues = new int[values.length][];
+         for(int v = 0; v < filteredValues.length; v++){
+            int c = 0;
+            int[] domain = new int[valueVariables[v].getDomainSize()]; 
+            DisposableValueIterator vit = valueVariables[v].getValueIterator(true);
+            while(vit.hasNext()){
+               domain[c++] = vit.next();
+            }
+            vit.dispose();
+            filteredValues[v] = domain;
+         }
+         
+         for(int v = 0; v < values.length; v++){
+            totalCount += values[v].length;
+            totalFilteredCount += filteredValues[v].length;
+         }
+      }
+      
+      {
+         int[][] filteredValues = new int[binCounts.length][];
+         for(int v = 0; v < filteredValues.length; v++){
+            int c = 0;
+            int[] domain = new int[binVariables[v].getDomainSize()]; 
+            DisposableValueIterator vit = binVariables[v].getValueIterator(true);
+            while(vit.hasNext()){
+               domain[c++] = vit.next();
+            }
+            vit.dispose();
+            filteredValues[v] = domain;
+         }
+         
+         for(int v = 0; v < binCounts.length; v++){
+            totalCount += binCounts[v][1]-binCounts[v][0]+1;
+            totalFilteredCount += filteredValues[v].length;      
+         }
+      }
+      
+      return totalFilteredCount/totalCount;
    }
    
    @Override
@@ -117,8 +162,9 @@ public class Bincounts extends AbstractProblem {
      int[][] binCounts = {{1,3},{0,1}};
      int[] binBounds = {1,3,5};
      
-     Bincounts bc = new Bincounts(values, binCounts, binBounds);
+     BincountsDomainReduction bc = new BincountsDomainReduction(values, binCounts, binBounds);
      bc.execute(str);
+     
+     LoggerFactory.getLogger("bench").info("Domain reduction: "+bc.getPercentDomainReduction(values, binCounts));
    }
-
 }
