@@ -28,7 +28,7 @@ public class ChiSquare extends AbstractProblem {
    RealVar[] allRV;
    
    int[] binBounds;
-   int[] targetFrequencies = {2,2,2};
+   int[] targetFrequencies = {1,4,1};
    
    double precision = 1.e-4;
    double pValue = 0.95;
@@ -59,7 +59,7 @@ public class ChiSquare extends AbstractProblem {
       
       this.chiSqDist = new ChiSquareDist(this.binVariables.length-1);
       
-      chiSqStatistics = VF.real("chiSqStatistics", 0, 5, precision, solver);
+      chiSqStatistics = VF.real("chiSqStatistics", 0, this.chiSqDist.inverseF(1-pValue), precision, solver);
       
       solver.post(IntConstraintFactorySt.bincountsSt(valueVariables, binVariables, binBounds));
       
@@ -69,12 +69,10 @@ public class ChiSquare extends AbstractProblem {
       System.arraycopy(realViews, 0, allRV, 0, realViews.length);
       allRV[realViews.length] = chiSqStatistics;
       solver.post(new RealConstraint("chiSqStatistics",
-            "(({0}-1)^2)/2+(({1}-4)^2)/2+(({2}-1)^2)/2={3}",
+            "(({0}-"+targetFrequencies[0]+")^2)/"+targetFrequencies[0]+"+"+
+            "(({1}-"+targetFrequencies[1]+")^2)/"+targetFrequencies[1]+"+"+
+            "(({2}-"+targetFrequencies[2]+")^2)/"+targetFrequencies[2]+"={3}",
             Ibex.HC4_NEWTON, allRV
-            ));
-      solver.post(new RealConstraint("ChiSquareTest",
-            "{0}<="+this.chiSqDist.inverseF(1-pValue),
-            Ibex.HC4_NEWTON, chiSqStatistics
             ));
    }
    

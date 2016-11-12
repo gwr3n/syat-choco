@@ -42,13 +42,11 @@ import org.chocosolver.solver.constraints.real.Ibex;
 import org.chocosolver.solver.constraints.real.RealConstraint;
 import org.chocosolver.solver.search.loop.monitors.IMonitorSolution;
 import org.chocosolver.solver.search.strategy.IntStrategyFactory;
-import org.chocosolver.solver.search.strategy.selectors.values.RealDomainMiddle;
-import org.chocosolver.solver.search.strategy.selectors.variables.Cyclic;
-import org.chocosolver.solver.search.strategy.strategy.RealStrategy;
 import org.chocosolver.solver.variables.BoolVar;
 import org.chocosolver.solver.variables.IntVar;
 import org.chocosolver.solver.variables.RealVar;
 import org.chocosolver.solver.variables.VariableFactory;
+import org.chocosolver.util.iterators.DisposableValueIterator;
 
 /**
  * The balanced academic curriculum problem: 
@@ -79,7 +77,7 @@ import org.chocosolver.solver.variables.VariableFactory;
  */
 public class BACP_Var_Bincounts extends AbstractProblem {
     
-    String instance = "BACP/bacp-12"
+    String instance = "BACP/bacp-10"
                       + ".mzn";
    
     public void loadInstance(){
@@ -174,8 +172,12 @@ public class BACP_Var_Bincounts extends AbstractProblem {
                     5, 9, 9, 10, 4, 6, 4,
                     5, 6, 6};
     
-    int[] binBounds = new int[]{0,15,20,30,35,load_per_period_ub+1};
-    int[] targetFrequencies = new int[]{0,2,6,2,0};
+    //int[] binBounds = new int[]{0,15,20,30,35,load_per_period_ub+1};
+    //int[] targetFrequencies = new int[]{1,2,4,2,1};
+    
+    // Target frequencies cannot be zero! If necessary reduce number of bins.
+    int[] binBounds = new int[]{15,20,30,35};
+    int[] targetFrequencies = new int[]{2,6,2};
 
     // period course is assigned to
     IntVar[] course_period;
@@ -199,7 +201,7 @@ public class BACP_Var_Bincounts extends AbstractProblem {
     public void buildModel() {  
         loadInstance();
        
-        // period is assigned to
+        // period course is assigned to
         //course_period = VariableFactory.enumeratedArray("c_p", n_courses, 0, n_periods-1, solver);
         course_period = new IntVar[n_courses];
         LongestPath path = new LongestPath();
@@ -214,7 +216,7 @@ public class BACP_Var_Bincounts extends AbstractProblem {
         // total load for each period
         load = VariableFactory.enumeratedArray("load", n_periods, load_per_period_lb, load_per_period_ub, solver);
         // sum variable
-        IntVar sum = VariableFactory.bounded("courses_per_period", courses_per_period_lb, courses_per_period_ub, solver);
+        IntVar[] sum = VariableFactory.integerArray("courses_per_period", n_periods, courses_per_period_lb, courses_per_period_ub, solver);
         // constraints
         for (int i = 0; i < n_periods; i++) {
             // forall(c in courses) (x[p,c] = bool2int(course_period[c] = p)) /\
@@ -231,10 +233,17 @@ public class BACP_Var_Bincounts extends AbstractProblem {
             }
             // sum(i in courses) (x[p, i])>=courses_per_period_lb /\
             // sum(i in courses) (x[p, i])<=courses_per_period_ub /\
-            solver.post(IntConstraintFactory.sum(x[i], sum));
+            solver.post(IntConstraintFactory.sum(x[i], sum[i]));
             //  load[p] = sum(c in courses) (x[p, c]*course_load[c])/\
             solver.post(IntConstraintFactory.scalar(x[i], course_load, load[i]));
         }
+        
+        int[] values = new int[n_periods];
+        for(int i = 0; i < n_periods; i++) values[i] = i;
+        
+        solver.post(IntConstraintFactory.global_cardinality(course_period, values, sum, true));
+        
+        solver.post(IntConstraintFactory.bin_packing(course_period, course_load, load, 0));
         
         /*for(int l = 0; l < n_periods; l++){
            IntVar[] reducedLoadArray = new IntVar[n_periods - l];
@@ -257,19 +266,19 @@ public class BACP_Var_Bincounts extends AbstractProblem {
         System.arraycopy(realViews, 0, allRV, 0, realViews.length);
         allRV[realViews.length] = variance;
         
-        /*String varExp = "";
+        String varExp = "";
         for(int i = 0; i < binVariables.length; i++)
            if(i == binVariables.length - 1)
               varExp += "({"+i+"}-"+targetFrequencies[i]+")^2/"+targetFrequencies[i]+"={"+(binVariables.length)+"}";
            else
-              varExp += "({"+i+"}-"+targetFrequencies[i]+")^2/"+targetFrequencies[i]+"+";*/
+              varExp += "({"+i+"}-"+targetFrequencies[i]+")^2/"+targetFrequencies[i]+"+";
         
-        String varExp = "";
+        /*String varExp = "";
         for(int i = 0; i < binVariables.length; i++)
            if(i == binVariables.length - 1)
               varExp += "({"+i+"}-"+targetFrequencies[i]+")^2={"+(binVariables.length)+"}";
            else
-              varExp += "({"+i+"}-"+targetFrequencies[i]+")^2+";
+              varExp += "({"+i+"}-"+targetFrequencies[i]+")^2+";*/
         
         solver.post(new RealConstraint("variance",
               varExp,
@@ -347,6 +356,34 @@ public class BACP_Var_Bincounts extends AbstractProblem {
         prerequisite(45, 43);
         prerequisite(49, 46);
         prerequisite(50, 47);*/
+        
+        postSymBreakDominanceConstraints(course_load);
+    }
+    
+    /**
+     * See https://www.info.ucl.ac.be/~pdupont/pdupont/pdf/BACP_symcon_07.pdf
+     * 
+     * @param load
+     */
+    private void postSymBreakDominanceConstraints(int[] load){
+       LongestPath path = new LongestPath();
+       int[][] prerequisiteMatrix = path.loadPrerequisites(instance);
+       for(int i = 0; i < load.length; i++){
+          for(int j = i; j < load.length; j++){
+             if(i != j && load[i] == load[j]){
+                boolean equivalent = true;
+                for(int k = 0; k < prerequisiteMatrix[i].length; k++){
+                   if(prerequisiteMatrix[i][k] != prerequisiteMatrix[j][k] ||
+                         prerequisiteMatrix[k][i] != prerequisiteMatrix[k][j]){
+                      equivalent = false;
+                   }
+                }
+                if(equivalent){
+                   solver.post(IntConstraintFactory.arithm(course_period[i], "<=", course_period[j]));
+                }
+             }
+          }
+       }
     }
 
     private void prerequisite(int a, int b) {
@@ -360,9 +397,28 @@ public class BACP_Var_Bincounts extends AbstractProblem {
        //System.arraycopy(course_period, 0, allVars, load.length, course_period.length);
        solver.set(
              //new RealStrategy(new RealVar[]{variance}, new Cyclic(), new RealDomainMiddle()),
-             //IntStrategyFactory.activity(load,1234),
              IntStrategyFactory.activity(course_period,1234)
-             //IntStrategyFactory.impact(binVariables, 2211)         
+             /*IntStrategyFactory.custom(
+                   IntStrategyFactory.minDomainSize_var_selector(), 
+                   new org.chocosolver.solver.search.strategy.selectors.IntValueSelector(){
+                      public int selectValue(IntVar var) {
+                         int periodWinner = -1;
+                         int minLoad = Integer.MAX_VALUE;
+                         DisposableValueIterator vit = var.getValueIterator(true);
+                         while(vit.hasNext()){
+                             int v = vit.next();
+                             if(load[v].getLB() < minLoad){
+                                minLoad = load[v].getLB();
+                                periodWinner = v;
+                             }
+                             // operate on value v here
+                         }
+                         vit.dispose();
+                         return periodWinner;
+                      };
+                   }, 
+                   course_period
+                   )*/        
        );
     }
 

@@ -1,5 +1,10 @@
 package org.chocosolver.samples.statistical.bincounts;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Random;
+import java.util.Set;
+
 import org.chocosolver.samples.AbstractProblem;
 import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.constraints.IntConstraintFactorySt;
@@ -18,6 +23,8 @@ public class BincountsDomainReduction extends AbstractProblem {
    int[][] binCounts;
    int[][] values;
    int[] binBounds;
+   
+   boolean wipeout = false;
    
    public BincountsDomainReduction(int[][] values,
                                    int[][] binCounts, 
@@ -69,10 +76,11 @@ public class BincountsDomainReduction extends AbstractProblem {
      LoggerFactory.getLogger("bench").info("---");
      this.prettyOut();
      try {
-      solver.propagate();
+        solver.propagate();
      } catch (ContradictionException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
+      wipeout = true;
      }
      LoggerFactory.getLogger("bench").info("---");
      this.prettyOut();
@@ -139,7 +147,7 @@ public class BincountsDomainReduction extends AbstractProblem {
          }
       }
       
-      return totalFilteredCount/totalCount;
+      return wipeout ? 0 : totalFilteredCount/totalCount;
    }
    
    @Override
@@ -155,16 +163,63 @@ public class BincountsDomainReduction extends AbstractProblem {
       }
       LoggerFactory.getLogger("bench").info(st.toString());
    }
+   
+   public static int[] removeDuplicates(int[] arr) {
+      Set<Integer> alreadyPresent = new HashSet<Integer>();
+      int[] whitelist = new int[0];
 
+      for (int nextElem : arr) {
+        if (!alreadyPresent.contains(nextElem)) {
+          whitelist = Arrays.copyOf(whitelist, whitelist.length + 1);
+          whitelist[whitelist.length - 1] = nextElem;
+          alreadyPresent.add(nextElem);
+        }
+      }
+
+      return whitelist;
+    }
+
+   public static int[][] generateRandomValues(Random rnd, int variables, int values, int valUB){ 
+      int[][] rndValues = new int[variables][values];
+      for(int i = 0; i < variables; i++){
+         for(int j = 0; j < values; j++){
+            rndValues[i][j] = rnd.nextInt(valUB);
+         }
+         rndValues[i] = removeDuplicates(rndValues[i]);
+      }
+      return rndValues;
+   }
+   
+   public static int[][] generateRandomBinCounts(Random rnd, int bins, int binUB){
+      int[][] rndValues = new int[bins][2];
+      for(int i = 0; i < bins; i++){
+         rndValues[i][0] = 0;
+         rndValues[i][1] = rnd.nextInt(binUB + 1);
+      }
+      return rndValues;
+   }
+   
    public static void main(String[] args) {
      String[] str={"-log","SILENT"};
-     int[][] values = {{3,4},{1,2,4},{2,3,4}};
-     int[][] binCounts = {{1,3},{0,1}};
-     int[] binBounds = {1,3,5};
+     int vars = 40;
+     int vals = 10;
+     int valUB = 30;
+     int[] binBounds = {0,10,20,valUB};                                  // {1,3,5};
+     int bins = binBounds.length - 1;
+     
+     Random rnd = new Random(123);
+     int[][] values = generateRandomValues(rnd, vars, vals, valUB);    // {{3,4},{1,2,4},{2,3,4}};
+     int[][] binCounts = generateRandomBinCounts(rnd, bins, vars);     // {{1,3},{0,1}};
      
      BincountsDomainReduction bc = new BincountsDomainReduction(values, binCounts, binBounds);
+     
+     long timeBefore = System.nanoTime();
+     
      bc.execute(str);
      
-     LoggerFactory.getLogger("bench").info("Domain reduction: "+bc.getPercentDomainReduction(values, binCounts));
+     long timeAfter = System.nanoTime();
+     
+     LoggerFactory.getLogger("bench").info("Domain reduction: "+(1 - bc.getPercentDomainReduction(values, binCounts)));
+     LoggerFactory.getLogger("bench").info("Time(sec): "+(timeAfter-timeBefore)*1e-9);
    }
 }

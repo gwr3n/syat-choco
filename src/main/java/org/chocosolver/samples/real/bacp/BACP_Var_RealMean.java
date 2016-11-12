@@ -48,6 +48,7 @@ import org.chocosolver.solver.variables.BoolVar;
 import org.chocosolver.solver.variables.IntVar;
 import org.chocosolver.solver.variables.RealVar;
 import org.chocosolver.solver.variables.VariableFactory;
+import org.chocosolver.util.iterators.DisposableValueIterator;
 
 /**
  * The balanced academic curriculum problem: 
@@ -195,7 +196,7 @@ public class BACP_Var_RealMean extends AbstractProblem {
     public void buildModel() {  
         loadInstance();
        
-        // period is assigned to
+        // period course is assigned to
         //course_period = VariableFactory.enumeratedArray("c_p", n_courses, 0, n_periods - 1, solver);
         course_period = new IntVar[n_courses];
         LongestPath path = new LongestPath();
@@ -210,7 +211,7 @@ public class BACP_Var_RealMean extends AbstractProblem {
         // total load for each period
         load = VariableFactory.enumeratedArray("load", n_periods, load_per_period_lb, load_per_period_ub, solver);
         // sum variable
-        IntVar sum = VariableFactory.bounded("courses_per_period", courses_per_period_lb, courses_per_period_ub, solver);
+        IntVar[] sum = VariableFactory.integerArray("courses_per_period", n_periods, courses_per_period_lb, courses_per_period_ub, solver);
         // constraints
         for (int i = 0; i < n_periods; i++) {
             // forall(c in courses) (x[p,c] = bool2int(course_period[c] = p)) /\
@@ -227,10 +228,17 @@ public class BACP_Var_RealMean extends AbstractProblem {
             }
             // sum(i in courses) (x[p, i])>=courses_per_period_lb /\
             // sum(i in courses) (x[p, i])<=courses_per_period_ub /\
-            solver.post(IntConstraintFactory.sum(x[i], sum));
+            solver.post(IntConstraintFactory.sum(x[i], sum[i]));
             //  load[p] = sum(c in courses) (x[p, c]*course_load[c])/\
             solver.post(IntConstraintFactory.scalar(x[i], course_load, load[i]));
         }
+        
+        int[] values = new int[n_periods];
+        for(int i = 0; i < n_periods; i++) values[i] = i;
+        
+        solver.post(IntConstraintFactory.global_cardinality(course_period, values, sum, true));
+        
+        solver.post(IntConstraintFactory.bin_packing(course_period, course_load, load, 0));
         
         meanLoad = VariableFactory.real("meanLoad", load_per_period_lb, load_per_period_ub, precision, solver);
         varLoad = VariableFactory.real("varLoad", 0, Math.pow(load_per_period_ub,2), precision, solver);
@@ -340,13 +348,39 @@ public class BACP_Var_RealMean extends AbstractProblem {
         prerequisite(45, 43);
         prerequisite(49, 46);
         prerequisite(50, 47);*/
+        
+        postSymBreakDominanceConstraints(course_load);
+    }
+    
+    /**
+     * See https://www.info.ucl.ac.be/~pdupont/pdupont/pdf/BACP_symcon_07.pdf
+     * 
+     * @param load
+     */
+    private void postSymBreakDominanceConstraints(int[] load){
+       LongestPath path = new LongestPath();
+       int[][] prerequisiteMatrix = path.loadPrerequisites(instance);
+       for(int i = 0; i < load.length; i++){
+          for(int j = i; j < load.length; j++){
+             if(i != j && load[i] == load[j]){
+                boolean equivalent = true;
+                for(int k = 0; k < prerequisiteMatrix[i].length; k++){
+                   if(prerequisiteMatrix[i][k] != prerequisiteMatrix[j][k] ||
+                         prerequisiteMatrix[k][i] != prerequisiteMatrix[k][j]){
+                      equivalent = false;
+                   }
+                }
+                if(equivalent){
+                   solver.post(IntConstraintFactory.arithm(course_period[i], "<=", course_period[j]));
+                }
+             }
+          }
+       }
     }
 
     private void prerequisite(int a, int b) {
         solver.post(IntConstraintFactory.arithm(course_period[b - 1], "<", course_period[a - 1]));
     }
-
-    
 
     @Override
     public void configureSearch() {
@@ -356,14 +390,28 @@ public class BACP_Var_RealMean extends AbstractProblem {
        
        solver.set(
              //new RealStrategy(new RealVar[]{varLoad}, new Cyclic(), new RealDomainMiddle()),
-             //IntStrategyFactory.activity(load,1234)
-             IntStrategyFactory.activity(course_period,1234)
-             //IntStrategyFactory.minDom_MidValue(load),
-             //new RealStrategy(new RealVar[]{meanLoad,varLoad}, new Cyclic(), new RealDomainMiddle())
-             
-             //new RealStrategy(allRV, new Cyclic(), new RealDomainMiddle())
-             //IntStrategyFactory.minDom_UB(course_period),
-             
+             //IntStrategyFactory.activity(course_period,1234)
+             IntStrategyFactory.custom(
+                   IntStrategyFactory.minDomainSize_var_selector(), 
+                   new org.chocosolver.solver.search.strategy.selectors.IntValueSelector(){
+                      public int selectValue(IntVar var) {
+                         int periodWinner = -1;
+                         int minLoad = Integer.MAX_VALUE;
+                         DisposableValueIterator vit = var.getValueIterator(true);
+                         while(vit.hasNext()){
+                             int v = vit.next();
+                             if(load[v].getLB() < minLoad){
+                                minLoad = load[v].getLB();
+                                periodWinner = v;
+                             }
+                             // operate on value v here
+                         }
+                         vit.dispose();
+                         return periodWinner;
+                      };
+                   }, 
+                   course_period
+                   )
        );
        
        //solver.set(org.chocosolver.solver.search.strategy.IntStrategyFactory.minDom_UB(course_period));
