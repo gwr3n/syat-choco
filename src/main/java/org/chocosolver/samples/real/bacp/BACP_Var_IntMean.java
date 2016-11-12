@@ -32,7 +32,7 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import org.chocosolver.samples.AbstractProblem;
-import org.chocosolver.samples.real.bacp.gc.BACP_gc;
+import org.chocosolver.samples.real.bacp.filtering.BACP_gc;
 import org.chocosolver.samples.real.bacp.preprocessing.longestpath.LongestPath;
 import org.chocosolver.solver.ResolutionPolicy;
 import org.chocosolver.solver.Solver;
@@ -81,7 +81,7 @@ import org.chocosolver.util.iterators.DisposableValueIterator;
  */
 public class BACP_Var_IntMean extends AbstractProblem {
     
-    String instance = "BACP/bacp-10"
+    String instance = "BACP/bacp-1"
                       + ".mzn";
    
     public void loadInstance(){
@@ -188,7 +188,7 @@ public class BACP_Var_IntMean extends AbstractProblem {
     RealVar varLoad;
     RealVar[] allRV;
     
-    double precision = 0.01;
+    double precision = 0.1;
 
     @Override
     public void createSolver() {
@@ -243,9 +243,9 @@ public class BACP_Var_IntMean extends AbstractProblem {
         
         solver.post(IntConstraintFactory.bin_packing(course_period, course_load, load, 0));
         
-        totalLoad = VariableFactory.bounded("totalLoad", n_periods*25, n_periods*25, solver);
-        //totalLoad = VariableFactory.bounded("totalLoad", n_periods*load_per_period_lb, n_periods*load_per_period_ub, solver);
-        //solver.post(IntConstraintFactory.sum(load, totalLoad));
+        //totalLoad = VariableFactory.bounded("totalLoad", n_periods*25, n_periods*25, solver);
+        totalLoad = VariableFactory.bounded("totalLoad", n_periods*load_per_period_lb, n_periods*load_per_period_ub, solver);
+        solver.post(IntConstraintFactory.sum(load, totalLoad));
         
         varLoad = VariableFactory.real("varLoad", 0, Math.pow(load_per_period_ub,2), precision, solver);
         

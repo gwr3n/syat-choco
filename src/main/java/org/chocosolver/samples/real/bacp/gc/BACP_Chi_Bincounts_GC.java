@@ -24,7 +24,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.chocosolver.samples.real.bacp;
+package org.chocosolver.samples.real.bacp.gc;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -33,22 +33,21 @@ import java.io.IOException;
 
 import org.chocosolver.samples.AbstractProblem;
 import org.chocosolver.samples.real.bacp.preprocessing.longestpath.LongestPath;
-import org.chocosolver.solver.ResolutionPolicy;
 import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.constraints.IntConstraintFactory;
+import org.chocosolver.solver.constraints.IntConstraintFactorySt;
 import org.chocosolver.solver.constraints.LogicalConstraintFactory;
 import org.chocosolver.solver.constraints.real.Ibex;
 import org.chocosolver.solver.constraints.real.RealConstraint;
 import org.chocosolver.solver.search.loop.monitors.IMonitorSolution;
 import org.chocosolver.solver.search.strategy.IntStrategyFactory;
-import org.chocosolver.solver.search.strategy.selectors.values.RealDomainMiddle;
-import org.chocosolver.solver.search.strategy.selectors.variables.Cyclic;
-import org.chocosolver.solver.search.strategy.strategy.RealStrategy;
 import org.chocosolver.solver.variables.BoolVar;
 import org.chocosolver.solver.variables.IntVar;
 import org.chocosolver.solver.variables.RealVar;
 import org.chocosolver.solver.variables.VariableFactory;
 import org.chocosolver.util.iterators.DisposableValueIterator;
+
+import umontreal.iro.lecuyer.probdist.ChiSquareDist;
 
 /**
  * The balanced academic curriculum problem: 
@@ -77,9 +76,9 @@ import org.chocosolver.util.iterators.DisposableValueIterator;
  * @author Charles Prud'homme
  * @since 20/07/12
  */
-public class BACP_Var_RealMean extends AbstractProblem {
+public class BACP_Chi_Bincounts_GC extends AbstractProblem {
     
-    String instance = "BACP/bacp-10"
+    String instance = "BACP/bacp-1"
                       + ".mzn";
    
     public void loadInstance(){
@@ -173,20 +172,28 @@ public class BACP_Var_RealMean extends AbstractProblem {
                     9, 7, 4, 6, 7, 2, 2,
                     5, 9, 9, 10, 4, 6, 4,
                     5, 6, 6};
+    
+    int[] binBounds = new int[]{0,15,20,30,35,load_per_period_ub+1};
+    int[] targetFrequencies = new int[]{1,2,4,2,1};
+    
+    // Target frequencies cannot be zero! If necessary reduce number of bins.
+    //int[] binBounds = new int[]{15,20,30,35};
+    //int[] targetFrequencies = new int[]{2,6,2};
 
     // period course is assigned to
     IntVar[] course_period;
-    // whether period i has course j assigned
-    BoolVar[][] x;
     // total load for each period
     IntVar[] load;
+    IntVar[] binVariables;
     
-    RealVar meanLoad;
-    RealVar varLoad;
+    RealVar chiSqStatistics;
     RealVar[] allRV;
     
-    double precision = 0.1;
+    double precision = 0.01;
 
+    ChiSquareDist chiSqDist;
+    double pValue = 0.99;
+    
     @Override
     public void createSolver() {
         solver = new Solver("BACP");
@@ -197,41 +204,11 @@ public class BACP_Var_RealMean extends AbstractProblem {
         loadInstance();
        
         // period course is assigned to
-        //course_period = VariableFactory.enumeratedArray("c_p", n_courses, 0, n_periods - 1, solver);
-        course_period = new IntVar[n_courses];
-        LongestPath path = new LongestPath();
-        int[] distancesLB = path.computeLBs(instance);
-        int[] distancesUB = path.computeUBs(instance);
-        for(int i = 0; i < course_period.length; i++){
-           course_period[i] = VariableFactory.enumerated("c_p"+i, distancesLB[i+1]-1, distancesUB[i+1]-1, solver);
-        }
-        
-        // whether period i has a course j assigned
-        x = VariableFactory.boolMatrix("X", n_periods, n_courses, solver);
+        course_period = VariableFactory.enumeratedArray("c_p", n_courses, 0, n_periods-1, solver);
         // total load for each period
         load = VariableFactory.enumeratedArray("load", n_periods, load_per_period_lb, load_per_period_ub, solver);
         // sum variable
         IntVar[] sum = VariableFactory.integerArray("courses_per_period", n_periods, courses_per_period_lb, courses_per_period_ub, solver);
-        // constraints
-        for (int i = 0; i < n_periods; i++) {
-            // forall(c in courses) (x[p,c] = bool2int(course_period[c] = p)) /\
-            for (int j = 0; j < n_courses; j++) {
-               try{
-                solver.post(
-                        LogicalConstraintFactory.ifThenElse_reifiable(x[i][j],
-                        IntConstraintFactory.arithm(course_period[j], "=", i),
-                        IntConstraintFactory.arithm(course_period[j], "!=", i))
-                );
-               }catch(NullPointerException e){
-                  e.printStackTrace();
-               }
-            }
-            // sum(i in courses) (x[p, i])>=courses_per_period_lb /\
-            // sum(i in courses) (x[p, i])<=courses_per_period_ub /\
-            solver.post(IntConstraintFactory.sum(x[i], sum[i]));
-            //  load[p] = sum(c in courses) (x[p, c]*course_load[c])/\
-            solver.post(IntConstraintFactory.scalar(x[i], course_load, load[i]));
-        }
         
         int[] values = new int[n_periods];
         for(int i = 0; i < n_periods; i++) values[i] = i;
@@ -240,40 +217,31 @@ public class BACP_Var_RealMean extends AbstractProblem {
         
         solver.post(IntConstraintFactory.bin_packing(course_period, course_load, load, 0));
         
-        meanLoad = VariableFactory.real("meanLoad", load_per_period_lb, load_per_period_ub, precision, solver);
-        varLoad = VariableFactory.real("varLoad", 0, Math.pow(load_per_period_ub,2), precision, solver);
-        RealVar[] realViews = VariableFactory.real(load, precision);
+        binVariables = new IntVar[binBounds.length-1];
+        for(int i = 0; i < binBounds.length-1; i++){
+           binVariables[i] = VariableFactory.bounded("Bin "+i, 0, n_periods, solver);
+        }
         
-        String meanExp = "(";
-        for(int i = 0; i < load.length; i++)
-           if(i == load.length - 1)
-              meanExp += "{"+i+"})/"+load.length+"={"+load.length+"}";
-           else
-              meanExp += "{"+i+"}+";
+        solver.post(IntConstraintFactorySt.bincountsSt(load, binVariables, binBounds));
         
-        RealVar[] meanRV = new RealVar[realViews.length+1];
-        System.arraycopy(realViews, 0, meanRV, 0, realViews.length);
-        meanRV[realViews.length] = meanLoad;
+        this.chiSqDist = new ChiSquareDist(this.binVariables.length-1);
         
-        solver.post(new RealConstraint("meanLoad",
-              meanExp,
-              Ibex.HC4_NEWTON, meanRV
-              ));
+        chiSqStatistics = VariableFactory.real("chiSqStatistics", 0, this.chiSqDist.inverseF(1-pValue), precision, solver);
         
-        allRV = new RealVar[realViews.length+2];
+        RealVar[] realViews = VariableFactory.real(binVariables, precision);
+        allRV = new RealVar[realViews.length+1];
         System.arraycopy(realViews, 0, allRV, 0, realViews.length);
-        allRV[realViews.length] = meanLoad;
-        allRV[realViews.length+1] = varLoad;
+        allRV[realViews.length] = chiSqStatistics;
         
-        String varExp = "(";
-        for(int i = 0; i < load.length; i++)
-           if(i == load.length - 1)
-              varExp += "({"+i+"}-{"+load.length+"})^2)/"+(load.length-1)+"={"+(load.length+1)+"}";
+        String chiSqExp = "";
+        for(int i = 0; i < binVariables.length; i++)
+           if(i == binVariables.length - 1)
+              chiSqExp += "(({"+i+"}-"+targetFrequencies[i]+")^2)/"+targetFrequencies[i]+"={"+(binVariables.length)+"}";
            else
-              varExp += "({"+i+"}-{"+load.length+"})^2+";
+              chiSqExp += "(({"+i+"}-"+targetFrequencies[i]+")^2)/"+targetFrequencies[i]+"+";
         
-        solver.post(new RealConstraint("varLoad",
-              varExp,
+        solver.post(new RealConstraint("chiSqTest",
+              chiSqExp,
               Ibex.HC4_NEWTON, allRV
               ));
 
@@ -383,15 +351,14 @@ public class BACP_Var_RealMean extends AbstractProblem {
     }
 
     @Override
-    public void configureSearch() {
-       //IntVar[] variables = new IntVar[load.length+course_period.length];
-       //System.arraycopy(course_period, 0, variables, 0, course_period.length);
-       //System.arraycopy(load, 0, variables, course_period.length, load.length);
-       
+    public void configureSearch() {   
+       //IntVar[] allVars = new IntVar[course_period.length+load.length];
+       //System.arraycopy(load, 0, allVars, 0, load.length);
+       //System.arraycopy(course_period, 0, allVars, load.length, course_period.length);
        solver.set(
-             //new RealStrategy(new RealVar[]{varLoad}, new Cyclic(), new RealDomainMiddle()),
-             //IntStrategyFactory.activity(course_period,1234)
-             IntStrategyFactory.custom(
+             //new RealStrategy(new RealVar[]{variance}, new Cyclic(), new RealDomainMiddle()),
+             IntStrategyFactory.activity(course_period,1234)
+             /*IntStrategyFactory.custom(
                    IntStrategyFactory.minDomainSize_var_selector(), 
                    new org.chocosolver.solver.search.strategy.selectors.IntValueSelector(){
                       public int selectValue(IntVar var) {
@@ -411,11 +378,10 @@ public class BACP_Var_RealMean extends AbstractProblem {
                       };
                    }, 
                    course_period
-                   )
+                   )*/        
        );
        
-       //solver.set(org.chocosolver.solver.search.strategy.IntStrategyFactory.minDom_UB(course_period));
-       //solver.set(new RealStrategy(allRV, new Random(2211), new RealDomainMiddle()));
+       //SearchMonitorFactory.limitTime(solver,10000);
     }
 
     @Override
@@ -423,14 +389,14 @@ public class BACP_Var_RealMean extends AbstractProblem {
        solver.getSearchLoop().plugSearchMonitor(new IMonitorSolution() {
           public void onSolution() {
                 System.out.println("---");
-                System.out.println("Mean: ("+meanLoad.getLB()+", "+meanLoad.getUB()+")\tVar: ("+varLoad.getLB()+", "+varLoad.getUB()+")");
-                System.out.print("Period\t");
+                System.out.println("Chi^2 statistics (min threshold "+chiSqDist.inverseF(1-pValue)+"): ("+chiSqStatistics.getLB()+", "+chiSqStatistics.getUB()+")");
+                System.out.print("Course\t");
                 for(int i = 0; i < course_period.length; i++){
                    System.out.print(i+"\t");
                 }
-                System.out.print("\nCourse\t");
+                System.out.print("\nPeriod\t");
                 for(int i = 0; i < course_period.length; i++){
-                   System.out.print(course_period[i].getValue()+"\t");
+                   System.out.print(course_period[i].getValue()+"("+course_period[i].getDomainSize()+")\t");
                 }
                 System.out.print("\nPeriod\t");
                 for(int i = 0; i < load.length; i++){
@@ -440,11 +406,15 @@ public class BACP_Var_RealMean extends AbstractProblem {
                 for(int i = 0; i < load.length; i++){
                    System.out.print(load[i].getValue()+"\t");
                 }
+                System.out.print("\nBins\t");
+                for(int i = 0; i < binVariables.length; i++){
+                   System.out.print(binVariables[i].getValue()+"\t");
+                }
                 System.out.println();
                 System.out.println("---");
              }
           });
-        solver.findOptimalSolution(ResolutionPolicy.MINIMIZE, varLoad, precision);
+       solver.findSolution();
     }
 
     @Override
@@ -453,6 +423,6 @@ public class BACP_Var_RealMean extends AbstractProblem {
 
     public static void main(String[] args) {
        String[] str={"-log","SOLUTION"};
-       new BACP_Var_RealMean().execute(str);
+       new BACP_Chi_Bincounts_GC().execute(str);
     }
 }

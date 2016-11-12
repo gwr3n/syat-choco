@@ -78,7 +78,7 @@ import umontreal.iro.lecuyer.probdist.ChiSquareDist;
  */
 public class BACP_Chi_Bincounts extends AbstractProblem {
     
-    String instance = "BACP/bacp-5"
+    String instance = "BACP/bacp-1"
                       + ".mzn";
    
     public void loadInstance(){
@@ -173,11 +173,12 @@ public class BACP_Chi_Bincounts extends AbstractProblem {
                     5, 9, 9, 10, 4, 6, 4,
                     5, 6, 6};
     
-    //int[] binBounds = new int[]{0,15,20,30,35,load_per_period_ub+1};
-    //int[] targetFrequencies = new int[]{1,2,4,2,1};
+    int[] binBounds = new int[]{0,15,20,30,35,load_per_period_ub+1};
+    int[] targetFrequencies = new int[]{1,2,4,2,1};
     
-    int[] binBounds = new int[]{15,20,30,35};
-    int[] targetFrequencies = new int[]{2,6,2};
+    // Target frequencies cannot be zero! If necessary reduce number of bins.
+    //int[] binBounds = new int[]{15,20,30,35};
+    //int[] targetFrequencies = new int[]{2,6,2};
 
     // period course is assigned to
     IntVar[] course_period;

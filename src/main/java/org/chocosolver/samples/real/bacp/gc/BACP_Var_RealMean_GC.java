@@ -24,7 +24,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.chocosolver.samples.real.bacp;
+package org.chocosolver.samples.real.bacp.gc;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -77,7 +77,7 @@ import org.chocosolver.util.iterators.DisposableValueIterator;
  * @author Charles Prud'homme
  * @since 20/07/12
  */
-public class BACP_Var_RealMean extends AbstractProblem {
+public class BACP_Var_RealMean_GC extends AbstractProblem {
     
     String instance = "BACP/bacp-10"
                       + ".mzn";
@@ -176,8 +176,6 @@ public class BACP_Var_RealMean extends AbstractProblem {
 
     // period course is assigned to
     IntVar[] course_period;
-    // whether period i has course j assigned
-    BoolVar[][] x;
     // total load for each period
     IntVar[] load;
     
@@ -197,41 +195,11 @@ public class BACP_Var_RealMean extends AbstractProblem {
         loadInstance();
        
         // period course is assigned to
-        //course_period = VariableFactory.enumeratedArray("c_p", n_courses, 0, n_periods - 1, solver);
-        course_period = new IntVar[n_courses];
-        LongestPath path = new LongestPath();
-        int[] distancesLB = path.computeLBs(instance);
-        int[] distancesUB = path.computeUBs(instance);
-        for(int i = 0; i < course_period.length; i++){
-           course_period[i] = VariableFactory.enumerated("c_p"+i, distancesLB[i+1]-1, distancesUB[i+1]-1, solver);
-        }
-        
-        // whether period i has a course j assigned
-        x = VariableFactory.boolMatrix("X", n_periods, n_courses, solver);
+        course_period = VariableFactory.enumeratedArray("c_p", n_courses, 0, n_periods - 1, solver);
         // total load for each period
         load = VariableFactory.enumeratedArray("load", n_periods, load_per_period_lb, load_per_period_ub, solver);
         // sum variable
         IntVar[] sum = VariableFactory.integerArray("courses_per_period", n_periods, courses_per_period_lb, courses_per_period_ub, solver);
-        // constraints
-        for (int i = 0; i < n_periods; i++) {
-            // forall(c in courses) (x[p,c] = bool2int(course_period[c] = p)) /\
-            for (int j = 0; j < n_courses; j++) {
-               try{
-                solver.post(
-                        LogicalConstraintFactory.ifThenElse_reifiable(x[i][j],
-                        IntConstraintFactory.arithm(course_period[j], "=", i),
-                        IntConstraintFactory.arithm(course_period[j], "!=", i))
-                );
-               }catch(NullPointerException e){
-                  e.printStackTrace();
-               }
-            }
-            // sum(i in courses) (x[p, i])>=courses_per_period_lb /\
-            // sum(i in courses) (x[p, i])<=courses_per_period_ub /\
-            solver.post(IntConstraintFactory.sum(x[i], sum[i]));
-            //  load[p] = sum(c in courses) (x[p, c]*course_load[c])/\
-            solver.post(IntConstraintFactory.scalar(x[i], course_load, load[i]));
-        }
         
         int[] values = new int[n_periods];
         for(int i = 0; i < n_periods; i++) values[i] = i;
@@ -416,6 +384,8 @@ public class BACP_Var_RealMean extends AbstractProblem {
        
        //solver.set(org.chocosolver.solver.search.strategy.IntStrategyFactory.minDom_UB(course_period));
        //solver.set(new RealStrategy(allRV, new Random(2211), new RealDomainMiddle()));
+       
+       //SearchMonitorFactory.limitTime(solver,10000);
     }
 
     @Override
@@ -453,6 +423,6 @@ public class BACP_Var_RealMean extends AbstractProblem {
 
     public static void main(String[] args) {
        String[] str={"-log","SOLUTION"};
-       new BACP_Var_RealMean().execute(str);
+       new BACP_Var_RealMean_GC().execute(str);
     }
 }

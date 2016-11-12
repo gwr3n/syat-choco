@@ -24,7 +24,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.chocosolver.samples.real.bacp;
+package org.chocosolver.samples.integer;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -37,16 +37,9 @@ import org.chocosolver.solver.ResolutionPolicy;
 import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.constraints.IntConstraintFactory;
 import org.chocosolver.solver.constraints.LogicalConstraintFactory;
-import org.chocosolver.solver.constraints.real.Ibex;
-import org.chocosolver.solver.constraints.real.RealConstraint;
-import org.chocosolver.solver.search.loop.monitors.IMonitorSolution;
 import org.chocosolver.solver.search.strategy.IntStrategyFactory;
-import org.chocosolver.solver.search.strategy.selectors.values.RealDomainMiddle;
-import org.chocosolver.solver.search.strategy.selectors.variables.Cyclic;
-import org.chocosolver.solver.search.strategy.strategy.RealStrategy;
 import org.chocosolver.solver.variables.BoolVar;
 import org.chocosolver.solver.variables.IntVar;
-import org.chocosolver.solver.variables.RealVar;
 import org.chocosolver.solver.variables.VariableFactory;
 import org.chocosolver.util.iterators.DisposableValueIterator;
 
@@ -77,86 +70,86 @@ import org.chocosolver.util.iterators.DisposableValueIterator;
  * @author Charles Prud'homme
  * @since 20/07/12
  */
-public class BACP_Var_RealMean extends AbstractProblem {
-    
-    String instance = "BACP/bacp-10"
-                      + ".mzn";
+public class BACP_GC extends AbstractProblem {
+
+   String instance = "BACP/bacp-15"
+         + ".mzn";
    
-    public void loadInstance(){
-       FileReader fr = null;
-       String model = "";
-       try {
-         ClassLoader classLoader = getClass().getClassLoader();
-         File file = new File(classLoader.getResource(instance).getFile()); 
-         fr = new FileReader(file);
-         char[] buffer = new char[1000];
-         while(fr.read(buffer) > -1){
-               model += new String(buffer);
-               buffer = new char[1000];
-         }
-         fr.close();
-         String[] lines = model.split("\n");
-         for(int i = 1; i < lines.length; i++){
-            if(!lines[i].startsWith("constraint prerequisite")){
-               String[] parts = lines[i].substring(0, lines[i].length()-1).split(" = ");
-               if(parts[0].equals("n_courses"))
-                  n_courses = Integer.parseInt(parts[1]);
-               else if(parts[0].equals("n_periods"))
-                  n_periods = Integer.parseInt(parts[1]);
-               else if(parts[0].equals("load_per_period_lb"))
-                  load_per_period_lb = Integer.parseInt(parts[1]);
-               else if(parts[0].equals("load_per_period_ub"))
-                  load_per_period_ub = Integer.parseInt(parts[1]);
-               else if(parts[0].equals("courses_per_period_lb"))
-                  courses_per_period_lb = Integer.parseInt(parts[1]);
-               else if(parts[0].equals("courses_per_period_ub"))
-                  courses_per_period_ub = Integer.parseInt(parts[1]);
-               else if(parts[0].equals("course_load")){
-                  String[] load =  parts[1].substring(1, parts[1].length() - 1).split(", ");
-                  course_load = new int[load.length];
-                  for(int l = 0; l < load.length; l++)
-                     course_load[l] = Integer.parseInt(load[l]);
-               }
-            }
-         }
-      } catch (FileNotFoundException e) {
-         // TODO Auto-generated catch block
-         e.printStackTrace();
-      } catch (IOException e) {
-         // TODO Auto-generated catch block
-         e.printStackTrace();
-      }
-    }
-    
-    public void loadPrerequisites(){
-       FileReader fr = null;
-       String model = "";
-       try {
-         ClassLoader classLoader = getClass().getClassLoader();
-         File file = new File(classLoader.getResource(instance).getFile()); 
-         fr = new FileReader(file);
-         char[] buffer = new char[1000];
-         while(fr.read(buffer) > -1){
-               model += new String(buffer);
-               buffer = new char[1000];
-         }
-         fr.close();
-         String[] lines = model.split("\n");
-         for(int i = 1; i < lines.length; i++){
-            if(lines[i].startsWith("constraint prerequisite")){
-               String[] parts = lines[i].substring(0, lines[i].length()-1).split("prerequisite");
-               String prerequisite[] = parts[1].substring(1, parts[1].length()-1).split(", ");
-               this.prerequisite(Integer.parseInt(prerequisite[0]), Integer.parseInt(prerequisite[1]));
-            }
-         }
-      } catch (FileNotFoundException e) {
-         // TODO Auto-generated catch block
-         e.printStackTrace();
-      } catch (IOException e) {
-         // TODO Auto-generated catch block
-         e.printStackTrace();
-      }
-    }
+   public void loadInstance(){
+      FileReader fr = null;
+      String model = "";
+      try {
+        ClassLoader classLoader = getClass().getClassLoader();
+        File file = new File(classLoader.getResource(instance).getFile()); 
+        fr = new FileReader(file);
+        char[] buffer = new char[1000];
+        while(fr.read(buffer) > -1){
+              model += new String(buffer);
+              buffer = new char[1000];
+        }
+        fr.close();
+        String[] lines = model.split("\n");
+        for(int i = 1; i < lines.length; i++){
+           if(!lines[i].startsWith("constraint prerequisite")){
+              String[] parts = lines[i].substring(0, lines[i].length()-1).split(" = ");
+              if(parts[0].equals("n_courses"))
+                 n_courses = Integer.parseInt(parts[1]);
+              else if(parts[0].equals("n_periods"))
+                 n_periods = Integer.parseInt(parts[1]);
+              else if(parts[0].equals("load_per_period_lb"))
+                 load_per_period_lb = Integer.parseInt(parts[1]);
+              else if(parts[0].equals("load_per_period_ub"))
+                 load_per_period_ub = Integer.parseInt(parts[1]);
+              else if(parts[0].equals("courses_per_period_lb"))
+                 courses_per_period_lb = Integer.parseInt(parts[1]);
+              else if(parts[0].equals("courses_per_period_ub"))
+                 courses_per_period_ub = Integer.parseInt(parts[1]);
+              else if(parts[0].equals("course_load")){
+                 String[] load =  parts[1].substring(1, parts[1].length() - 1).split(", ");
+                 course_load = new int[load.length];
+                 for(int l = 0; l < load.length; l++)
+                    course_load[l] = Integer.parseInt(load[l]);
+              }
+           }
+        }
+     } catch (FileNotFoundException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+     } catch (IOException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+     }
+   }
+   
+   public void loadPrerequisites(){
+      FileReader fr = null;
+      String model = "";
+      try {
+        ClassLoader classLoader = getClass().getClassLoader();
+        File file = new File(classLoader.getResource(instance).getFile()); 
+        fr = new FileReader(file);
+        char[] buffer = new char[1000];
+        while(fr.read(buffer) > -1){
+              model += new String(buffer);
+              buffer = new char[1000];
+        }
+        fr.close();
+        String[] lines = model.split("\n");
+        for(int i = 1; i < lines.length; i++){
+           if(lines[i].startsWith("constraint prerequisite")){
+              String[] parts = lines[i].substring(0, lines[i].length()-1).split("prerequisite");
+              String prerequisite[] = parts[1].substring(1, parts[1].length()-1).split(", ");
+              this.prerequisite(Integer.parseInt(prerequisite[0]), Integer.parseInt(prerequisite[1]));
+           }
+        }
+     } catch (FileNotFoundException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+     } catch (IOException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+     }
+   }
    
     int n_courses = 50;
     int n_periods = 10;
@@ -176,16 +169,11 @@ public class BACP_Var_RealMean extends AbstractProblem {
 
     // period course is assigned to
     IntVar[] course_period;
-    // whether period i has course j assigned
-    BoolVar[][] x;
     // total load for each period
     IntVar[] load;
-    
-    RealVar meanLoad;
-    RealVar varLoad;
-    RealVar[] allRV;
-    
-    double precision = 0.1;
+    // optimisation target
+    IntVar objective;
+
 
     @Override
     public void createSolver() {
@@ -193,45 +181,22 @@ public class BACP_Var_RealMean extends AbstractProblem {
     }
 
     @Override
-    public void buildModel() {  
+    public void buildModel() {
         loadInstance();
        
-        // period course is assigned to
-        //course_period = VariableFactory.enumeratedArray("c_p", n_courses, 0, n_periods - 1, solver);
-        course_period = new IntVar[n_courses];
-        LongestPath path = new LongestPath();
-        int[] distancesLB = path.computeLBs(instance);
-        int[] distancesUB = path.computeUBs(instance);
-        for(int i = 0; i < course_period.length; i++){
-           course_period[i] = VariableFactory.enumerated("c_p"+i, distancesLB[i+1]-1, distancesUB[i+1]-1, solver);
-        }
-        
-        // whether period i has a course j assigned
-        x = VariableFactory.boolMatrix("X", n_periods, n_courses, solver);
+        // period is assigned to
+        course_period = VariableFactory.enumeratedArray("c_p", n_courses, 0, n_periods, solver);
         // total load for each period
         load = VariableFactory.enumeratedArray("load", n_periods, load_per_period_lb, load_per_period_ub, solver);
+        // opt. target
+        objective = VariableFactory.bounded("objective", load_per_period_lb, load_per_period_ub, solver);
+        
         // sum variable
         IntVar[] sum = VariableFactory.integerArray("courses_per_period", n_periods, courses_per_period_lb, courses_per_period_ub, solver);
+        
         // constraints
-        for (int i = 0; i < n_periods; i++) {
-            // forall(c in courses) (x[p,c] = bool2int(course_period[c] = p)) /\
-            for (int j = 0; j < n_courses; j++) {
-               try{
-                solver.post(
-                        LogicalConstraintFactory.ifThenElse_reifiable(x[i][j],
-                        IntConstraintFactory.arithm(course_period[j], "=", i),
-                        IntConstraintFactory.arithm(course_period[j], "!=", i))
-                );
-               }catch(NullPointerException e){
-                  e.printStackTrace();
-               }
-            }
-            // sum(i in courses) (x[p, i])>=courses_per_period_lb /\
-            // sum(i in courses) (x[p, i])<=courses_per_period_ub /\
-            solver.post(IntConstraintFactory.sum(x[i], sum[i]));
-            //  load[p] = sum(c in courses) (x[p, c]*course_load[c])/\
-            solver.post(IntConstraintFactory.scalar(x[i], course_load, load[i]));
-        }
+        for (int i = 0; i < n_periods; i++) 
+            solver.post(IntConstraintFactory.arithm(load[i], "<=", objective));
         
         int[] values = new int[n_periods];
         for(int i = 0; i < n_periods; i++) values[i] = i;
@@ -239,43 +204,6 @@ public class BACP_Var_RealMean extends AbstractProblem {
         solver.post(IntConstraintFactory.global_cardinality(course_period, values, sum, true));
         
         solver.post(IntConstraintFactory.bin_packing(course_period, course_load, load, 0));
-        
-        meanLoad = VariableFactory.real("meanLoad", load_per_period_lb, load_per_period_ub, precision, solver);
-        varLoad = VariableFactory.real("varLoad", 0, Math.pow(load_per_period_ub,2), precision, solver);
-        RealVar[] realViews = VariableFactory.real(load, precision);
-        
-        String meanExp = "(";
-        for(int i = 0; i < load.length; i++)
-           if(i == load.length - 1)
-              meanExp += "{"+i+"})/"+load.length+"={"+load.length+"}";
-           else
-              meanExp += "{"+i+"}+";
-        
-        RealVar[] meanRV = new RealVar[realViews.length+1];
-        System.arraycopy(realViews, 0, meanRV, 0, realViews.length);
-        meanRV[realViews.length] = meanLoad;
-        
-        solver.post(new RealConstraint("meanLoad",
-              meanExp,
-              Ibex.HC4_NEWTON, meanRV
-              ));
-        
-        allRV = new RealVar[realViews.length+2];
-        System.arraycopy(realViews, 0, allRV, 0, realViews.length);
-        allRV[realViews.length] = meanLoad;
-        allRV[realViews.length+1] = varLoad;
-        
-        String varExp = "(";
-        for(int i = 0; i < load.length; i++)
-           if(i == load.length - 1)
-              varExp += "({"+i+"}-{"+load.length+"})^2)/"+(load.length-1)+"={"+(load.length+1)+"}";
-           else
-              varExp += "({"+i+"}-{"+load.length+"})^2+";
-        
-        solver.post(new RealConstraint("varLoad",
-              varExp,
-              Ibex.HC4_NEWTON, allRV
-              ));
 
         // prerequisite(a, b) means "course a has prerequisite course b".
         
@@ -382,15 +310,11 @@ public class BACP_Var_RealMean extends AbstractProblem {
         solver.post(IntConstraintFactory.arithm(course_period[b - 1], "<", course_period[a - 1]));
     }
 
+
     @Override
     public void configureSearch() {
-       //IntVar[] variables = new IntVar[load.length+course_period.length];
-       //System.arraycopy(course_period, 0, variables, 0, course_period.length);
-       //System.arraycopy(load, 0, variables, course_period.length, load.length);
-       
+       //solver.set(org.chocosolver.solver.search.strategy.IntStrategyFactory.domOverWDeg(course_period, 2222));
        solver.set(
-             //new RealStrategy(new RealVar[]{varLoad}, new Cyclic(), new RealDomainMiddle()),
-             //IntStrategyFactory.activity(course_period,1234)
              IntStrategyFactory.custom(
                    IntStrategyFactory.minDomainSize_var_selector(), 
                    new org.chocosolver.solver.search.strategy.selectors.IntValueSelector(){
@@ -412,39 +336,13 @@ public class BACP_Var_RealMean extends AbstractProblem {
                    }, 
                    course_period
                    )
+             //IntStrategyFactory.activity(course_period,1234)
        );
-       
-       //solver.set(org.chocosolver.solver.search.strategy.IntStrategyFactory.minDom_UB(course_period));
-       //solver.set(new RealStrategy(allRV, new Random(2211), new RealDomainMiddle()));
     }
 
     @Override
     public void solve() {
-       solver.getSearchLoop().plugSearchMonitor(new IMonitorSolution() {
-          public void onSolution() {
-                System.out.println("---");
-                System.out.println("Mean: ("+meanLoad.getLB()+", "+meanLoad.getUB()+")\tVar: ("+varLoad.getLB()+", "+varLoad.getUB()+")");
-                System.out.print("Period\t");
-                for(int i = 0; i < course_period.length; i++){
-                   System.out.print(i+"\t");
-                }
-                System.out.print("\nCourse\t");
-                for(int i = 0; i < course_period.length; i++){
-                   System.out.print(course_period[i].getValue()+"\t");
-                }
-                System.out.print("\nPeriod\t");
-                for(int i = 0; i < load.length; i++){
-                   System.out.print(i+"\t");
-                }
-                System.out.print("\nLoad\t");
-                for(int i = 0; i < load.length; i++){
-                   System.out.print(load[i].getValue()+"\t");
-                }
-                System.out.println();
-                System.out.println("---");
-             }
-          });
-        solver.findOptimalSolution(ResolutionPolicy.MINIMIZE, varLoad, precision);
+        solver.findOptimalSolution(ResolutionPolicy.MINIMIZE, objective);
     }
 
     @Override
@@ -452,7 +350,6 @@ public class BACP_Var_RealMean extends AbstractProblem {
     }
 
     public static void main(String[] args) {
-       String[] str={"-log","SOLUTION"};
-       new BACP_Var_RealMean().execute(str);
+        new BACP_GC().execute(args);
     }
 }

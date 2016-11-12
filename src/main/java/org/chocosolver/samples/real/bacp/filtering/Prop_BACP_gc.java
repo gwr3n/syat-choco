@@ -1,4 +1,4 @@
-package org.chocosolver.samples.real.bacp.gc;
+package org.chocosolver.samples.real.bacp.filtering;
 
 import java.io.File;
 import java.io.FileNotFoundException;

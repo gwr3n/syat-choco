@@ -1,4 +1,4 @@
-package org.chocosolver.samples.real.bacp.gc;
+package org.chocosolver.samples.real.bacp.filtering;
 
 import org.chocosolver.solver.constraints.Constraint;
 import org.chocosolver.solver.constraints.Propagator;
