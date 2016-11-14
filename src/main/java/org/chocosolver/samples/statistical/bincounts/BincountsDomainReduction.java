@@ -9,6 +9,7 @@ import org.chocosolver.samples.AbstractProblem;
 import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.constraints.IntConstraintFactorySt;
 import org.chocosolver.solver.exception.ContradictionException;
+import org.chocosolver.solver.search.loop.monitors.IMonitorSolution;
 import org.chocosolver.solver.search.strategy.IntStrategyFactory;
 import org.chocosolver.solver.search.strategy.strategy.AbstractStrategy;
 import org.chocosolver.solver.variables.IntVar;
@@ -26,12 +27,16 @@ public class BincountsDomainReduction extends AbstractProblem {
    
    boolean wipeout = false;
    
+   int assignedVariables = 0;
+   
    public BincountsDomainReduction(int[][] values,
                                    int[][] binCounts, 
-                                   int[] binBounds){
+                                   int[] binBounds,
+                                   int assignedVariables){
       this.values = values.clone();
       this.binCounts = binCounts.clone();
       this.binBounds = binBounds.clone();
+      this.assignedVariables = assignedVariables;
    }
    
    public void setUp() {
@@ -66,9 +71,12 @@ public class BincountsDomainReduction extends AbstractProblem {
    
    @Override
    public void configureSearch() {
-     AbstractStrategy<IntVar> strat = IntStrategyFactory.domOverWDeg(mergeArrays(valueVariables,binVariables),1234);
+     if(assignedVariables > 0){
+        IntVar[] reducedVariableArray = Arrays.copyOf(valueVariables, assignedVariables);
+        AbstractStrategy<IntVar> strat = IntStrategyFactory.minDom_LB(reducedVariableArray);
        // trick : top-down maximization
        solver.set(strat);
+     }
    }
    
    @Override
@@ -84,6 +92,9 @@ public class BincountsDomainReduction extends AbstractProblem {
      }
      LoggerFactory.getLogger("bench").info("---");
      this.prettyOut();
+     
+     if(assignedVariables > 0)
+        solver.findSolution();
      
      /*StringBuilder st = new StringBuilder();
      boolean solution = solver.findSolution();
@@ -105,7 +116,7 @@ public class BincountsDomainReduction extends AbstractProblem {
      LoggerFactory.getLogger("bench").info(st.toString());*/
    }
    
-   public double getPercentDomainReduction(int[][] values, int[][] binCounts){
+   public double getPercentRemainingValuesCount(int[][] values, int[][] binCounts){
       double totalCount = 0;
       double totalFilteredCount = 0;
       
@@ -200,26 +211,42 @@ public class BincountsDomainReduction extends AbstractProblem {
    }
    
    public static void main(String[] args) {
-     String[] str={"-log","SILENT"};
+     String[] str={"-log","SOLUTION"};
      int vars = 40;
      int vals = 10;
      int valUB = 30;
      int[] binBounds = {0,10,20,valUB};                                  // {1,3,5};
      int bins = binBounds.length - 1;
      
+     int instances = 50;
+     double percentageVarAssigned = 0.8;
+     
+     StringBuilder results = new StringBuilder();
+     
      Random rnd = new Random(123);
-     int[][] values = generateRandomValues(rnd, vars, vals, valUB);    // {{3,4},{1,2,4},{2,3,4}};
-     int[][] binCounts = generateRandomBinCounts(rnd, bins, vars);     // {{1,3},{0,1}};
-     
-     BincountsDomainReduction bc = new BincountsDomainReduction(values, binCounts, binBounds);
-     
-     long timeBefore = System.nanoTime();
-     
-     bc.execute(str);
-     
-     long timeAfter = System.nanoTime();
-     
-     LoggerFactory.getLogger("bench").info("Domain reduction: "+(1 - bc.getPercentDomainReduction(values, binCounts)));
-     LoggerFactory.getLogger("bench").info("Time(sec): "+(timeAfter-timeBefore)*1e-9);
+     int counter = 0;
+     do{
+        int[][] values = generateRandomValues(rnd, vars, vals, valUB);    // {{3,4},{1,2,4},{2,3,4}};
+        int[][] binCounts = generateRandomBinCounts(rnd, bins, vars);     // {{1,3},{0,1}};
+        
+        BincountsDomainReduction bc = new BincountsDomainReduction(values, binCounts, binBounds, (int)Math.floor(vars*percentageVarAssigned));
+        
+        long timeBefore = System.nanoTime();
+        
+        bc.execute(str);
+        
+        long timeAfter = System.nanoTime();
+        
+        if(bc.wipeout) 
+           continue;
+        else
+           counter++;
+        
+        LoggerFactory.getLogger("bench").info("Domain reduction: "+(1 - bc.getPercentRemainingValuesCount(values, binCounts)));
+        LoggerFactory.getLogger("bench").info("Time(sec): "+(timeAfter-timeBefore)*1e-9);
+        
+        results.append((1 - bc.getPercentRemainingValuesCount(values, binCounts))+"\t"+(timeAfter-timeBefore)*1e-9+"\n");
+     }while(counter < instances);
+     System.out.println(results);
    }
 }

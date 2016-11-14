@@ -37,12 +37,11 @@ import org.chocosolver.solver.ResolutionPolicy;
 import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.constraints.IntConstraintFactory;
 import org.chocosolver.solver.constraints.IntConstraintFactorySt;
-import org.chocosolver.solver.constraints.LogicalConstraintFactory;
 import org.chocosolver.solver.constraints.real.Ibex;
 import org.chocosolver.solver.constraints.real.RealConstraint;
 import org.chocosolver.solver.search.loop.monitors.IMonitorSolution;
+import org.chocosolver.solver.search.loop.monitors.SearchMonitorFactory;
 import org.chocosolver.solver.search.strategy.IntStrategyFactory;
-import org.chocosolver.solver.variables.BoolVar;
 import org.chocosolver.solver.variables.IntVar;
 import org.chocosolver.solver.variables.RealVar;
 import org.chocosolver.solver.variables.VariableFactory;
@@ -176,8 +175,11 @@ public class BACP_Var_Bincounts_GC extends AbstractProblem {
     //int[] targetFrequencies = new int[]{1,2,4,2,1};
     
     // Target frequencies cannot be zero! If necessary reduce number of bins.
-    int[] binBounds = new int[]{15,20,30,35};
-    int[] targetFrequencies = new int[]{2,6,2};
+    //int[] binBounds = new int[]{22,24,27,29};
+    //int[] targetFrequencies = new int[]{1,8,1};
+    
+    int[] binBounds = new int[]{0,15,20,30,35,load_per_period_ub+1};
+    int[] targetFrequencies = new int[]{1,2,4,2,1};
 
     // period course is assigned to
     IntVar[] course_period;
@@ -318,7 +320,7 @@ public class BACP_Var_Bincounts_GC extends AbstractProblem {
         prerequisite(49, 46);
         prerequisite(50, 47);*/
         
-        postSymBreakDominanceConstraints(course_load);
+        //postSymBreakDominanceConstraints(course_load);
     }
     
     /**
@@ -382,7 +384,7 @@ public class BACP_Var_Bincounts_GC extends AbstractProblem {
                    )*/        
        );
        
-       //SearchMonitorFactory.limitTime(solver,10000);
+       //SearchMonitorFactory.limitTime(solver,120000);
     }
 
     @Override

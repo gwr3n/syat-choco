@@ -36,12 +36,11 @@ import org.chocosolver.samples.real.bacp.preprocessing.longestpath.LongestPath;
 import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.constraints.IntConstraintFactory;
 import org.chocosolver.solver.constraints.IntConstraintFactorySt;
-import org.chocosolver.solver.constraints.LogicalConstraintFactory;
 import org.chocosolver.solver.constraints.real.Ibex;
 import org.chocosolver.solver.constraints.real.RealConstraint;
 import org.chocosolver.solver.search.loop.monitors.IMonitorSolution;
+import org.chocosolver.solver.search.loop.monitors.SearchMonitorFactory;
 import org.chocosolver.solver.search.strategy.IntStrategyFactory;
-import org.chocosolver.solver.variables.BoolVar;
 import org.chocosolver.solver.variables.IntVar;
 import org.chocosolver.solver.variables.RealVar;
 import org.chocosolver.solver.variables.VariableFactory;
@@ -78,7 +77,7 @@ import umontreal.iro.lecuyer.probdist.ChiSquareDist;
  */
 public class BACP_Chi_Bincounts_GC extends AbstractProblem {
     
-    String instance = "BACP/bacp-1"
+    String instance = "BACP/bacp-27"
                       + ".mzn";
    
     public void loadInstance(){
@@ -381,7 +380,7 @@ public class BACP_Chi_Bincounts_GC extends AbstractProblem {
                    )*/        
        );
        
-       //SearchMonitorFactory.limitTime(solver,10000);
+       SearchMonitorFactory.limitTime(solver,500000);
     }
 
     @Override
@@ -423,6 +422,8 @@ public class BACP_Chi_Bincounts_GC extends AbstractProblem {
 
     public static void main(String[] args) {
        String[] str={"-log","SOLUTION"};
-       new BACP_Chi_Bincounts_GC().execute(str);
+       
+       BACP_Chi_Bincounts_GC chi = new BACP_Chi_Bincounts_GC();
+       chi.execute(str);
     }
 }

@@ -179,7 +179,7 @@ public class ChiSquare extends AbstractProblem {
    }
    
    public static void main(String[] args) {
-      String[] str={"-log","SILENT"};
+      String[] str={"-log","SOLUTION"};
       /*int[][] values = {{2,3,4},{1,2},{0,3,5},{3,4},{1},{2,3,4}};
       int[][] binCounts = {{0,6},{0,6},{0,6}};
       int[] binBounds = {0,2,4,6};
@@ -191,13 +191,13 @@ public class ChiSquare extends AbstractProblem {
       int[] binBounds = {0,5,10,15,20,25,valUB};                                  
       int bins = binBounds.length - 1;
       
-      Random rnd = new Random(1234);
+      Random rnd = new Random(123);
       int[][] values = generateRandomValues(rnd, vars, vals, valUB);   
       int[][] binCounts = generateBinCounts(bins, vars);
       
       int[] targetFrequencies = {2,4,10,4,2,2};
       
-      double pValue = 0.95;
+      double pValue = 0.99;
       
       ChiSquare cs = new ChiSquare(values, binCounts, binBounds, targetFrequencies, pValue);
       cs.execute(str);

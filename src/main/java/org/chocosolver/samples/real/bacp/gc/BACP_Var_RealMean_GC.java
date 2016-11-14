@@ -40,6 +40,7 @@ import org.chocosolver.solver.constraints.LogicalConstraintFactory;
 import org.chocosolver.solver.constraints.real.Ibex;
 import org.chocosolver.solver.constraints.real.RealConstraint;
 import org.chocosolver.solver.search.loop.monitors.IMonitorSolution;
+import org.chocosolver.solver.search.loop.monitors.SearchMonitorFactory;
 import org.chocosolver.solver.search.strategy.IntStrategyFactory;
 import org.chocosolver.solver.search.strategy.selectors.values.RealDomainMiddle;
 import org.chocosolver.solver.search.strategy.selectors.variables.Cyclic;
@@ -208,6 +209,7 @@ public class BACP_Var_RealMean_GC extends AbstractProblem {
         
         solver.post(IntConstraintFactory.bin_packing(course_period, course_load, load, 0));
         
+        //meanLoad = VariableFactory.real("meanLoad", 25.5, 25.5, precision, solver);
         meanLoad = VariableFactory.real("meanLoad", load_per_period_lb, load_per_period_ub, precision, solver);
         varLoad = VariableFactory.real("varLoad", 0, Math.pow(load_per_period_ub,2), precision, solver);
         RealVar[] realViews = VariableFactory.real(load, precision);
@@ -317,7 +319,7 @@ public class BACP_Var_RealMean_GC extends AbstractProblem {
         prerequisite(49, 46);
         prerequisite(50, 47);*/
         
-        postSymBreakDominanceConstraints(course_load);
+        //postSymBreakDominanceConstraints(course_load);
     }
     
     /**
@@ -385,7 +387,7 @@ public class BACP_Var_RealMean_GC extends AbstractProblem {
        //solver.set(org.chocosolver.solver.search.strategy.IntStrategyFactory.minDom_UB(course_period));
        //solver.set(new RealStrategy(allRV, new Random(2211), new RealDomainMiddle()));
        
-       //SearchMonitorFactory.limitTime(solver,10000);
+       //SearchMonitorFactory.limitTime(solver,120000);
     }
 
     @Override
