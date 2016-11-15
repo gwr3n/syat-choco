@@ -24,7 +24,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.chocosolver.samples.real.bacp.gc;
+package org.chocosolver.samples.real.bacp.dec;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -75,7 +75,7 @@ import umontreal.iro.lecuyer.probdist.ChiSquareDist;
  * @author Charles Prud'homme
  * @since 20/07/12
  */
-public class BACP_Chi_Bincounts_GC extends AbstractProblem {
+public class BACP_Chi_Bincounts_Dec extends AbstractProblem {
     
     String instance = "BACP/bacp-9"
                       + ".mzn";
@@ -183,6 +183,7 @@ public class BACP_Chi_Bincounts_GC extends AbstractProblem {
     IntVar[] course_period;
     // total load for each period
     IntVar[] load;
+    IntVar[] valueOccurrenceVariables;
     IntVar[] binVariables;
     
     RealVar chiSqStatistics;
@@ -216,12 +217,27 @@ public class BACP_Chi_Bincounts_GC extends AbstractProblem {
         
         solver.post(IntConstraintFactory.bin_packing(course_period, course_load, load, 0));
         
+        valueOccurrenceVariables = new IntVar[this.binBounds[this.binBounds.length-1]-this.binBounds[0]];
+        int[] valuesArray = new int[valueOccurrenceVariables.length];
+        for(int i = 0; i < this.valueOccurrenceVariables.length; i++){
+           valueOccurrenceVariables[i] = VariableFactory.bounded("Value Occurrence "+i, 0, load.length, solver);
+           valuesArray[i] = i;
+        }
+        
         binVariables = new IntVar[binBounds.length-1];
         for(int i = 0; i < binBounds.length-1; i++){
            binVariables[i] = VariableFactory.bounded("Bin "+i, 0, n_periods, solver);
         }
         
-        solver.post(IntConstraintFactorySt.bincountsSt(load, binVariables, binBounds));
+        for(int i = 0; i < this.binBounds.length - 1; i++){
+           IntVar[] binOccurrences = new IntVar[this.binBounds[i+1]-this.binBounds[i]];
+           System.arraycopy(valueOccurrenceVariables, this.binBounds[i]-this.binBounds[0], binOccurrences, 0, this.binBounds[i+1]-this.binBounds[i]);
+           solver.post(IntConstraintFactorySt.sum(binOccurrences, binVariables[i]));
+        }
+        
+        solver.post(IntConstraintFactorySt.sum(binVariables, VariableFactory.fixed(load.length, solver)));
+        
+        solver.post(IntConstraintFactorySt.global_cardinality(load, valuesArray, valueOccurrenceVariables, true));
         
         this.chiSqDist = new ChiSquareDist(this.binVariables.length-1);
         
@@ -423,7 +439,7 @@ public class BACP_Chi_Bincounts_GC extends AbstractProblem {
     public static void main(String[] args) {
        String[] str={"-log","SOLUTION"};
        
-       BACP_Chi_Bincounts_GC chi = new BACP_Chi_Bincounts_GC();
+       BACP_Chi_Bincounts_Dec chi = new BACP_Chi_Bincounts_Dec();
        chi.execute(str);
     }
 }

@@ -7,7 +7,7 @@ import org.chocosolver.solver.variables.IntVar;
 public class BincountsSt extends Constraint {
    
    public BincountsSt(IntVar[] valueVariables, IntVar[] binVariables, int[] binBounds){
-      super("BincountsSt", (Propagator<IntVar>) new PropBincountsEQSt(valueVariables, binVariables, binBounds));
+      super("BincountsSt", (Propagator<IntVar>) new PropBincountsEQFastSt(valueVariables, binVariables, binBounds));
    }
 
 }

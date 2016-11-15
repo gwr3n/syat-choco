@@ -17,9 +17,10 @@ import org.chocosolver.solver.variables.VariableFactory;
 import org.chocosolver.util.iterators.DisposableValueIterator;
 import org.slf4j.LoggerFactory;
 
-public class BincountsDomainReduction extends AbstractProblem {
+public class BincountsDomainReductionDec extends AbstractProblem {
    public IntVar[] valueVariables;
    public IntVar[] binVariables;
+   public IntVar[] valueOccurrenceVariables;
    
    int[][] binCounts;
    int[][] values;
@@ -29,7 +30,7 @@ public class BincountsDomainReduction extends AbstractProblem {
    
    int assignedVariables = 0;
    
-   public BincountsDomainReduction(int[][] values,
+   public BincountsDomainReductionDec(int[][] values,
                                    int[][] binCounts, 
                                    int[] binBounds,
                                    int assignedVariables){
@@ -55,11 +56,27 @@ public class BincountsDomainReduction extends AbstractProblem {
       for(int i = 0; i < this.values.length; i++)
          valueVariables[i] = VariableFactory.enumerated("Value "+(i+1), values[i], solver);
       
-      binVariables = new IntVar[this.binCounts.length];
-      for(int i = 0; i < this.binCounts.length; i++)
-         binVariables[i] = VariableFactory.bounded("Bin "+(i+1), this.binCounts[i][0], this.binCounts[i][1], solver);
+      valueOccurrenceVariables = new IntVar[this.binBounds[this.binBounds.length-1]-this.binBounds[0]];
+      int[] valuesArray = new int[valueOccurrenceVariables.length];
+      for(int i = 0; i < this.valueOccurrenceVariables.length; i++){
+         valueOccurrenceVariables[i] = VariableFactory.bounded("Value Occurrence "+i, 0, this.values.length, solver);
+         valuesArray[i] = i;
+      }
       
-      solver.post(IntConstraintFactorySt.bincountsSt(valueVariables, binVariables, binBounds));      
+      binVariables = new IntVar[this.binCounts.length];
+      for(int i = 0; i < this.binCounts.length; i++){
+         binVariables[i] = VariableFactory.bounded("Bin "+(i+1), this.binCounts[i][0], this.binCounts[i][1], solver);
+      }
+      
+      for(int i = 0; i < this.binBounds.length - 1; i++){
+         IntVar[] binOccurrences = new IntVar[this.binBounds[i+1]-this.binBounds[i]];
+         System.arraycopy(valueOccurrenceVariables, this.binBounds[i]-this.binBounds[0], binOccurrences, 0, this.binBounds[i+1]-this.binBounds[i]);
+         solver.post(IntConstraintFactorySt.sum(binOccurrences, binVariables[i]));
+      }
+      
+      solver.post(IntConstraintFactorySt.sum(binVariables, VariableFactory.fixed(valueVariables.length, solver)));
+      
+      solver.post(IntConstraintFactorySt.global_cardinality(valueVariables, valuesArray, valueOccurrenceVariables, true));  
    }
    
    private static IntVar[] mergeArrays(IntVar[] var1, IntVar[] var2){
@@ -81,20 +98,21 @@ public class BincountsDomainReduction extends AbstractProblem {
    
    @Override
    public void solve() {
-     LoggerFactory.getLogger("bench").info("---");
-     this.prettyOut();
-     try {
-        solver.propagate();
-     } catch (ContradictionException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-      wipeout = true;
+     if(assignedVariables == 0){
+        //LoggerFactory.getLogger("bench").info("---");
+        //this.prettyOut();
+        try {
+           solver.propagate();
+        } catch (ContradictionException e) {
+         // TODO Auto-generated catch block
+         e.printStackTrace();
+         wipeout = true;
+        }
+        //LoggerFactory.getLogger("bench").info("---");
+        //this.prettyOut();
+     }else{
+        wipeout = !solver.findSolution();
      }
-     LoggerFactory.getLogger("bench").info("---");
-     this.prettyOut();
-     
-     if(assignedVariables > 0)
-        solver.findSolution();
      
      /*StringBuilder st = new StringBuilder();
      boolean solution = solver.findSolution();
@@ -172,7 +190,7 @@ public class BincountsDomainReduction extends AbstractProblem {
       for(int i = 0; i < binVariables.length; i++){
          st.append(binVariables[i].toString()+", ");
       }
-      LoggerFactory.getLogger("bench").info(st.toString());
+      //LoggerFactory.getLogger("bench").info(st.toString());
    }
    
    public static int[] removeDuplicates(int[] arr) {
@@ -211,7 +229,8 @@ public class BincountsDomainReduction extends AbstractProblem {
    }
    
    public static void main(String[] args) {
-     String[] str={"-log","SOLUTION"};
+     String[] str={"-log","SILENT"};
+     //String[] str={"-log","SOLUTION"};
      int vars = 40;
      int vals = 10;
      int valUB = 30;
@@ -225,11 +244,13 @@ public class BincountsDomainReduction extends AbstractProblem {
      
      Random rnd = new Random(123);
      int counter = 0;
+     int instance = 0;
+     int[] instanceNos = {1, 2, 3, 4, 5, 6, 8, 9, 10, 11, 12, 13, 14, 15, 17, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 31, 32, 33, 34, 35, 36, 37, 39, 40, 41, 42, 43, 45, 47, 49, 50, 51, 52, 53, 54, 55, 56, 57, 59, 60};
      do{
         int[][] values = generateRandomValues(rnd, vars, vals, valUB);    // {{3,4},{1,2,4},{2,3,4}};
         int[][] binCounts = generateRandomBinCounts(rnd, bins, vars);     // {{1,3},{0,1}};
         
-        BincountsDomainReduction bc = new BincountsDomainReduction(values, binCounts, binBounds, (int)Math.floor(vars*percentageVarAssigned));
+        BincountsDomainReductionDec bc = new BincountsDomainReductionDec(values, binCounts, binBounds, (int)Math.floor(vars*percentageVarAssigned));
         
         long timeBefore = System.nanoTime();
         
@@ -237,7 +258,8 @@ public class BincountsDomainReduction extends AbstractProblem {
         
         long timeAfter = System.nanoTime();
         
-        if(bc.wipeout) 
+        instance++;
+        if(Arrays.binarySearch(instanceNos, instance)<0) 
            continue;
         else
            counter++;
@@ -245,7 +267,7 @@ public class BincountsDomainReduction extends AbstractProblem {
         LoggerFactory.getLogger("bench").info("Domain reduction: "+(1 - bc.getPercentRemainingValuesCount(values, binCounts)));
         LoggerFactory.getLogger("bench").info("Time(sec): "+(timeAfter-timeBefore)*1e-9);
         
-        results.append((1 - bc.getPercentRemainingValuesCount(values, binCounts))+"\t"+(timeAfter-timeBefore)*1e-9+"\n");
+        results.append(instance+"\t"+(1 - bc.getPercentRemainingValuesCount(values, binCounts))+"\t"+(timeAfter-timeBefore)*1e-9+"\n");
      }while(counter < instances);
      System.out.println(results);
    }

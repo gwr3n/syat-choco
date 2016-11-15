@@ -1,5 +1,7 @@
 package org.chocosolver.solver.constraints.statistical.bincounts;
 
+import org.chocosolver.memory.IEnvironment;
+import org.chocosolver.memory.IStateBool;
 import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.constraints.Propagator;
 import org.chocosolver.solver.constraints.PropagatorPriority;
@@ -16,6 +18,7 @@ import org.chocosolver.util.iterators.DisposableValueIterator;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation.Result;
+import org.slf4j.LoggerFactory;
 import org.ojalgo.optimisation.Variable;
 
 import gnu.trove.map.hash.THashMap;
@@ -28,11 +31,11 @@ import gnu.trove.map.hash.THashMap;
  * @author Roberto Rossi
  *
  */
-public class PropBincountsEQSt extends Propagator<IntVar> {
+public class PropBincountsEQFastSt extends Propagator<IntVar> {
    
    int m, n;
    int[] binBounds;
-   ExpressionsBasedModel[] models;
+   IStateBool[][] fitsInBin;
    
    private static IntVar[] joinVariables(IntVar[] valueVariables, IntVar[] binVariables){
       IntVar[] variables = new IntVar[valueVariables.length + binVariables.length];
@@ -41,80 +44,159 @@ public class PropBincountsEQSt extends Propagator<IntVar> {
       return variables;
    }
    
-   public PropBincountsEQSt(IntVar[] valueVariables, IntVar[] binVariables, int[] binBounds){
+   public PropBincountsEQFastSt(IntVar[] valueVariables, IntVar[] binVariables, int[] binBounds){
       super(joinVariables(valueVariables, binVariables), PropagatorPriority.VERY_SLOW, true);
       this.n = valueVariables.length;
       this.m = binVariables.length;
       this.binBounds = binBounds.clone();
-      //this.prepare();
+      
+      IEnvironment environment = solver.getEnvironment();
+      
+      fitsInBin = new IStateBool[n][m];
+      for(int i = 0; i < n; i++){
+         for(int j = 0; j < m; j++){
+            if(fitsInBin(this.vars[i], j))
+               fitsInBin[i][j]=environment.makeBool(true);
+            else
+               fitsInBin[i][j]=environment.makeBool(false);
+         }
+      }
    }
    
    protected void prepare() {
-      this.models = new ExpressionsBasedModel[n*m + m];
-      for(int k = 0; k < n*m + m; k++)
-         this.models[k] = this.buildLPModel(k);
    }
    
    @Override
    public void propagate(int evtmask) throws ContradictionException {
+      //long timeBefore = System.nanoTime();
       if (PropagatorEventType.isFullPropagation(evtmask)) {
          prepare();
          updateDomains();
       }
+      //long timeAfter = System.nanoTime();
+      //LoggerFactory.getLogger("bench").info("Prop main time: "+(timeAfter-timeBefore)*1e-9);
    }
+   
+   int totalLPsSolved = 0;
    
    @Override
    public void propagate(int i, int mask) throws ContradictionException {
-      /*if(i < n){
-         addInstatiatedVarLPConstraints(i);
-      }else{
-         addBinBoundLPConstraints(i-n);
-      }*/
-      //forcePropagate(PropagatorEventType.CUSTOM_PROPAGATION);
+      //totalLPsSolved = 0;
+      //long timeBefore = System.nanoTime();
       if (PropagatorEventType.isFullPropagation(mask)) {
          prepare();
-         updateDomains();  
+         if(i < n)
+            updateDomainsBin(i);  
+         updateDomainsValue(i);  
+      }
+      //long timeAfter = System.nanoTime();
+      //LoggerFactory.getLogger("bench").info("Prop targeted time: "+(timeAfter-timeBefore)*1e-9+"\t"+totalLPsSolved);
+   }
+   
+   private void updateDomainsValue(int varIndex) throws ContradictionException{
+      //Cast to integer justified by the fact matrix is TUM
+      for(int k = 0; k < n*m; k++){
+         int i = k / m;
+         int j = k % m;
+         
+         if(varIndex < n && !(fitsInBin[varIndex][j].get() && fitsInBin[i][j].get()))
+            continue;
+         
+         ExpressionsBasedModel model = this.buildLPModel(k);
+         
+         Result result = model.minimise();     //totalLPsSolved++;
+         if(!result.getState().isFeasible()){
+            this.vars[i].wipeOut(aCause);
+         }else if((int) result.getValue() == 1){
+            for(int l = 0; l < m; l++){
+               if(l != j){
+                  this.vars[i].removeInterval(getBinLB(l), getBinUB(l), aCause);
+                  fitsInBin[i][l].set(false);
+               }
+            }
+         }
+         
+         result = model.maximise();            //totalLPsSolved++;
+         if(!result.getState().isFeasible()){
+            this.vars[i].wipeOut(aCause);
+         }else if((int) result.getValue() == 0){
+            this.vars[i].removeInterval(getBinLB(j), getBinUB(j), aCause);
+            fitsInBin[i][j].set(false);
+         }
+      }
+   }
+   
+   private void updateDomainsBin(int varIndex) throws ContradictionException{
+      //Cast to integer justified by the fact matrix is TUM
+      for(int k = n*m; k < n*m + m; k++){
+         int j = k-n*m;  
+         
+         ExpressionsBasedModel model = this.buildLPModel(k);
+         
+         Result result = model.minimise();    
+         if(!result.getState().isFeasible()){
+            this.vars[j+n].wipeOut(aCause);
+         }else{
+            int lb = (int) result.getValue();
+            this.vars[j+n].updateLowerBound(lb, aCause);
+         }
+         result = model.maximise();           
+         if(!result.getState().isFeasible()){
+            this.vars[j+n].wipeOut(aCause);
+         }else{
+            int ub = (int) result.getValue();
+            this.vars[j+n].updateUpperBound(ub, aCause);
+         }
       }
    }
    
    private void updateDomains() throws ContradictionException{
       //Cast to integer justified by the fact matrix is TUM
-      for(int k = 0; k < n*m; k++){
-         int i = k / m;
-         int j = k % m;
-         Result result = models[k].minimise();
-         if(!result.getState().isFeasible()){
-            this.vars[i].wipeOut(aCause);
-         }else if((int) result.getValue() == 1){
-            for(int l = 0; l < m; l++){
-               if(l != j)
-                  this.vars[i].removeInterval(getBinLB(l), getBinUB(l), aCause);
-            }
-         }
-         
-         result = models[k].maximise();
-         if(!result.getState().isFeasible()){
-            this.vars[i].wipeOut(aCause);
-         }else if((int) result.getValue() == 0){
-            this.vars[i].removeInterval(getBinLB(j), getBinUB(j), aCause);
-         }
-      }
-      
       for(int k = n*m; k < n*m + m; k++){
          int j = k-n*m;
-         Result result = models[k].minimise();
+         
+         ExpressionsBasedModel model = this.buildLPModel(k);
+         
+         Result result = model.minimise();
          if(result.getState().isFeasible()){
             int lb = (int) result.getValue();
             this.vars[j+n].updateLowerBound(lb, aCause);
          }else{
             this.vars[j+n].wipeOut(aCause);
          }
-         result = models[k].maximise();
+         result = model.maximise();
          if(result.getState().isFeasible()){
-            int ub = (int) models[k].maximise().getValue();
+            int ub = (int) result.getValue();
             this.vars[j+n].updateUpperBound(ub, aCause);
          }else{
             this.vars[j+n].wipeOut(aCause);
+         }
+      }
+      
+      for(int k = 0; k < n*m; k++){
+         int i = k / m;
+         int j = k % m;
+         
+         ExpressionsBasedModel model = this.buildLPModel(k);
+         
+         Result result = model.minimise();
+         if(!result.getState().isFeasible()){
+            this.vars[i].wipeOut(aCause);
+         }else if((int) result.getValue() == 1){
+            for(int l = 0; l < m; l++){
+               if(l != j){
+                  this.vars[i].removeInterval(getBinLB(l), getBinUB(l), aCause);
+                  fitsInBin[i][l].set(false);
+               }
+            }
+         }
+         
+         result = model.maximise();
+         if(!result.getState().isFeasible()){
+            this.vars[i].wipeOut(aCause);
+         }else if((int) result.getValue() == 0){
+            this.vars[i].removeInterval(getBinLB(j), getBinUB(j), aCause);
+            fitsInBin[i][j].set(false);
          }
       }
    }
@@ -184,9 +266,9 @@ public class PropBincountsEQSt extends Propagator<IntVar> {
       for(int i = 0; i < n; i++){
          for(int j = 0; j < m; j++){
             if(i*m + j < n*m && i*m + j == index)
-               lpVars[j][i] = Variable.make("x"+j+"_"+i).lower(0).upper(1).weight(1);
+               lpVars[j][i] = Variable.make("x"+j+"_"+i).lower(0).upper(fitsInBin(this.vars[i], j) ? 1 : 0).weight(1);
             else
-               lpVars[j][i] = Variable.make("x"+j+"_"+i).lower(0).upper(1).weight(0);
+               lpVars[j][i] = Variable.make("x"+j+"_"+i).lower(0).upper(fitsInBin(this.vars[i], j) ? 1 : 0).weight(0);
             model.addVariable(lpVars[j][i]);
          }
       }
@@ -215,22 +297,22 @@ public class PropBincountsEQSt extends Propagator<IntVar> {
          binCount.set(binVars[j],-1);
       }
       
-      Expression binTotal = model.addExpression("Bin total").lower(n).upper(n);
+      /*Expression binTotal = model.addExpression("Bin total").lower(n).upper(n);
       for(int j = 0; j < m; j++){
          binTotal.set(binVars[j], 1);
-      }
+      }*/
       
-      for(int j = 0; j < m; j++){
+      /*for(int j = 0; j < m; j++){
          Expression binCount = model.addExpression("Bin bounds "+j).lower(getBinCountLB(j)).upper(getBinCountUB(j));
          binCount.set(binVars[j], 1);
-      }
+      }*/
       
-      for(int i = 0; i < n; i++){
+      /*for(int i = 0; i < n; i++){
          for(int j = 0; j < m; j++){
             Expression connection = model.addExpression("Connection "+i+"_"+j).lower(0).upper(fitsInBin(this.vars[i], j) ? 1 : 0);
             connection.set(lpVars[j][i], 1);
          }
-      }
+      }*/
       
       return model;
    }

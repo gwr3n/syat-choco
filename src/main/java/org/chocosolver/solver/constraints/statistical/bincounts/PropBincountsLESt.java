@@ -42,7 +42,7 @@ public class PropBincountsLESt extends Propagator<IntVar> {
    }
    
    public PropBincountsLESt(IntVar[] valueVariables, IntVar[] binVariables, int[] binBounds){
-      super(joinVariables(valueVariables, binVariables), PropagatorPriority.LINEAR, true);
+      super(joinVariables(valueVariables, binVariables), PropagatorPriority.VERY_SLOW, true);
       this.n = valueVariables.length;
       this.m = binVariables.length;
       this.binBounds = binBounds.clone();
