@@ -33,6 +33,10 @@ import gnu.trove.map.hash.THashMap;
  */
 public class PropBincountsEQFastSt extends Propagator<IntVar> {
    
+   public static ExpressionsBasedModel modelInstance = null;
+   Variable[][] lpVars;
+   Variable[] binVars;
+   
    int m, n;
    int[] binBounds;
    IStateBool[][] fitsInBin;
@@ -68,6 +72,7 @@ public class PropBincountsEQFastSt extends Propagator<IntVar> {
    
    @Override
    public void propagate(int evtmask) throws ContradictionException {
+      modelInstance = null;
       //long timeBefore = System.nanoTime();
       if (PropagatorEventType.isFullPropagation(evtmask)) {
          prepare();
@@ -81,6 +86,7 @@ public class PropBincountsEQFastSt extends Propagator<IntVar> {
    
    @Override
    public void propagate(int i, int mask) throws ContradictionException {
+      modelInstance = null;
       //totalLPsSolved = 0;
       //long timeBefore = System.nanoTime();
       if (PropagatorEventType.isFullPropagation(mask)) {
@@ -102,7 +108,7 @@ public class PropBincountsEQFastSt extends Propagator<IntVar> {
          if(varIndex < n && !(fitsInBin[varIndex][j].get() && fitsInBin[i][j].get()))
             continue;
          
-         ExpressionsBasedModel model = this.buildLPModel(k);
+         ExpressionsBasedModel model = this.getLPModel(k);
          
          Result result = model.minimise();     //totalLPsSolved++;
          if(!result.getState().isFeasible()){
@@ -123,6 +129,8 @@ public class PropBincountsEQFastSt extends Propagator<IntVar> {
             this.vars[i].removeInterval(getBinLB(j), getBinUB(j), aCause);
             fitsInBin[i][j].set(false);
          }
+         
+         this.unsetLPModelWeight(k);
       }
    }
    
@@ -131,7 +139,7 @@ public class PropBincountsEQFastSt extends Propagator<IntVar> {
       for(int k = n*m; k < n*m + m; k++){
          int j = k-n*m;  
          
-         ExpressionsBasedModel model = this.buildLPModel(k);
+         ExpressionsBasedModel model = this.getLPModel(k);
          
          Result result = model.minimise();    
          if(!result.getState().isFeasible()){
@@ -147,6 +155,8 @@ public class PropBincountsEQFastSt extends Propagator<IntVar> {
             int ub = (int) result.getValue();
             this.vars[j+n].updateUpperBound(ub, aCause);
          }
+         
+         this.unsetLPModelWeight(k);
       }
    }
    
@@ -155,7 +165,7 @@ public class PropBincountsEQFastSt extends Propagator<IntVar> {
       for(int k = n*m; k < n*m + m; k++){
          int j = k-n*m;
          
-         ExpressionsBasedModel model = this.buildLPModel(k);
+         ExpressionsBasedModel model = this.getLPModel(k);
          
          Result result = model.minimise();
          if(result.getState().isFeasible()){
@@ -171,13 +181,15 @@ public class PropBincountsEQFastSt extends Propagator<IntVar> {
          }else{
             this.vars[j+n].wipeOut(aCause);
          }
+         
+         this.unsetLPModelWeight(k);
       }
       
       for(int k = 0; k < n*m; k++){
          int i = k / m;
          int j = k % m;
          
-         ExpressionsBasedModel model = this.buildLPModel(k);
+         ExpressionsBasedModel model = this.getLPModel(k);
          
          Result result = model.minimise();
          if(!result.getState().isFeasible()){
@@ -198,6 +210,8 @@ public class PropBincountsEQFastSt extends Propagator<IntVar> {
             this.vars[i].removeInterval(getBinLB(j), getBinUB(j), aCause);
             fitsInBin[i][j].set(false);
          }
+         
+         this.unsetLPModelWeight(k);
       }
    }
 
@@ -258,10 +272,35 @@ public class PropBincountsEQFastSt extends Propagator<IntVar> {
       return false;
    }
    
+   public ExpressionsBasedModel getLPModel(int index){
+      if(modelInstance == null){
+         return modelInstance = buildLPModel(index);
+      }else{
+         if(index < n*m){
+            int i = index / m;
+            int j = index % m;
+            lpVars[j][i].weight(1);
+         }else{
+            binVars[index - n*m].weight(1);
+         }
+         return modelInstance;
+      }
+   }
+   
+   public void unsetLPModelWeight(int index){
+      if(index < n*m){
+         int i = index / m;
+         int j = index % m;
+         lpVars[j][i].weight(0);
+      }else{
+         binVars[index - n*m].weight(0);
+      }
+   }
+   
    public ExpressionsBasedModel buildLPModel(int index){
       ExpressionsBasedModel model = new ExpressionsBasedModel();
-      Variable[][] lpVars = new Variable[m][n];
-      Variable[] binVars = new Variable[m];
+      lpVars = new Variable[m][n];
+      binVars = new Variable[m];
       
       for(int i = 0; i < n; i++){
          for(int j = 0; j < m; j++){
