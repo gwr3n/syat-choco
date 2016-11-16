@@ -31,8 +31,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
-import javax.naming.directory.SearchResult;
-
 import org.chocosolver.samples.AbstractProblem;
 import org.chocosolver.samples.real.bacp.preprocessing.longestpath.LongestPath;
 import org.chocosolver.solver.Solver;

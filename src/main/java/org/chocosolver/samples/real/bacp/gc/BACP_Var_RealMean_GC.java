@@ -36,16 +36,10 @@ import org.chocosolver.samples.real.bacp.preprocessing.longestpath.LongestPath;
 import org.chocosolver.solver.ResolutionPolicy;
 import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.constraints.IntConstraintFactory;
-import org.chocosolver.solver.constraints.LogicalConstraintFactory;
 import org.chocosolver.solver.constraints.real.Ibex;
 import org.chocosolver.solver.constraints.real.RealConstraint;
 import org.chocosolver.solver.search.loop.monitors.IMonitorSolution;
-import org.chocosolver.solver.search.loop.monitors.SearchMonitorFactory;
 import org.chocosolver.solver.search.strategy.IntStrategyFactory;
-import org.chocosolver.solver.search.strategy.selectors.values.RealDomainMiddle;
-import org.chocosolver.solver.search.strategy.selectors.variables.Cyclic;
-import org.chocosolver.solver.search.strategy.strategy.RealStrategy;
-import org.chocosolver.solver.variables.BoolVar;
 import org.chocosolver.solver.variables.IntVar;
 import org.chocosolver.solver.variables.RealVar;
 import org.chocosolver.solver.variables.VariableFactory;
@@ -327,6 +321,7 @@ public class BACP_Var_RealMean_GC extends AbstractProblem {
      * 
      * @param load
      */
+    @SuppressWarnings("unused")
     private void postSymBreakDominanceConstraints(int[] load){
        LongestPath path = new LongestPath();
        int[][] prerequisiteMatrix = path.loadPrerequisites(instance);

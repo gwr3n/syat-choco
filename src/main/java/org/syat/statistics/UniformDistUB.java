@@ -1,8 +1,6 @@
 package org.syat.statistics;
 
 import umontreal.iro.lecuyer.probdist.EmpiricalDist;
-import umontreal.iro.lecuyer.randvar.UniformGen;
-import umontreal.iro.lecuyer.rng.MRG32k3a;
 
 public class UniformDistUB {
 	

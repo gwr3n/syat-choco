@@ -1,13 +1,10 @@
 package org.chocosolver.samples.statistical.kolmogorovsmirnov;
 
-import java.io.IOException;
-
 import org.slf4j.LoggerFactory;
 
 import org.chocosolver.samples.AbstractProblem;
 import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.constraints.IntConstraintFactorySt;
-import org.chocosolver.solver.constraints.Operator;
 import org.chocosolver.solver.search.strategy.IntStrategyFactory;
 import org.chocosolver.solver.search.strategy.strategy.AbstractStrategy;
 import org.chocosolver.solver.variables.IntVar;
@@ -50,7 +47,7 @@ public class TwoSampleKolmogorovSmirnovTest extends AbstractProblem {
         for(int i = 0; i < populationYSize; i++)
         	populationY[i] = VariableFactory.bounded("sample "+i, dataY[i], dataY[i], solver);
         
-        Distribution dist = new NormalDist(10,Math.sqrt(10));
+        //Distribution dist = new NormalDist(10,Math.sqrt(10));
         
         solver.post(IntConstraintFactorySt.arithmSt(populationX, populationY, "=", "DISTRIBUTION", 0.95));
     }

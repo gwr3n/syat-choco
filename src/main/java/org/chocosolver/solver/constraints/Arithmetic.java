@@ -68,7 +68,7 @@ public class Arithmetic extends Constraint {
       this.cste = cste;
    }
 
-   private static Propagator createProp(IntVar var, Operator op, int cste) {
+   private static Propagator<IntVar> createProp(IntVar var, Operator op, int cste) {
       switch (op) {
          case EQ: // X = C
             return new PropEqualXC(var, cste);
@@ -95,7 +95,7 @@ public class Arithmetic extends Constraint {
       this.cste = 0;
    }
 
-   private static Propagator createProp(IntVar var1, Operator op, IntVar var2) {
+   private static Propagator<IntVar> createProp(IntVar var1, Operator op, IntVar var2) {
       switch (op) {
          case EQ: // X = Y
             return new PropEqualX_Y(var1, var2);
@@ -125,7 +125,7 @@ public class Arithmetic extends Constraint {
       this.cste = cste;
    }
 
-   private static Propagator createProp(IntVar var1, Operator op1, IntVar var2, Operator op2, int cste) {
+   private static Propagator<IntVar> createProp(IntVar var1, Operator op1, IntVar var2, Operator op2, int cste) {
       if(op1==null)throw new UnsupportedOperationException();
       if(op2==null)throw new UnsupportedOperationException();
       if (isOperation(op1) == isOperation(op2)) {

@@ -1,6 +1,5 @@
 package org.syat.statistics;
 
-import umontreal.iro.lecuyer.probdist.Distribution;
 import umontreal.iro.lecuyer.probdist.EmpiricalDist;
 import umontreal.iro.lecuyer.probdist.StudentDist;
 

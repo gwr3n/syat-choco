@@ -30,16 +30,12 @@ package org.chocosolver.samples.statistical.rng;
 import org.slf4j.LoggerFactory;
 
 import org.chocosolver.samples.AbstractProblem;
-import org.chocosolver.solver.ResolutionPolicy;
 import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.constraints.IntConstraintFactorySt;
-import org.chocosolver.solver.exception.SolverException;
 import org.chocosolver.solver.search.strategy.IntStrategyFactory;
 import org.chocosolver.solver.variables.IntVar;
-import org.chocosolver.solver.variables.Task;
 import org.chocosolver.solver.variables.VariableFactory;
 import umontreal.iro.lecuyer.probdist.Distribution;
-import umontreal.iro.lecuyer.probdist.ExponentialDist;
 import umontreal.iro.lecuyer.probdist.NormalDist;
 import org.chocosolver.util.ESat;
 
@@ -117,6 +113,7 @@ public class RandomNumberGeneration extends AbstractProblem {
 	}
 
 	public static void main(String[] args){
+	   @SuppressWarnings("unused")
 		String[] str={"-log","SEARCH"};
 		new RandomNumberGeneration().execute();
 	}

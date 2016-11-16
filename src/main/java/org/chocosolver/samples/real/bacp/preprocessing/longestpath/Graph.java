@@ -45,6 +45,7 @@ public class Graph {
       return distances;
    }
 
+   @SuppressWarnings("unused")
    private void printDistances(int source) {
       System.out.println("Distances from source " + source + " are as follows: ");
       for (int to = 0; to < V; to++) {
@@ -59,6 +60,7 @@ public class Graph {
       System.out.println();
    }
 
+   @SuppressWarnings("unused")
    private void printPath(int source) {
       System.out.println("Path from source " + source + " to other nodes are as follows: ");
       for (int i = 0; i < V; i++) {

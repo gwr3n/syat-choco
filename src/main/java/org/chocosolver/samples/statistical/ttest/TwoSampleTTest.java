@@ -1,19 +1,14 @@
 package org.chocosolver.samples.statistical.ttest;
 
-import java.io.IOException;
-
 import org.slf4j.LoggerFactory;
 
 import org.chocosolver.samples.AbstractProblem;
 import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.constraints.IntConstraintFactorySt;
-import org.chocosolver.solver.constraints.Operator;
 import org.chocosolver.solver.search.strategy.IntStrategyFactory;
 import org.chocosolver.solver.search.strategy.strategy.AbstractStrategy;
 import org.chocosolver.solver.variables.IntVar;
 import org.chocosolver.solver.variables.VariableFactory;
-import umontreal.iro.lecuyer.probdist.Distribution;
-import umontreal.iro.lecuyer.probdist.NormalDist;
 
 public class TwoSampleTTest extends AbstractProblem {
 

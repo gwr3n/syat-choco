@@ -79,6 +79,7 @@ public class BincountsDomainReductionDec extends AbstractProblem {
       solver.post(IntConstraintFactorySt.global_cardinality(valueVariables, valuesArray, valueOccurrenceVariables, true));  
    }
    
+   @SuppressWarnings("unused")
    private static IntVar[] mergeArrays(IntVar[] var1, IntVar[] var2){
       IntVar[] var3 = new IntVar[var1.length+var2.length];
       System.arraycopy(var1, 0, var3, 0, var1.length);

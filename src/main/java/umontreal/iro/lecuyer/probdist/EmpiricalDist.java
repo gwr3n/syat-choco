@@ -324,7 +324,9 @@ public class EmpiricalDist extends DiscreteDistribution {
       for(int i = 0; i<n; i++) {
          formatter.format("%f%n", sortedVal[i]);
       }
-      return sb.toString();
+      String out = sb.toString();
+      formatter.close();
+      return out;
    }
 
 }

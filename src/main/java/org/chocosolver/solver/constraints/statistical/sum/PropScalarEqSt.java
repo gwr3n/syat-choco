@@ -27,8 +27,6 @@
 
 package org.chocosolver.solver.constraints.statistical.sum;
 
-import java.util.Arrays;
-
 import gnu.trove.map.hash.THashMap;
 
 import org.chocosolver.solver.Solver;
@@ -40,8 +38,6 @@ import org.chocosolver.solver.explanations.*;
 import org.chocosolver.solver.variables.IntVar;
 import org.chocosolver.solver.variables.events.IntEventType;
 import org.chocosolver.util.ESat;
-import org.chocosolver.util.iterators.DisposableValueIterator;
-import org.syat.statistics.KolmogorovSmirnovTest;
 import org.syat.statistics.KolmogorovSmirnovTestTwoSamples;
 
 import umontreal.iro.lecuyer.probdist.EmpiricalDist;
@@ -110,8 +106,6 @@ public class PropScalarEqSt extends Propagator<IntVar> {
         } while (run || nbR < nbRules);
     }
 
-
-    @SuppressWarnings({"NullableProblems"})
     boolean filterOnLeq() throws ContradictionException {
         boolean anychange = false;
         double[] pivotUB = new double[samples.length];
@@ -155,7 +149,6 @@ public class PropScalarEqSt extends Propagator<IntVar> {
         return anychange;
     }
 
-    @SuppressWarnings({"NullableProblems"})
     boolean filterOnGeq() throws ContradictionException {
     	boolean anychange = false;
         double[] pivotLB = new double[samples.length];

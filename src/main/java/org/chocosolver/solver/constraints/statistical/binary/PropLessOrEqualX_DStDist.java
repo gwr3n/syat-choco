@@ -10,13 +10,10 @@ import org.chocosolver.solver.exception.SolverException;
 import org.chocosolver.solver.explanations.Deduction;
 import org.chocosolver.solver.explanations.Explanation;
 import org.chocosolver.solver.explanations.ExplanationEngine;
-import org.chocosolver.solver.explanations.VariableState;
 import org.chocosolver.solver.variables.IntVar;
-import org.chocosolver.solver.variables.Variable;
 import org.chocosolver.solver.variables.events.IntEventType;
 import org.chocosolver.util.ESat;
 import org.syat.statistics.KolmogorovSmirnovTest;
-import org.syat.statistics.TTest;
 import org.chocosolver.solver.variables.statistical.distributions.DistributionVar;
 
 import umontreal.iro.lecuyer.probdist.ContinuousDistribution;

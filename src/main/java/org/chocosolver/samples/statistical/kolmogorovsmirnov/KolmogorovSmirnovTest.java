@@ -1,7 +1,5 @@
 package org.chocosolver.samples.statistical.kolmogorovsmirnov;
 
-import java.io.IOException;
-
 import org.slf4j.LoggerFactory;
 
 import org.chocosolver.samples.AbstractProblem;

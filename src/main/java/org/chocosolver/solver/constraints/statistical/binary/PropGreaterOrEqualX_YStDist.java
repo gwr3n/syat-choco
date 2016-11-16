@@ -14,8 +14,6 @@ import org.chocosolver.solver.variables.IntVar;
 import org.chocosolver.solver.variables.events.IntEventType;
 import org.chocosolver.util.ESat;
 import org.syat.statistics.KolmogorovSmirnovTestTwoSamples;
-import org.syat.statistics.TTest;
-import org.syat.statistics.TTestTwoSamples;
 
 import umontreal.iro.lecuyer.probdist.EmpiricalDist;
 
@@ -40,7 +38,6 @@ public final class PropGreaterOrEqualX_YStDist extends Propagator<IntVar> {
     	return var3;
     }
     
-    @SuppressWarnings({"unchecked"})
     public PropGreaterOrEqualX_YStDist(IntVar[] var1, IntVar[] var2, double confidence) {
         super(mergeArrays(var1, var2), PropagatorPriority.BINARY, true);
         if(var1.length == 1 || var2.length == 1)

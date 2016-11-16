@@ -140,7 +140,7 @@ public class Prop_BACP_gc extends Propagator<IntVar> {
          }
          for(int j = 0; j < connectionMatrix.length; j++){
             if(connectionMatrix[i][j] == 1){
-               int newDist = (vars[j].getLB() + 1) - this.distances[j+1] + 1; //Incorrect
+               //int newDist = (vars[j].getLB() + 1) - this.distances[j+1] + 1; //Incorrect
                g.addEdge(j+1, i+1, 1);
             }
          }

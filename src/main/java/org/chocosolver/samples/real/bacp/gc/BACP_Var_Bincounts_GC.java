@@ -40,12 +40,10 @@ import org.chocosolver.solver.constraints.IntConstraintFactorySt;
 import org.chocosolver.solver.constraints.real.Ibex;
 import org.chocosolver.solver.constraints.real.RealConstraint;
 import org.chocosolver.solver.search.loop.monitors.IMonitorSolution;
-import org.chocosolver.solver.search.loop.monitors.SearchMonitorFactory;
 import org.chocosolver.solver.search.strategy.IntStrategyFactory;
 import org.chocosolver.solver.variables.IntVar;
 import org.chocosolver.solver.variables.RealVar;
 import org.chocosolver.solver.variables.VariableFactory;
-import org.chocosolver.util.iterators.DisposableValueIterator;
 
 /**
  * The balanced academic curriculum problem: 
@@ -328,6 +326,7 @@ public class BACP_Var_Bincounts_GC extends AbstractProblem {
      * 
      * @param load
      */
+    @SuppressWarnings("unused")
     private void postSymBreakDominanceConstraints(int[] load){
        LongestPath path = new LongestPath();
        int[][] prerequisiteMatrix = path.loadPrerequisites(instance);

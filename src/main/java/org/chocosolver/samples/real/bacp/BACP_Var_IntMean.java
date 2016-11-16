@@ -32,7 +32,6 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import org.chocosolver.samples.AbstractProblem;
-import org.chocosolver.samples.real.bacp.filtering.BACP_gc;
 import org.chocosolver.samples.real.bacp.preprocessing.longestpath.LongestPath;
 import org.chocosolver.solver.ResolutionPolicy;
 import org.chocosolver.solver.Solver;
@@ -43,9 +42,6 @@ import org.chocosolver.solver.constraints.real.RealConstraint;
 import org.chocosolver.solver.exception.ContradictionException;
 import org.chocosolver.solver.search.loop.monitors.IMonitorSolution;
 import org.chocosolver.solver.search.strategy.IntStrategyFactory;
-import org.chocosolver.solver.search.strategy.selectors.values.RealDomainMiddle;
-import org.chocosolver.solver.search.strategy.selectors.variables.Cyclic;
-import org.chocosolver.solver.search.strategy.strategy.RealStrategy;
 import org.chocosolver.solver.variables.BoolVar;
 import org.chocosolver.solver.variables.IntVar;
 import org.chocosolver.solver.variables.RealVar;

@@ -10,15 +10,10 @@ import org.chocosolver.solver.exception.SolverException;
 import org.chocosolver.solver.explanations.Deduction;
 import org.chocosolver.solver.explanations.Explanation;
 import org.chocosolver.solver.explanations.ExplanationEngine;
-import org.chocosolver.solver.explanations.VariableState;
 import org.chocosolver.solver.variables.IntVar;
-import org.chocosolver.solver.variables.Variable;
 import org.chocosolver.solver.variables.events.IntEventType;
 import org.chocosolver.util.ESat;
-import org.chocosolver.util.tools.ArrayUtils;
 import org.syat.statistics.KolmogorovSmirnovTestTwoSamples;
-import org.syat.statistics.TTest;
-import org.syat.statistics.TTestTwoSamples;
 import org.chocosolver.util.iterators.DisposableValueIterator;
 
 import umontreal.iro.lecuyer.probdist.EmpiricalDist;
@@ -45,7 +40,6 @@ public final class PropNotEqualX_YStDist extends Propagator<IntVar> {
     	return var3;
     }
     
-    @SuppressWarnings({"unchecked"})
     public PropNotEqualX_YStDist(IntVar[] var1, IntVar[] var2, double confidence) {
         super(mergeArrays(var1, var2), PropagatorPriority.BINARY, true);
         if(var1.length == 1 || var2.length == 1)

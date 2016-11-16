@@ -39,7 +39,6 @@ public final class PropGreaterOrEqualX_YStMean extends Propagator<IntVar> {
     	return var3;
     }
     
-    @SuppressWarnings({"unchecked"})
     public PropGreaterOrEqualX_YStMean(IntVar[] var1, IntVar[] var2, double confidence) {
         super(mergeArrays(var1, var2), PropagatorPriority.BINARY, true);
         this.x = var1;

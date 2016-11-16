@@ -27,12 +27,9 @@
 
 package org.chocosolver.solver.constraints.statistical.sum;
 
-import gnu.trove.map.hash.TObjectIntHashMap;
 import org.chocosolver.solver.constraints.Constraint;
 import org.chocosolver.solver.constraints.Propagator;
 import org.chocosolver.solver.variables.IntVar;
-import org.chocosolver.util.tools.ArrayUtils;
-import org.chocosolver.util.ESat;
 
 /**
  * <br/>

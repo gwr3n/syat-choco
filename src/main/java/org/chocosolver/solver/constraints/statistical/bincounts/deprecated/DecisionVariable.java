@@ -1,9 +1,7 @@
 package org.chocosolver.solver.constraints.statistical.bincounts.deprecated;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class DecisionVariable {
    ArrayList<Integer> domain;

@@ -11,10 +11,6 @@ import org.chocosolver.solver.search.strategy.strategy.AbstractStrategy;
 import org.chocosolver.solver.variables.IntVar;
 import org.chocosolver.solver.variables.VariableFactory;
 import org.chocosolver.solver.variables.statistical.distributions.UniformDistVar;
-import org.chocosolver.util.tools.ArrayUtils;
-
-import umontreal.iro.lecuyer.randvar.UniformIntGen;
-import umontreal.iro.lecuyer.rng.MRG32k3a;
 
 public class IncompleteGermanTankProblem extends AbstractProblem {
 

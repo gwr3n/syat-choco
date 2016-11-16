@@ -1,6 +1,5 @@
 package org.chocosolver.solver.constraints.statistical;
 
-import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.constraints.Constraint;
 import org.chocosolver.solver.constraints.Operator;
 import org.chocosolver.solver.constraints.Propagator;
@@ -10,7 +9,6 @@ import org.chocosolver.solver.variables.statistical.distributions.DistributionVa
 
 import umontreal.iro.lecuyer.probdist.Distribution;
 
-import org.chocosolver.util.ESat;
 import org.chocosolver.solver.constraints.statistical.binary.PropGreaterOrEqualX_DStDist;
 import org.chocosolver.solver.constraints.statistical.binary.PropGreaterOrEqualX_YStDist;
 import org.chocosolver.solver.constraints.statistical.binary.PropGreaterOrEqualX_YStMean;
@@ -24,19 +22,6 @@ import org.chocosolver.solver.constraints.statistical.unary.PropLessOrEqualXCStD
 import org.chocosolver.solver.constraints.statistical.unary.PropLessOrEqualXCStMean;
 import org.chocosolver.solver.constraints.statistical.unary.PropNotEqualXCStDist;
 import org.chocosolver.solver.constraints.statistical.unary.PropNotEqualXCStMean;
-import org.chocosolver.solver.constraints.binary.PropEqualXY_C;
-import org.chocosolver.solver.constraints.binary.PropEqualX_Y;
-import org.chocosolver.solver.constraints.binary.PropEqualX_YC;
-import org.chocosolver.solver.constraints.binary.PropGreaterOrEqualXY_C;
-import org.chocosolver.solver.constraints.binary.PropGreaterOrEqualX_Y;
-import org.chocosolver.solver.constraints.binary.PropGreaterOrEqualX_YC;
-import org.chocosolver.solver.constraints.binary.PropLessOrEqualXY_C;
-import org.chocosolver.solver.constraints.binary.PropNotEqualXY_C;
-import org.chocosolver.solver.constraints.binary.PropNotEqualX_Y;
-import org.chocosolver.solver.constraints.binary.PropNotEqualX_YC;
-import org.chocosolver.solver.constraints.unary.PropEqualXC;
-import org.chocosolver.solver.constraints.unary.PropGreaterOrEqualXC;
-import org.chocosolver.solver.constraints.unary.PropNotEqualXC;
 
 /**
  * A constraint dedicated to arithmetic operations.
@@ -57,12 +42,13 @@ public class ArithmeticSt extends Constraint {
     protected final Operator op1, op2; // operators.
     protected final int cste;
     protected final boolean isBinary; // to distinct unary and binary formula
-
+    
+    @SuppressWarnings("unused")
     private static boolean isOperation(Operator operator) {
         return operator.equals(Operator.PL) || operator.equals(Operator.MN);
     }
 
-    private static Propagator[] createProp(IntVar[] var, Operator op1, Operator op2, int cste, double confidence){
+    private static Propagator<IntVar>[] createProp(IntVar[] var, Operator op1, Operator op2, int cste, double confidence){
     	switch (op2) {
         case MEAN:
 	        switch (op1) {
@@ -96,7 +82,7 @@ public class ArithmeticSt extends Constraint {
         
     }
     
-    private static Propagator[] createProp(IntVar[] var1, DistributionVar dist, Operator op1, double confidence) {
+    private static Propagator<IntVar>[] createProp(IntVar[] var1, DistributionVar dist, Operator op1, double confidence) {
     	switch (op1) {
 			case EQ: // X = Y
 				return new Propagator[]{new PropGreaterOrEqualX_DStDist(var1, dist, 1-(1-confidence)/2.0), new PropLessOrEqualX_DStDist(var1, dist, 1-(1-confidence)/2.0)};
@@ -120,7 +106,7 @@ public class ArithmeticSt extends Constraint {
     	
     }
     
-    private static Propagator[] createProp(IntVar[] var1, Distribution dist, Operator op1, double confidence) {
+    private static Propagator<IntVar>[] createProp(IntVar[] var1, Distribution dist, Operator op1, double confidence) {
     	switch (op1) {
 	        case EQ: // X = Y
 	        	return new Propagator[]{new PropGreaterOrEqualXCStDist(var1, dist, 1-(1-confidence)/2.0), new PropLessOrEqualXCStDist(var1, dist, 1-(1-confidence)/2.0)};
@@ -149,6 +135,7 @@ public class ArithmeticSt extends Constraint {
     	this.cste = 0;
     }
     
+    @SuppressWarnings("unused")
     private static IntVar[] mergeArrays(IntVar[] var1, IntVar[] var2){
     	IntVar[] var3 = new IntVar[var1.length+var2.length];
     	System.arraycopy(var1, 0, var3, 0, var1.length);
@@ -156,7 +143,7 @@ public class ArithmeticSt extends Constraint {
     	return var3;
     }
     
-    private static Propagator[] createProp(IntVar[] var1, IntVar[] var2, Operator op1, Operator op2, double confidence) {
+    private static Propagator<IntVar>[] createProp(IntVar[] var1, IntVar[] var2, Operator op1, Operator op2, double confidence) {
     	switch (op2) {
         case MEAN:
 	        switch (op1) {

@@ -30,7 +30,6 @@ package org.chocosolver.samples.statistical.inspectionscheduling;
 import org.slf4j.LoggerFactory;
 
 import org.chocosolver.samples.AbstractProblem;
-import org.chocosolver.solver.ResolutionPolicy;
 import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.constraints.IntConstraintFactorySt;
 import org.chocosolver.solver.constraints.IntConstraintFactory;
@@ -165,6 +164,7 @@ public class InspectionSchedulingSatisfaction extends AbstractProblem {
 	}
 
 	public static void main(String[] args){
+	   @SuppressWarnings("unused")
 		String[] str={"-log","SEARCH"};
 		new InspectionSchedulingSatisfaction().execute();
 	}

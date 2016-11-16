@@ -1,20 +1,12 @@
 package org.chocosolver.samples.statistical.kolmogorovsmirnov;
 
-import java.io.IOException;
-
-import org.kohsuke.args4j.Option;
 import org.slf4j.LoggerFactory;
 
 import org.chocosolver.samples.AbstractProblem;
-import org.chocosolver.solver.ResolutionPolicy;
 import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.constraints.IntConstraintFactorySt;
-import org.chocosolver.solver.exception.ContradictionException;
-import org.chocosolver.solver.objective.ObjectiveStrategy;
-import org.chocosolver.solver.objective.OptimizationPolicy;
 import org.chocosolver.solver.search.strategy.IntStrategyFactory;
 import org.chocosolver.solver.search.strategy.strategy.AbstractStrategy;
-import org.chocosolver.solver.search.strategy.strategy.StrategiesSequencer;
 import org.chocosolver.solver.variables.IntVar;
 import org.chocosolver.solver.variables.VariableFactory;
 
@@ -74,7 +66,7 @@ public class ScalarStTest extends AbstractProblem {
 
     @Override
     public void configureSearch() {
-        AbstractStrategy strat = IntStrategyFactory.domOverWDeg(objects,2211);
+        AbstractStrategy<IntVar> strat = IntStrategyFactory.domOverWDeg(objects,2211);
         // trick : top-down maximization
         solver.set(strat);
     }

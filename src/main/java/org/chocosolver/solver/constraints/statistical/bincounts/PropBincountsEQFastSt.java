@@ -18,7 +18,6 @@ import org.chocosolver.util.iterators.DisposableValueIterator;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation.Result;
-import org.slf4j.LoggerFactory;
 import org.ojalgo.optimisation.Variable;
 
 import gnu.trove.map.hash.THashMap;
