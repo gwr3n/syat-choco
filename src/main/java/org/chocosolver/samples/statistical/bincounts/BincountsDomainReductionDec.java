@@ -60,7 +60,7 @@ public class BincountsDomainReductionDec extends AbstractProblem {
       int[] valuesArray = new int[valueOccurrenceVariables.length];
       for(int i = 0; i < this.valueOccurrenceVariables.length; i++){
          valueOccurrenceVariables[i] = VariableFactory.bounded("Value Occurrence "+i, 0, this.values.length, solver);
-         valuesArray[i] = i;
+         valuesArray[i] = i + this.binBounds[0];
       }
       
       binVariables = new IntVar[this.binCounts.length];
@@ -231,10 +231,10 @@ public class BincountsDomainReductionDec extends AbstractProblem {
    public static void main(String[] args) {
      String[] str={"-log","SILENT"};
      //String[] str={"-log","SOLUTION"};
-     int vars = 40;
+     int vars = 15;
      int vals = 10;
-     int valUB = 30;
-     int[] binBounds = {0,10,20,valUB};                                  // {1,3,5};
+     int valUB = 60;
+     int[] binBounds = {0,5,10,15,20,25,30,35,40,valUB};                                  // {1,3,5};
      int bins = binBounds.length - 1;
      
      int instances = 50;
@@ -245,7 +245,7 @@ public class BincountsDomainReductionDec extends AbstractProblem {
      Random rnd = new Random(123);
      int counter = 0;
      int instance = 0;
-     int[] instanceNos = {1, 2, 3, 4, 5, 6, 8, 9, 10, 11, 12, 13, 14, 15, 17, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 31, 32, 33, 34, 35, 36, 37, 39, 40, 41, 42, 43, 45, 47, 49, 50, 51, 52, 53, 54, 55, 56, 57, 59, 60};
+     int[] instanceNos = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50};
      do{
         int[][] values = generateRandomValues(rnd, vars, vals, valUB);    // {{3,4},{1,2,4},{2,3,4}};
         int[][] binCounts = generateRandomBinCounts(rnd, bins, vars);     // {{1,3},{0,1}};

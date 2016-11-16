@@ -77,9 +77,14 @@ import umontreal.iro.lecuyer.probdist.ChiSquareDist;
  */
 public class BACP_Chi_Bincounts_GC extends AbstractProblem {
     
-    String instance = "BACP/bacp-9"
+    String instance = "BACP/bacp-5"
                       + ".mzn";
    
+    public BACP_Chi_Bincounts_GC(String instance){
+       super();
+       this.instance = instance;
+    }
+    
     public void loadInstance(){
        FileReader fr = null;
        String model = "";
@@ -356,7 +361,8 @@ public class BACP_Chi_Bincounts_GC extends AbstractProblem {
        //System.arraycopy(course_period, 0, allVars, load.length, course_period.length);
        solver.set(
              //new RealStrategy(new RealVar[]{variance}, new Cyclic(), new RealDomainMiddle()),
-             IntStrategyFactory.activity(course_period,1234)
+             IntStrategyFactory.minDom_LB(course_period)
+             //IntStrategyFactory.activity(course_period,1234)
              /*IntStrategyFactory.custom(
                    IntStrategyFactory.minDomainSize_var_selector(), 
                    new org.chocosolver.solver.search.strategy.selectors.IntValueSelector(){
@@ -380,12 +386,12 @@ public class BACP_Chi_Bincounts_GC extends AbstractProblem {
                    )*/        
        );
        
-       //SearchMonitorFactory.limitTime(solver,500000);
+       SearchMonitorFactory.limitTime(solver,60000);
     }
 
     @Override
     public void solve() {
-       solver.getSearchLoop().plugSearchMonitor(new IMonitorSolution() {
+       /*solver.getSearchLoop().plugSearchMonitor(new IMonitorSolution() {
           public void onSolution() {
                 System.out.println("---");
                 System.out.println("Chi^2 statistics (min threshold "+chiSqDist.inverseF(1-pValue)+"): ("+chiSqStatistics.getLB()+", "+chiSqStatistics.getUB()+")");
@@ -412,18 +418,35 @@ public class BACP_Chi_Bincounts_GC extends AbstractProblem {
                 System.out.println();
                 System.out.println("---");
              }
-          });
+          });*/
        solver.findSolution();
     }
 
     @Override
     public void prettyOut() {
     }
+    
+    public String getStats(){
+       return   solver.getMeasures().getSolutionCount()+"\t"+
+                solver.getMeasures().getTimeCount()+"\t"+
+                solver.getMeasures().getNodeCount()+"\t"+
+                solver.getMeasures().getBackTrackCount()+"\t"+
+                solver.getMeasures().getFailCount()+"\t"+
+                solver.getMeasures().getRestartCount()+"\t"+
+                solver.getMeasures().getMaxDepth()+"\t"+
+                solver.getMeasures().getPropagationsCount();
+    }
 
     public static void main(String[] args) {
-       String[] str={"-log","SOLUTION"};
-       
-       BACP_Chi_Bincounts_GC chi = new BACP_Chi_Bincounts_GC();
-       chi.execute(str);
+       String[] str={"-log","SILENT"};
+
+       for(int i = 1; i <= 28; i++){
+          String instance = "BACP/bacp-"+i
+                          + ".mzn";
+
+          BACP_Chi_Bincounts_GC chi = new BACP_Chi_Bincounts_GC(instance);
+          chi.execute(str);
+          System.out.println(chi.getStats());
+       }
     }
 }

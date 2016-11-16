@@ -31,6 +31,8 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
+import javax.naming.directory.SearchResult;
+
 import org.chocosolver.samples.AbstractProblem;
 import org.chocosolver.samples.real.bacp.preprocessing.longestpath.LongestPath;
 import org.chocosolver.solver.Solver;
@@ -77,9 +79,14 @@ import umontreal.iro.lecuyer.probdist.ChiSquareDist;
  */
 public class BACP_Chi_Bincounts_Dec extends AbstractProblem {
     
-    String instance = "BACP/bacp-9"
+    String instance = "BACP/bacp-1"
                       + ".mzn";
    
+    public BACP_Chi_Bincounts_Dec(String instance){
+       super();
+       this.instance = instance;
+    }
+    
     public void loadInstance(){
        FileReader fr = null;
        String model = "";
@@ -221,7 +228,7 @@ public class BACP_Chi_Bincounts_Dec extends AbstractProblem {
         int[] valuesArray = new int[valueOccurrenceVariables.length];
         for(int i = 0; i < this.valueOccurrenceVariables.length; i++){
            valueOccurrenceVariables[i] = VariableFactory.bounded("Value Occurrence "+i, 0, load.length, solver);
-           valuesArray[i] = i;
+           valuesArray[i] = i+this.binBounds[0];
         }
         
         binVariables = new IntVar[binBounds.length-1];
@@ -372,7 +379,8 @@ public class BACP_Chi_Bincounts_Dec extends AbstractProblem {
        //System.arraycopy(course_period, 0, allVars, load.length, course_period.length);
        solver.set(
              //new RealStrategy(new RealVar[]{variance}, new Cyclic(), new RealDomainMiddle()),
-             IntStrategyFactory.activity(course_period,1234)
+             IntStrategyFactory.minDom_LB(course_period)
+             //IntStrategyFactory.activity(course_period,1234)
              /*IntStrategyFactory.custom(
                    IntStrategyFactory.minDomainSize_var_selector(), 
                    new org.chocosolver.solver.search.strategy.selectors.IntValueSelector(){
@@ -396,12 +404,12 @@ public class BACP_Chi_Bincounts_Dec extends AbstractProblem {
                    )*/        
        );
        
-       //SearchMonitorFactory.limitTime(solver,500000);
+       SearchMonitorFactory.limitTime(solver,60000);
     }
 
     @Override
     public void solve() {
-       solver.getSearchLoop().plugSearchMonitor(new IMonitorSolution() {
+       /*solver.getSearchLoop().plugSearchMonitor(new IMonitorSolution() {
           public void onSolution() {
                 System.out.println("---");
                 System.out.println("Chi^2 statistics (min threshold "+chiSqDist.inverseF(1-pValue)+"): ("+chiSqStatistics.getLB()+", "+chiSqStatistics.getUB()+")");
@@ -428,18 +436,35 @@ public class BACP_Chi_Bincounts_Dec extends AbstractProblem {
                 System.out.println();
                 System.out.println("---");
              }
-          });
+          });*/
        solver.findSolution();
     }
 
     @Override
     public void prettyOut() {
+       
+    }
+    
+    public String getStats(){
+       return   solver.getMeasures().getSolutionCount()+"\t"+
+                solver.getMeasures().getTimeCount()+"\t"+
+                solver.getMeasures().getNodeCount()+"\t"+
+                solver.getMeasures().getBackTrackCount()+"\t"+
+                solver.getMeasures().getFailCount()+"\t"+
+                solver.getMeasures().getRestartCount()+"\t"+
+                solver.getMeasures().getMaxDepth()+"\t"+
+                solver.getMeasures().getPropagationsCount();
     }
 
     public static void main(String[] args) {
-       String[] str={"-log","SOLUTION"};
+       String[] str={"-log","SILENT"};
        
-       BACP_Chi_Bincounts_Dec chi = new BACP_Chi_Bincounts_Dec();
-       chi.execute(str);
+       for(int i = 1; i <= 28; i++){
+          String instance = "BACP/bacp-"+i
+                          + ".mzn";
+          BACP_Chi_Bincounts_Dec chi = new BACP_Chi_Bincounts_Dec(instance);
+          chi.execute(str);
+          System.out.println(chi.getStats());
+       }
     }
 }

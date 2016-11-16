@@ -214,14 +214,14 @@ public class BincountsDomainReductionGC extends AbstractProblem {
    public static void main(String[] args) {
      String[] str={"-log","SILENT"};
      //String[] str={"-log","SOLUTION"};
-     int vars = 40;
+     int vars = 15;
      int vals = 10;
-     int valUB = 30;
-     int[] binBounds = {0,10,20,valUB};                                  // {1,3,5};
+     int valUB = 60;
+     int[] binBounds = {0,5,10,15,20,25,30,35,40,valUB};                                // {1,3,5};
      int bins = binBounds.length - 1;
      
      int instances = 50;
-     double percentageVarAssigned = 0.2;
+     double percentageVarAssigned = 0.8;
      
      StringBuilder results = new StringBuilder();
      

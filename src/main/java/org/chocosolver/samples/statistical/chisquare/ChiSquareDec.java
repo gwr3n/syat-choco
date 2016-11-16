@@ -70,7 +70,7 @@ public class ChiSquareDec extends AbstractProblem {
       int[] valuesArray = new int[valueOccurrenceVariables.length];
       for(int i = 0; i < this.valueOccurrenceVariables.length; i++){
          valueOccurrenceVariables[i] = VariableFactory.bounded("Value Occurrence "+i, 0, this.values.length, solver);
-         valuesArray[i] = i;
+         valuesArray[i] = i + this.binBounds[0];
       }
       
       binVariables = new IntVar[this.binCounts.length];
