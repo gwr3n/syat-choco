@@ -37,6 +37,9 @@ public class Bincounts extends AbstractProblem {
        solver = new Solver("Frequency");
    }
    
+   /**
+    * Bincounts constraint
+    *
    @Override
    public void buildModel() {
       //setUp();
@@ -49,9 +52,13 @@ public class Bincounts extends AbstractProblem {
          binVariables[i] = VariableFactory.bounded("Bin "+(i+1), this.binCounts[i][0], this.binCounts[i][1], solver);
       
       solver.post(IntConstraintFactorySt.bincountsSt(valueVariables, binVariables, binBounds));      
-   }
+   }*/
    
-   /*@Override
+   /**
+    * GAC enforced on linear equalities
+    * Choco GCC (GAC not guaranteed)
+    *
+   @Override
    public void buildModel() {
       //setUp();
       valueVariables = new IntVar[this.values.length];
@@ -79,6 +86,39 @@ public class Bincounts extends AbstractProblem {
       
       solver.post(IntConstraintFactorySt.global_cardinality(valueVariables, valuesArray, valueOccurrenceVariables, true));    
    }*/
+   
+   /**
+    * GAC enforced on each constraint
+    */
+   @Override
+   public void buildModel() {
+      //setUp();
+      valueVariables = new IntVar[this.values.length];
+      for(int i = 0; i < this.values.length; i++)
+         valueVariables[i] = VariableFactory.enumerated("Value "+(i+1), values[i], solver);
+      
+      valueOccurrenceVariables = new IntVar[this.binBounds[this.binBounds.length-1]-this.binBounds[0]];
+      int[] valuesArray = new int[this.binBounds[this.binBounds.length-1]-this.binBounds[0]+1];
+      for(int i = 0; i < this.valueOccurrenceVariables.length; i++){
+         valueOccurrenceVariables[i] = VariableFactory.bounded("Value Occurrence "+i, 0, this.values.length, solver);
+         valuesArray[i] = i + this.binBounds[0];
+      }
+      valuesArray[valuesArray.length-1] = this.binBounds[this.binBounds.length-1];
+      
+      binVariables = new IntVar[this.binCounts.length];
+      for(int i = 0; i < this.binCounts.length; i++)
+         binVariables[i] = VariableFactory.bounded("Bin "+(i+1), this.binCounts[i][0], this.binCounts[i][1], solver);
+      
+      for(int i = 0; i < this.binBounds.length - 1; i++){
+         IntVar[] binOccurrences = new IntVar[this.binBounds[i+1]-this.binBounds[i]];
+         System.arraycopy(valueOccurrenceVariables, this.binBounds[i]-this.binBounds[0], binOccurrences, 0, this.binBounds[i+1]-this.binBounds[i]);
+         solver.post(IntConstraintFactorySt.sum(binOccurrences, binVariables[i]));
+      }
+      
+      solver.post(IntConstraintFactorySt.sum(binVariables, VariableFactory.fixed(valueVariables.length, solver)));
+      
+      solver.post(IntConstraintFactorySt.bincountsSt(valueVariables, valueOccurrenceVariables, valuesArray));
+   }
    
    private static IntVar[] mergeArrays(IntVar[] var1, IntVar[] var2){
       IntVar[] var3 = new IntVar[var1.length+var2.length];
