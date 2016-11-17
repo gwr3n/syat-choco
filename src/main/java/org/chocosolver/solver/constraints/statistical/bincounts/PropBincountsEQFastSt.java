@@ -100,11 +100,16 @@ public class PropBincountsEQFastSt extends Propagator<IntVar> {
    
    private void updateDomainsValue(int varIndex) throws ContradictionException{
       //Cast to integer justified by the fact matrix is TUM
+      boolean[] tempFitsInBin = new boolean[m];
+      for(int j = 0; j < m; j++){
+         tempFitsInBin[j] = varIndex < n && fitsInBin[varIndex][j].get();
+      }
+      
       for(int k = 0; k < n*m; k++){
          int i = k / m;
          int j = k % m;
          
-         if(varIndex < n && !(fitsInBin[varIndex][j].get() && fitsInBin[i][j].get()))
+         if(varIndex < n && !(tempFitsInBin[j] && fitsInBin[i][j].get()))
             continue;
          
          ExpressionsBasedModel model = this.getLPModel(k);
