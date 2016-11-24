@@ -88,6 +88,11 @@ public class PropLessOrEqualXCStDist extends Propagator<IntVar> {
         return ESat.UNDEFINED;*/
     	return ESat.UNDEFINED;
     }
+    
+    @Override
+    public String toString() {
+        return vars[0].getName() + " >= " + dist.toString();
+    }
 
     @Override
     public void explain(ExplanationEngine xengine, Deduction d, Explanation e) {

@@ -66,39 +66,29 @@ public class PropBincountsEQFastSt extends Propagator<IntVar> {
       }
    }
    
-   protected void prepare() {
-   }
-   
    @Override
    public void propagate(int evtmask) throws ContradictionException {
       modelInstance = null;
       //long timeBefore = System.nanoTime();
       if (PropagatorEventType.isFullPropagation(evtmask)) {
-         prepare();
-         updateDomains();
+         boolean anyChange = updateDomains();
+         //if(anyChange) 
+            //this.forcePropagate(PropagatorEventType.CUSTOM_PROPAGATION);
       }
       //long timeAfter = System.nanoTime();
       //LoggerFactory.getLogger("bench").info("Prop main time: "+(timeAfter-timeBefore)*1e-9);
    }
    
-   int totalLPsSolved = 0;
-   
    @Override
    public void propagate(int i, int mask) throws ContradictionException {
       modelInstance = null;
-      //totalLPsSolved = 0;
-      //long timeBefore = System.nanoTime();
-      if (PropagatorEventType.isFullPropagation(mask)) {
-         prepare();
-         if(i < n)
-            updateDomainsBin(i);  
-         updateDomainsValue(i);  
-      }
-      //long timeAfter = System.nanoTime();
-      //LoggerFactory.getLogger("bench").info("Prop targeted time: "+(timeAfter-timeBefore)*1e-9+"\t"+totalLPsSolved);
+      
+      boolean anyChangeBin = updateDomainsBin(i);  
+      boolean anyChangeValue = updateDomainsValue(i);
    }
    
-   private void updateDomainsValue(int varIndex) throws ContradictionException{
+   private boolean updateDomainsValue(int varIndex) throws ContradictionException{
+      boolean anyChange = false;
       //Cast to integer justified by the fact matrix is TUM
       boolean[] tempFitsInBin = new boolean[m];
       for(int j = 0; j < m; j++){
@@ -109,36 +99,39 @@ public class PropBincountsEQFastSt extends Propagator<IntVar> {
          int i = k / m;
          int j = k % m;
          
-         if(varIndex < n && !(tempFitsInBin[j] && fitsInBin[i][j].get()))
+         if(!(tempFitsInBin[j] && fitsInBin[i][j].get()))
             continue;
          
          ExpressionsBasedModel model = this.getLPModel(k);
          
-         Result result = model.minimise();     //totalLPsSolved++;
+         Result result = model.minimise();     
          if(!result.getState().isFeasible()){
             this.vars[i].wipeOut(aCause);
          }else if((int) result.getValue() == 1){
             for(int l = 0; l < m; l++){
                if(l != j){
-                  this.vars[i].removeInterval(getBinLB(l), getBinUB(l), aCause);
+                  anyChange = this.vars[i].removeInterval(getBinLB(l), getBinUB(l), aCause);
                   fitsInBin[i][l].set(false);
                }
             }
          }
          
-         result = model.maximise();            //totalLPsSolved++;
+         result = model.maximise();            
          if(!result.getState().isFeasible()){
             this.vars[i].wipeOut(aCause);
          }else if((int) result.getValue() == 0){
-            this.vars[i].removeInterval(getBinLB(j), getBinUB(j), aCause);
+            anyChange = this.vars[i].removeInterval(getBinLB(j), getBinUB(j), aCause);
             fitsInBin[i][j].set(false);
          }
          
          this.unsetLPModelWeight(k);
       }
+      
+      return anyChange;
    }
    
-   private void updateDomainsBin(int varIndex) throws ContradictionException{
+   private boolean updateDomainsBin(int varIndex) throws ContradictionException{
+      boolean anyChange = false;
       //Cast to integer justified by the fact matrix is TUM
       for(int k = n*m; k < n*m + m; k++){
          int j = k-n*m;  
@@ -150,21 +143,23 @@ public class PropBincountsEQFastSt extends Propagator<IntVar> {
             this.vars[j+n].wipeOut(aCause);
          }else{
             int lb = (int) result.getValue();
-            this.vars[j+n].updateLowerBound(lb, aCause);
+            anyChange = this.vars[j+n].updateLowerBound(lb, aCause);
          }
          result = model.maximise();           
          if(!result.getState().isFeasible()){
             this.vars[j+n].wipeOut(aCause);
          }else{
             int ub = (int) result.getValue();
-            this.vars[j+n].updateUpperBound(ub, aCause);
+            anyChange = this.vars[j+n].updateUpperBound(ub, aCause);
          }
          
          this.unsetLPModelWeight(k);
       }
+      
+      return anyChange;
    }
    
-   private void updateDomains() throws ContradictionException{
+   private boolean verifyDomains() {
       //Cast to integer justified by the fact matrix is TUM
       for(int k = n*m; k < n*m + m; k++){
          int j = k-n*m;
@@ -174,14 +169,74 @@ public class PropBincountsEQFastSt extends Propagator<IntVar> {
          Result result = model.minimise();
          if(result.getState().isFeasible()){
             int lb = (int) result.getValue();
-            this.vars[j+n].updateLowerBound(lb, aCause);
+            if(lb != this.vars[j+n].getLB())
+               return false;
+         }else{
+            return false;
+         }
+         result = model.maximise();
+         if(result.getState().isFeasible()){
+            int ub = (int) result.getValue();
+            if(ub != this.vars[j+n].getUB())
+               return false;
+         }else{
+            return false;
+         }
+         
+         this.unsetLPModelWeight(k);
+      }
+      
+      for(int k = 0; k < n*m; k++){
+         int i = k / m;
+         int j = k % m;
+         
+         ExpressionsBasedModel model = this.getLPModel(k);
+         
+         Result result = model.minimise();
+         if(!result.getState().isFeasible()){
+            return false;
+         }else if((int) result.getValue() == 1){
+            for(int l = 0; l < m; l++){
+               if(l != j){
+                  if(this.fitsInBin(this.vars[i], l))
+                     return false;
+               }
+            }
+         }
+         
+         result = model.maximise();
+         if(!result.getState().isFeasible()){
+            return false;
+         }else if((int) result.getValue() == 0){
+            if(this.fitsInBin(this.vars[i], j))
+               return false;
+         }
+         
+         this.unsetLPModelWeight(k);
+      }
+      
+      return true;
+   }
+   
+   private boolean updateDomains() throws ContradictionException{
+      boolean anyChange = false;
+      //Cast to integer justified by the fact matrix is TUM
+      for(int k = n*m; k < n*m + m; k++){
+         int j = k-n*m;
+         
+         ExpressionsBasedModel model = this.getLPModel(k);
+         
+         Result result = model.minimise();
+         if(result.getState().isFeasible()){
+            int lb = (int) result.getValue();
+            anyChange = this.vars[j+n].updateLowerBound(lb, aCause);
          }else{
             this.vars[j+n].wipeOut(aCause);
          }
          result = model.maximise();
          if(result.getState().isFeasible()){
             int ub = (int) result.getValue();
-            this.vars[j+n].updateUpperBound(ub, aCause);
+            anyChange = this.vars[j+n].updateUpperBound(ub, aCause);
          }else{
             this.vars[j+n].wipeOut(aCause);
          }
@@ -201,7 +256,7 @@ public class PropBincountsEQFastSt extends Propagator<IntVar> {
          }else if((int) result.getValue() == 1){
             for(int l = 0; l < m; l++){
                if(l != j){
-                  this.vars[i].removeInterval(getBinLB(l), getBinUB(l), aCause);
+                  anyChange = this.vars[i].removeInterval(getBinLB(l), getBinUB(l), aCause);
                   fitsInBin[i][l].set(false);
                }
             }
@@ -211,23 +266,26 @@ public class PropBincountsEQFastSt extends Propagator<IntVar> {
          if(!result.getState().isFeasible()){
             this.vars[i].wipeOut(aCause);
          }else if((int) result.getValue() == 0){
-            this.vars[i].removeInterval(getBinLB(j), getBinUB(j), aCause);
+            anyChange = this.vars[i].removeInterval(getBinLB(j), getBinUB(j), aCause);
             fitsInBin[i][j].set(false);
          }
          
          this.unsetLPModelWeight(k);
       }
+      
+      return anyChange;
    }
 
    @Override
    public int getPropagationConditions(int vIdx) {
-     return IntEventType.boundAndInst();
+      return IntEventType.all();
    }
 
    @Override
    public ESat isEntailed() {
       // TODO Auto-generated method stub
-      return ESat.UNDEFINED;
+      modelInstance = null;
+      return verifyDomains() ? ESat.TRUE : ESat.FALSE;
    }
    
    @Override
@@ -359,20 +417,4 @@ public class PropBincountsEQFastSt extends Propagator<IntVar> {
       
       return model;
    }
-   
-   /*protected void addBinBoundLPConstraints(int j){
-      for(int k = 0; k < n*m + m; k++){
-         Expression binCount = this.models[k].addExpression("Bin bounds "+(j-n)+"_"+System.currentTimeMillis()).lower(getBinCountLB(j)).upper(getBinCountUB(j));
-         binCount.set(this.models[k].getVariable(j), 1);
-      }
-   }
-
-   protected void addInstatiatedVarLPConstraints(int i){
-      for(int k = 0; k < n*m + m; k++){
-         for(int j = 0; j < m; j++){
-            Expression connection = this.models[k].addExpression("Connection "+i+"_"+(j-m)+"_"+System.currentTimeMillis()).lower(0).upper(fitsInBin(this.vars[i], j) ? 1 : 0);
-            connection.set(this.models[k].getVariable(m+i*m+j), 1);
-         }
-      }
-   }*/
 }

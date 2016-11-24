@@ -57,10 +57,10 @@ public class PropBincountsEQSt extends Propagator<IntVar> {
    
    @Override
    public void propagate(int evtmask) throws ContradictionException {
-      if (PropagatorEventType.isFullPropagation(evtmask)) {
+      //if (PropagatorEventType.isFullPropagation(evtmask)) {
          prepare();
          updateDomains();
-      }
+      //}
    }
    
    @Override
@@ -71,10 +71,10 @@ public class PropBincountsEQSt extends Propagator<IntVar> {
          addBinBoundLPConstraints(i-n);
       }*/
       //forcePropagate(PropagatorEventType.CUSTOM_PROPAGATION);
-      if (PropagatorEventType.isFullPropagation(mask)) {
+      //if (PropagatorEventType.isFullPropagation(mask)) {
          prepare();
          updateDomains();  
-      }
+      //}
    }
    
    private void updateDomains() throws ContradictionException{
@@ -121,7 +121,7 @@ public class PropBincountsEQSt extends Propagator<IntVar> {
 
    @Override
    public int getPropagationConditions(int vIdx) {
-     return IntEventType.boundAndInst();
+      return IntEventType.all();
    }
 
    @Override

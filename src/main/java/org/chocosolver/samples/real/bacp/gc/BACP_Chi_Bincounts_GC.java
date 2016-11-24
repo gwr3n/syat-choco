@@ -447,6 +447,14 @@ public class BACP_Chi_Bincounts_GC extends AbstractProblem {
           BACP_Chi_Bincounts_GC chi = new BACP_Chi_Bincounts_GC(instance);
           chi.execute(str);
           System.out.println(chi.getStats());
+          chi = null;
+          System.gc();
+          try {
+             Thread.sleep(1000);
+          } catch (InterruptedException e) {
+             // TODO Auto-generated catch block
+             e.printStackTrace();
+          }
        }
     }
 }

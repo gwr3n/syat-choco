@@ -222,7 +222,7 @@ public class BincountsDomainReductionGC extends AbstractProblem {
      int bins = binBounds.length - 1;
      
      int instances = 50;
-     double percentageVarAssigned = 0.8;
+     double percentageVarAssigned = 0;
      
      StringBuilder results = new StringBuilder();
      

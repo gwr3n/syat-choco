@@ -56,7 +56,7 @@ public class ArithmeticSt extends Constraint {
 	            	//throw new UnsupportedOperationException();
 	                return new Propagator[]{new PropGreaterOrEqualXCStMean(var, cste, 1-(1-confidence)/2.0),new PropLessOrEqualXCStMean(var, cste, 1-(1-confidence)/2.0)};
 	            case NQ: // X =/= C
-	            	return new Propagator[]{new PropNotEqualXCStMean(var, cste, confidence)};
+	            	return new Propagator[]{new PropNotEqualXCStMean(var, cste, 1-(1-confidence)/2.0)};
 	            case GE: // X >= C
 	            	return new Propagator[]{new PropGreaterOrEqualXCStMean(var, cste, confidence)};
 	            case GT: // X > C -->  X >= C + 1
@@ -87,7 +87,7 @@ public class ArithmeticSt extends Constraint {
 			case EQ: // X = Y
 				return new Propagator[]{new PropGreaterOrEqualX_DStDist(var1, dist, 1-(1-confidence)/2.0), new PropLessOrEqualX_DStDist(var1, dist, 1-(1-confidence)/2.0)};
 			case NQ: // X =/= Y
-				return new Propagator[]{new PropNotEqualX_DStDist(var1, dist, confidence)};
+				return new Propagator[]{new PropNotEqualX_DStDist(var1, dist, 1-(1-confidence)/2.0)};
 	    	case GE: //  X >= Y
 	    		return new Propagator[]{new PropGreaterOrEqualX_DStDist(var1, dist, confidence)};
 	    	case LE: //  X <= Y --> Y >= X
@@ -111,7 +111,7 @@ public class ArithmeticSt extends Constraint {
 	        case EQ: // X = Y
 	        	return new Propagator[]{new PropGreaterOrEqualXCStDist(var1, dist, 1-(1-confidence)/2.0), new PropLessOrEqualXCStDist(var1, dist, 1-(1-confidence)/2.0)};
 	        case NQ: // X =/= Y
-	        	return new Propagator[]{new PropNotEqualXCStDist(var1, dist, confidence)};
+	        	return new Propagator[]{new PropNotEqualXCStDist(var1, dist, 1-(1-confidence)/2.0)};
 	        case GE: //  X >= Y
 	        	return new Propagator[]{new PropGreaterOrEqualXCStDist(var1, dist, confidence)};
 	        case GT: //  X > Y --> X >= Y + 1
@@ -150,7 +150,7 @@ public class ArithmeticSt extends Constraint {
 	            case EQ: // X = Y
 	            	return new Propagator[]{new PropGreaterOrEqualX_YStMean(var1, var2, 1-(1-confidence)/2.0),new PropGreaterOrEqualX_YStMean(var2, var1, 1-(1-confidence)/2.0)};
 	            case NQ: // X =/= Y
-	            	return new Propagator[]{new PropNotEqualX_YStMean(var1, var2, confidence)};
+	            	return new Propagator[]{new PropNotEqualX_YStMean(var1, var2, 1-(1-confidence)/2.0)};
 	            case GE: //  X >= Y
 	            	return new Propagator[]{new PropGreaterOrEqualX_YStMean(var1, var2, confidence)};
 	            case GT: //  X > Y --> X >= Y + 1
@@ -169,9 +169,9 @@ public class ArithmeticSt extends Constraint {
         case DISTRIBUTION:
 	        switch (op1) {
 	            case EQ: // X = Y
-	            	return new Propagator[]{new PropGreaterOrEqualX_YStDist(var1, var2, confidence),new PropGreaterOrEqualX_YStDist(var2, var1, confidence)};
+	            	return new Propagator[]{new PropGreaterOrEqualX_YStDist(var1, var2, 1-(1-confidence)/2.0),new PropGreaterOrEqualX_YStDist(var2, var1, 1-(1-confidence)/2.0)};
 	            case NQ: // X =/= Y
-	            	return new Propagator[]{new PropNotEqualX_YStDist(var1, var2, confidence)};
+	            	return new Propagator[]{new PropNotEqualX_YStDist(var1, var2, 1-(1-confidence)/2.0)};
 	            case GE: //  X >= Y
 	            	return new Propagator[]{new PropGreaterOrEqualX_YStDist(var1, var2, confidence)};
 	            case GT: //  X > Y --> X >= Y + 1

@@ -3,9 +3,14 @@ package org.chocosolver.samples.statistical.kolmogorovsmirnov;
 import java.util.Arrays;
 
 import org.slf4j.LoggerFactory;
+
+import umontreal.iro.lecuyer.randvar.UniformIntGen;
+import umontreal.iro.lecuyer.rng.MRG32k3a;
+
 import org.chocosolver.samples.AbstractProblem;
 import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.constraints.IntConstraintFactorySt;
+import org.chocosolver.solver.exception.ContradictionException;
 import org.chocosolver.solver.search.strategy.IntStrategyFactory;
 import org.chocosolver.solver.search.strategy.strategy.AbstractStrategy;
 import org.chocosolver.solver.variables.IntVar;
@@ -37,15 +42,15 @@ public class IncompleteGermanTankProblem extends AbstractProblem {
         populationX = new IntVar[populationXSize];
         for(int i = 0; i < populationXSize; i++){
         	if(i == 5)
-        		populationX[i] = VariableFactory.bounded("sample "+i, dataX[i]-dataX[i]%10, dataX[i]+(9-dataX[i]%10), solver);
-        		//populationX[i] = VariableFactory.bounded("sample "+i, dataX[i], dataX[i], solver);
+        		//populationX[i] = VariableFactory.bounded("sample "+i, dataX[i]-dataX[i]%10, dataX[i]+(9-dataX[i]%10), solver);
+        		populationX[i] = VariableFactory.bounded("sample "+i, dataX[i], dataX[i], solver);
         	else
         		populationX[i] = VariableFactory.bounded("sample "+i, dataX[i], dataX[i], solver);
         }
 
         uniformUB = VariableFactory.bounded("UB", 1, 150, solver);
         
-        solver.post(IntConstraintFactorySt.arithmSt(populationX, new UniformDistVar(uniformUB), "=", 0.95));
+        solver.post(IntConstraintFactorySt.arithmSt(populationX, new UniformDistVar(uniformUB), "=", 0.9));
     }
     
     private static IntVar[] mergeArrays(IntVar[] var1, IntVar[] var2){
@@ -58,29 +63,27 @@ public class IncompleteGermanTankProblem extends AbstractProblem {
 
     @Override
     public void configureSearch() {
-        AbstractStrategy<IntVar> strat = IntStrategyFactory.domOverWDeg(mergeArrays(populationX,new IntVar[]{uniformUB}),2211);
+        AbstractStrategy<IntVar> strat = IntStrategyFactory.minDom_LB(populationX);
         // trick : top-down maximization
         solver.set(strat);
     }
 
     @Override
     public void solve() {
-    	StringBuilder st = new StringBuilder();
-    	boolean solution = solver.findSolution();
-    	do{
-    		if(solution) {
-    			for(int i = 0; i < populationX.length; i++){
-    				//st.append(populationX[i].getValue()+", ");
-    				populationXUB[i] = Math.max(populationXUB[i], populationX[i].getValue());
-    				populationXLB[i] = Math.min(populationXLB[i], populationX[i].getValue());
-    			}
-    			upperBound = Math.max(upperBound, uniformUB.getValue());
-    			lowerBound = Math.min(lowerBound, uniformUB.getValue());
-    		}else{
-    			st.append("No solution!");
-    		}
-    	}while(solution = solver.nextSolution());
-    	LoggerFactory.getLogger("bench").info(st.toString());
+    	try {
+         solver.propagate();
+      } catch (ContradictionException e) {
+         // TODO Auto-generated catch block
+         e.printStackTrace();
+      }
+    	
+    	for(int i = 0; i < populationX.length; i++){
+         //st.append(populationX[i].getValue()+", ");
+         populationXUB[i] = populationX[i].getUB();
+         populationXLB[i] = populationX[i].getLB();
+      }
+      upperBound = uniformUB.getUB();
+      lowerBound = uniformUB.getLB();
     }
 
     @Override
@@ -150,7 +153,8 @@ All data known
 		Arrays.fill(populationXLB, Integer.MAX_VALUE);
     	
     	String[] str={"-log","SILENT"};
-		new IncompleteGermanTankProblem().execute(str);
+    	IncompleteGermanTankProblem pb = new IncompleteGermanTankProblem();
+    	pb.execute(str);
 		
 		StringBuilder st = new StringBuilder();
 		st.append("\nm: "+lowerBound+"\t"+upperBound+"\n");
