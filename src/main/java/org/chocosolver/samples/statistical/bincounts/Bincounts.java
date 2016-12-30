@@ -39,7 +39,7 @@ public class Bincounts extends AbstractProblem {
    
    /**
     * Bincounts constraint
-    *
+    */
    @Override
    public void buildModel() {
       //setUp();
@@ -52,7 +52,7 @@ public class Bincounts extends AbstractProblem {
          binVariables[i] = VariableFactory.bounded("Bin "+(i+1), this.binCounts[i][0], this.binCounts[i][1], solver);
       
       solver.post(IntConstraintFactorySt.bincountsSt(valueVariables, binVariables, binBounds));      
-   }*/
+   }
    
    /**
     * GAC enforced on linear equalities
@@ -89,7 +89,7 @@ public class Bincounts extends AbstractProblem {
    
    /**
     * GAC enforced on each constraint
-    */
+    *
    @Override
    public void buildModel() {
       //setUp();
@@ -118,7 +118,7 @@ public class Bincounts extends AbstractProblem {
       solver.post(IntConstraintFactorySt.sum(binVariables, VariableFactory.fixed(valueVariables.length, solver)));
       
       solver.post(IntConstraintFactorySt.bincountsSt(valueVariables, valueOccurrenceVariables, valuesArray));
-   }
+   }*/
    
    private static IntVar[] mergeArrays(IntVar[] var1, IntVar[] var2){
       IntVar[] var3 = new IntVar[var1.length+var2.length];
