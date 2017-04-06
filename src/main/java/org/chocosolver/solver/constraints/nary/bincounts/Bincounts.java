@@ -6,8 +6,13 @@ import org.chocosolver.solver.variables.IntVar;
 
 public class Bincounts extends Constraint {
    
-   public Bincounts(IntVar[] valueVariables, IntVar[] binVariables, int[] binBounds){
-      super("Bincounts", (Propagator<IntVar>) new PropBincountsEQFast(valueVariables, binVariables, binBounds));
+   public Bincounts(IntVar[] valueVariables, IntVar[] binVariables, int[] binBounds, BincountsPropagatorType propagator){
+      super("Bincounts", 
+            propagator == BincountsPropagatorType.EQ ?
+                  (Propagator<IntVar>) new PropBincountsEQ(valueVariables, binVariables, binBounds) :
+            propagator == BincountsPropagatorType.EQFast ? new PropBincountsEQFast(valueVariables, binVariables, binBounds) :
+                  new PropBincountsLE(valueVariables, binVariables, binBounds)
+            );
    }
 
 }

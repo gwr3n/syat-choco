@@ -13,6 +13,7 @@ import org.chocosolver.solver.ResolutionPolicy;
 import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.constraints.IntConstraintFactory;
 import org.chocosolver.solver.constraints.IntConstraintFactorySt;
+import org.chocosolver.solver.constraints.nary.bincounts.BincountsPropagatorType;
 import org.chocosolver.solver.constraints.real.Ibex;
 import org.chocosolver.solver.constraints.real.RealConstraint;
 import org.chocosolver.solver.search.loop.monitors.SearchMonitorFactory;
@@ -173,7 +174,7 @@ public class BNWP_Ref_Chi_Bincounts_GC extends AbstractProblem {
              binVariables[n][i] = VariableFactory.enumerated("Bin "+i, 0, nbSlotsPerNurse, solver);
           }
        
-          solver.post(IntConstraintFactorySt.bincounts(nursePatientAcuity[n], binVariables[n], binBounds));
+          solver.post(IntConstraintFactorySt.bincounts(nursePatientAcuity[n], binVariables[n], binBounds, BincountsPropagatorType.EQFast));
        
           RealVar[] realViews = VariableFactory.real(binVariables[n], precision);
           allRV = new RealVar[realViews.length+1];

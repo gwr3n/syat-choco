@@ -12,6 +12,7 @@ import org.chocosolver.solver.ResolutionPolicy;
 import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.constraints.IntConstraintFactorySt;
 import org.chocosolver.solver.constraints.LogicalConstraintFactory;
+import org.chocosolver.solver.constraints.nary.bincounts.BincountsPropagatorType;
 import org.chocosolver.solver.constraints.real.Ibex;
 import org.chocosolver.solver.constraints.real.RealConstraint;
 import org.chocosolver.solver.constraints.real.RealPropagator;
@@ -88,7 +89,7 @@ public class MultinomialGC extends AbstractProblem {
       
       chiSqStatistics = VF.real("chiSqStatistics", this.chiSqDist.inverseF(confidence), this.chiSqDist.inverseF(confidence), precision, solver);
       
-      solver.post(IntConstraintFactorySt.bincounts(valueVariables, binVariables, binBounds));
+      solver.post(IntConstraintFactorySt.bincounts(valueVariables, binVariables, binBounds, BincountsPropagatorType.EQFast));
       
       RealVar[] realViews = VF.real(binVariables, precision);
       

@@ -8,6 +8,8 @@ import java.util.Set;
 import org.chocosolver.samples.AbstractProblem;
 import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.constraints.IntConstraintFactorySt;
+import org.chocosolver.solver.constraints.nary.bincounts.BincountsDecompositionType;
+import org.chocosolver.solver.constraints.nary.bincounts.BincountsPropagatorType;
 import org.chocosolver.solver.constraints.real.Ibex;
 import org.chocosolver.solver.constraints.real.RealConstraint;
 import org.chocosolver.solver.search.strategy.IntStrategyFactory;
@@ -20,7 +22,7 @@ import org.slf4j.LoggerFactory;
 
 import umontreal.iro.lecuyer.probdist.ChiSquareDist;
 
-public class ChiSquareGC extends AbstractProblem {
+public class ChiSquare extends AbstractProblem {
    
    public IntVar[] valueVariables;
    public IntVar[] binVariables;
@@ -31,7 +33,7 @@ public class ChiSquareGC extends AbstractProblem {
    int[] targetFrequencies;
    double pValue;
    
-   public ChiSquareGC(int[][] values,
+   public ChiSquare(int[][] values,
                     int[][] binCounts, 
                     int[] binBounds,
                     int[] targetFrequencies,
@@ -69,7 +71,8 @@ public class ChiSquareGC extends AbstractProblem {
       
       chiSqStatistics = VF.real("chiSqStatistics", 0, this.chiSqDist.inverseF(1-pValue), precision, solver);
       
-      solver.post(IntConstraintFactorySt.bincounts(valueVariables, binVariables, binBounds));
+      //solver.post(IntConstraintFactorySt.bincounts(valueVariables, binVariables, binBounds, BincountsPropagatorType.EQFast));
+      IntConstraintFactorySt.bincountsDecomposition(valueVariables, binVariables, binBounds, BincountsDecompositionType.Rossi2016);
       
       RealVar[] realViews = VF.real(binVariables, precision);
       
@@ -196,7 +199,7 @@ public class ChiSquareGC extends AbstractProblem {
       
       double pValue = 0.99;
       
-      ChiSquareGC cs = new ChiSquareGC(values, binCounts, binBounds, targetFrequencies, pValue);
+      ChiSquare cs = new ChiSquare(values, binCounts, binBounds, targetFrequencies, pValue);
       cs.execute(str);
    }
 

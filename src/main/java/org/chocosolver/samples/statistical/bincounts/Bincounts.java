@@ -4,6 +4,8 @@ import org.chocosolver.samples.AbstractProblem;
 import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.constraints.IntConstraintFactorySt;
 import org.chocosolver.solver.constraints.LogicalConstraintFactory;
+import org.chocosolver.solver.constraints.nary.bincounts.BincountsDecompositionType;
+import org.chocosolver.solver.constraints.nary.bincounts.BincountsPropagatorType;
 import org.chocosolver.solver.exception.ContradictionException;
 import org.chocosolver.solver.search.strategy.IntStrategyFactory;
 import org.chocosolver.solver.search.strategy.strategy.AbstractStrategy;
@@ -41,7 +43,7 @@ public class Bincounts extends AbstractProblem {
    
    /**
     * Bincounts constraint
-    *
+    */
    @Override
    public void buildModel() {
       //setUp();
@@ -53,13 +55,14 @@ public class Bincounts extends AbstractProblem {
       for(int i = 0; i < this.binCounts.length; i++)
          binVariables[i] = VariableFactory.bounded("Bin "+(i+1), this.binCounts[i][0], this.binCounts[i][1], solver);
       
-      solver.post(IntConstraintFactorySt.bincountsSt(valueVariables, binVariables, binBounds));      
-   }*/
+      //solver.post(IntConstraintFactorySt.bincounts(valueVariables, binVariables, binBounds, BincountsPropagator.EQFast));
+      IntConstraintFactorySt.bincountsDecomposition(valueVariables, binVariables, binBounds, BincountsDecompositionType.Rossi2016);
+   }
    
    /**
     * Ozgur's decomposition 1
     * Choco GCC (GAC not guaranteed)
-    */
+    *
    @Override
    public void buildModel() {
       //setUp();
@@ -96,7 +99,7 @@ public class Bincounts extends AbstractProblem {
       for(int k = 0; k < this.binBounds.length - 1; k++) bins[k] = k;
       
       solver.post(IntConstraintFactorySt.global_cardinality(valueOccurrenceVariables, bins, binVariables, true));
-   }
+   }*/
    
    /**
     * Ozgur's decomposition 2

@@ -12,6 +12,7 @@ import org.chocosolver.solver.ResolutionPolicy;
 import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.constraints.IntConstraintFactory;
 import org.chocosolver.solver.constraints.IntConstraintFactorySt;
+import org.chocosolver.solver.constraints.nary.bincounts.BincountsPropagatorType;
 import org.chocosolver.solver.constraints.real.Ibex;
 import org.chocosolver.solver.constraints.real.RealConstraint;
 import org.chocosolver.solver.search.loop.monitors.SearchMonitorFactory;
@@ -142,7 +143,7 @@ public class BNWP_Chi_Bincounts_GC extends AbstractProblem {
           binVariables[i] = VariableFactory.bounded("Bin "+i, 0, nursesNeeded, solver);
        }
        
-       solver.post(IntConstraintFactorySt.bincounts(workloadNurse, binVariables, binBounds));
+       solver.post(IntConstraintFactorySt.bincounts(workloadNurse, binVariables, binBounds, BincountsPropagatorType.EQFast));
        
        this.chiSqDist = new ChiSquareDist(this.binVariables.length-1);
        
