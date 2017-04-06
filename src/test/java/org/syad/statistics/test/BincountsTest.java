@@ -96,7 +96,7 @@ public class BincountsTest {
          for(int i = 0; i < this.binCounts.length; i++)
             binVariables[i] = VariableFactory.bounded("Bin "+(i+1), this.binCounts[i][0], this.binCounts[i][1], solver);
          
-         solver.post(IntConstraintFactorySt.bincountsSt(valueVariables, binVariables, binBounds));      
+         solver.post(IntConstraintFactorySt.bincounts(valueVariables, binVariables, binBounds));      
       }
       
       private IntVar[] mergeArrays(IntVar[] var1, IntVar[] var2){

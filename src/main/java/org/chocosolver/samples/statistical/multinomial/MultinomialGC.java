@@ -88,7 +88,7 @@ public class MultinomialGC extends AbstractProblem {
       
       chiSqStatistics = VF.real("chiSqStatistics", this.chiSqDist.inverseF(confidence), this.chiSqDist.inverseF(confidence), precision, solver);
       
-      solver.post(IntConstraintFactorySt.bincountsSt(valueVariables, binVariables, binBounds));
+      solver.post(IntConstraintFactorySt.bincounts(valueVariables, binVariables, binBounds));
       
       RealVar[] realViews = VF.real(binVariables, precision);
       

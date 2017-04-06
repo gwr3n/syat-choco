@@ -8,6 +8,7 @@ import java.util.Set;
 import org.chocosolver.samples.AbstractProblem;
 import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.constraints.IntConstraintFactorySt;
+import org.chocosolver.solver.constraints.LogicalConstraintFactory;
 import org.chocosolver.solver.constraints.real.Ibex;
 import org.chocosolver.solver.constraints.real.RealConstraint;
 import org.chocosolver.solver.search.strategy.IntStrategyFactory;
@@ -20,9 +21,10 @@ import org.slf4j.LoggerFactory;
 
 import umontreal.iro.lecuyer.probdist.ChiSquareDist;
 
-public class ChiSquareGC extends AbstractProblem {
+public class ChiSquareDecGAC extends AbstractProblem {
    
    public IntVar[] valueVariables;
+   public IntVar[] valueOccurrenceVariables;
    public IntVar[] binVariables;
    
    int[][] binCounts;
@@ -31,7 +33,7 @@ public class ChiSquareGC extends AbstractProblem {
    int[] targetFrequencies;
    double pValue;
    
-   public ChiSquareGC(int[][] values,
+   public ChiSquareDecGAC(int[][] values,
                     int[][] binCounts, 
                     int[] binBounds,
                     int[] targetFrequencies,
@@ -61,15 +63,39 @@ public class ChiSquareGC extends AbstractProblem {
       for(int i = 0; i < this.values.length; i++)
          valueVariables[i] = VariableFactory.enumerated("Value "+(i+1), values[i], solver);
       
+      valueOccurrenceVariables = new IntVar[this.values.length];
+      for(int i = 0; i < this.valueOccurrenceVariables.length; i++){
+         valueOccurrenceVariables[i] = VariableFactory.bounded("Value-Bin "+i, 0, this.binBounds.length - 2, solver);
+         for(int j = 0; j < this.binBounds.length - 1; j++){
+            solver.post(LogicalConstraintFactory.ifThen_reifiable(
+                  IntConstraintFactorySt.arithm(valueOccurrenceVariables[i], "=", j), 
+                  LogicalConstraintFactory.and(
+                        IntConstraintFactorySt.arithm(valueVariables[i], ">=", this.binBounds[j]),
+                        IntConstraintFactorySt.arithm(valueVariables[i], "<", this.binBounds[j+1])
+                        )));
+            
+            solver.post(LogicalConstraintFactory.ifThen_reifiable( 
+                  LogicalConstraintFactory.and(
+                        IntConstraintFactorySt.arithm(valueVariables[i], ">=", this.binBounds[j]),
+                        IntConstraintFactorySt.arithm(valueVariables[i], "<", this.binBounds[j+1])
+                        ),
+                        IntConstraintFactorySt.arithm(valueOccurrenceVariables[i], "=", j)
+                  ));
+         }
+      }
+      
       binVariables = new IntVar[this.binCounts.length];
       for(int i = 0; i < this.binCounts.length; i++)
          binVariables[i] = VariableFactory.bounded("Bin "+(i+1), this.binCounts[i][0], this.binCounts[i][1], solver);
       
+      int[] bins = new int[this.binBounds.length-1];
+      for(int k = 0; k < this.binBounds.length - 1; k++) bins[k] = k;
+      
+      solver.post(IntConstraintFactorySt.global_cardinality(valueOccurrenceVariables, bins, binVariables, true));
+      
       this.chiSqDist = new ChiSquareDist(this.binVariables.length-1);
       
       chiSqStatistics = VF.real("chiSqStatistics", 0, this.chiSqDist.inverseF(1-pValue), precision, solver);
-      
-      solver.post(IntConstraintFactorySt.bincounts(valueVariables, binVariables, binBounds));
       
       RealVar[] realViews = VF.real(binVariables, precision);
       
@@ -196,7 +222,7 @@ public class ChiSquareGC extends AbstractProblem {
       
       double pValue = 0.99;
       
-      ChiSquareGC cs = new ChiSquareGC(values, binCounts, binBounds, targetFrequencies, pValue);
+      ChiSquareDecGAC cs = new ChiSquareDecGAC(values, binCounts, binBounds, targetFrequencies, pValue);
       cs.execute(str);
    }
 

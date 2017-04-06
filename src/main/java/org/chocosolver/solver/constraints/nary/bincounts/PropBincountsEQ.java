@@ -1,4 +1,4 @@
-package org.chocosolver.solver.constraints.statistical.bincounts;
+package org.chocosolver.solver.constraints.nary.bincounts;
 
 import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.constraints.Propagator;
@@ -28,7 +28,7 @@ import gnu.trove.map.hash.THashMap;
  * @author Roberto Rossi
  *
  */
-public class PropBincountsEQSt extends Propagator<IntVar> {
+public class PropBincountsEQ extends Propagator<IntVar> {
    
    int m, n;
    int[] binBounds;
@@ -41,7 +41,7 @@ public class PropBincountsEQSt extends Propagator<IntVar> {
       return variables;
    }
    
-   public PropBincountsEQSt(IntVar[] valueVariables, IntVar[] binVariables, int[] binBounds){
+   public PropBincountsEQ(IntVar[] valueVariables, IntVar[] binVariables, int[] binBounds){
       super(joinVariables(valueVariables, binVariables), PropagatorPriority.VERY_SLOW, true);
       this.n = valueVariables.length;
       this.m = binVariables.length;

@@ -1,4 +1,4 @@
-package org.chocosolver.solver.constraints.statistical.bincounts;
+package org.chocosolver.solver.constraints.nary.bincounts;
 
 import org.chocosolver.memory.IEnvironment;
 import org.chocosolver.memory.IStateBool;
@@ -30,7 +30,7 @@ import gnu.trove.map.hash.THashMap;
  * @author Roberto Rossi
  *
  */
-public class PropBincountsEQFastSt extends Propagator<IntVar> {
+public class PropBincountsEQFast extends Propagator<IntVar> {
    
    public static ExpressionsBasedModel modelInstance = null;
    Variable[][] lpVars;
@@ -47,7 +47,7 @@ public class PropBincountsEQFastSt extends Propagator<IntVar> {
       return variables;
    }
    
-   public PropBincountsEQFastSt(IntVar[] valueVariables, IntVar[] binVariables, int[] binBounds){
+   public PropBincountsEQFast(IntVar[] valueVariables, IntVar[] binVariables, int[] binBounds){
       super(joinVariables(valueVariables, binVariables), PropagatorPriority.VERY_SLOW, true);
       this.n = valueVariables.length;
       this.m = binVariables.length;

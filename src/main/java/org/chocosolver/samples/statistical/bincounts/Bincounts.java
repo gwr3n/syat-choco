@@ -3,10 +3,12 @@ package org.chocosolver.samples.statistical.bincounts;
 import org.chocosolver.samples.AbstractProblem;
 import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.constraints.IntConstraintFactorySt;
+import org.chocosolver.solver.constraints.LogicalConstraintFactory;
 import org.chocosolver.solver.exception.ContradictionException;
 import org.chocosolver.solver.search.strategy.IntStrategyFactory;
 import org.chocosolver.solver.search.strategy.strategy.AbstractStrategy;
 import org.chocosolver.solver.variables.IntVar;
+import org.chocosolver.solver.variables.BoolVar;
 import org.chocosolver.solver.variables.VariableFactory;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +41,7 @@ public class Bincounts extends AbstractProblem {
    
    /**
     * Bincounts constraint
-    */
+    *
    @Override
    public void buildModel() {
       //setUp();
@@ -52,7 +54,80 @@ public class Bincounts extends AbstractProblem {
          binVariables[i] = VariableFactory.bounded("Bin "+(i+1), this.binCounts[i][0], this.binCounts[i][1], solver);
       
       solver.post(IntConstraintFactorySt.bincountsSt(valueVariables, binVariables, binBounds));      
+   }*/
+   
+   /**
+    * Ozgur's decomposition 1
+    * Choco GCC (GAC not guaranteed)
+    */
+   @Override
+   public void buildModel() {
+      //setUp();
+      valueVariables = new IntVar[this.values.length];
+      for(int i = 0; i < this.values.length; i++)
+         valueVariables[i] = VariableFactory.enumerated("Value "+(i+1), values[i], solver);
+      
+      valueOccurrenceVariables = new IntVar[this.values.length];
+      for(int i = 0; i < this.valueOccurrenceVariables.length; i++){
+         valueOccurrenceVariables[i] = VariableFactory.bounded("Value-Bin "+i, 0, this.binBounds.length - 2, solver);
+         for(int j = 0; j < this.binBounds.length - 1; j++){
+            solver.post(LogicalConstraintFactory.ifThen_reifiable(
+                  IntConstraintFactorySt.arithm(valueOccurrenceVariables[i], "=", j), 
+                  LogicalConstraintFactory.and(
+                        IntConstraintFactorySt.arithm(valueVariables[i], ">=", this.binBounds[j]),
+                        IntConstraintFactorySt.arithm(valueVariables[i], "<", this.binBounds[j+1])
+                        )));
+            
+            solver.post(LogicalConstraintFactory.ifThen_reifiable( 
+                  LogicalConstraintFactory.and(
+                        IntConstraintFactorySt.arithm(valueVariables[i], ">=", this.binBounds[j]),
+                        IntConstraintFactorySt.arithm(valueVariables[i], "<", this.binBounds[j+1])
+                        ),
+                        IntConstraintFactorySt.arithm(valueOccurrenceVariables[i], "=", j)
+                  ));
+         }
+      }
+      
+      binVariables = new IntVar[this.binCounts.length];
+      for(int i = 0; i < this.binCounts.length; i++)
+         binVariables[i] = VariableFactory.bounded("Bin "+(i+1), this.binCounts[i][0], this.binCounts[i][1], solver);
+      
+      int[] bins = new int[this.binBounds.length-1];
+      for(int k = 0; k < this.binBounds.length - 1; k++) bins[k] = k;
+      
+      solver.post(IntConstraintFactorySt.global_cardinality(valueOccurrenceVariables, bins, binVariables, true));
    }
+   
+   /**
+    * Ozgur's decomposition 2
+    * Choco GCC (GAC not guaranteed)
+    *
+   public void buildModel() {
+      //setUp();
+      valueVariables = new IntVar[this.values.length];
+      for(int i = 0; i < this.values.length; i++)
+         valueVariables[i] = VariableFactory.enumerated("Value "+(i+1), values[i], solver);
+      
+      binVariables = new IntVar[this.binCounts.length];
+      for(int i = 0; i < this.binCounts.length; i++)
+         binVariables[i] = VariableFactory.bounded("Bin "+(i+1), this.binCounts[i][0], this.binCounts[i][1], solver);
+      
+      for(int j = 0; j < this.binBounds.length - 1; j++){
+         valueOccurrenceVariables = new BoolVar[this.values.length];
+         for(int i = 0; i < this.valueOccurrenceVariables.length; i++){
+            valueOccurrenceVariables[i] = VariableFactory.bool("Value-Bin "+i+" "+j, solver);
+            
+            solver.post(LogicalConstraintFactory.reification_reifiable(
+                  valueOccurrenceVariables[i], 
+                  LogicalConstraintFactory.and(
+                        IntConstraintFactorySt.arithm(valueVariables[i], ">=", this.binBounds[j]),
+                        IntConstraintFactorySt.arithm(valueVariables[i], "<", this.binBounds[j+1])
+                        )));
+            
+         }
+         solver.post(IntConstraintFactorySt.sum(valueOccurrenceVariables, binVariables[j]));
+      }
+   }*/
    
    /**
     * GAC enforced on linear equalities

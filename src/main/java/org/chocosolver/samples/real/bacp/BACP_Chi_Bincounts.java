@@ -261,7 +261,7 @@ public class BACP_Chi_Bincounts extends AbstractProblem {
            binVariables[i] = VariableFactory.bounded("Bin "+i, 0, n_periods, solver);
         }
         
-        solver.post(IntConstraintFactorySt.bincountsSt(load, binVariables, binBounds));
+        solver.post(IntConstraintFactorySt.bincounts(load, binVariables, binBounds));
         
         this.chiSqDist = new ChiSquareDist(this.binVariables.length-1);
         

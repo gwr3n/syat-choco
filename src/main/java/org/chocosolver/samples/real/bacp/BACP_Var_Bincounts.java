@@ -257,7 +257,7 @@ public class BACP_Var_Bincounts extends AbstractProblem {
            binVariables[i] = VariableFactory.bounded("Bin "+i, 0, n_periods, solver);
         }
         
-        solver.post(IntConstraintFactorySt.bincountsSt(load, binVariables, binBounds));
+        solver.post(IntConstraintFactorySt.bincounts(load, binVariables, binBounds));
         
         variance = VariableFactory.real("variance", 0, Math.pow((load_per_period_ub-load_per_period_lb),2)*binVariables.length, precision, solver);
         

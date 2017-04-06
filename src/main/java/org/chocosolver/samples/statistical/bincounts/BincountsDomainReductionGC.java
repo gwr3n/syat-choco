@@ -59,7 +59,7 @@ public class BincountsDomainReductionGC extends AbstractProblem {
       for(int i = 0; i < this.binCounts.length; i++)
          binVariables[i] = VariableFactory.bounded("Bin "+(i+1), this.binCounts[i][0], this.binCounts[i][1], solver);
       
-      solver.post(IntConstraintFactorySt.bincountsSt(valueVariables, binVariables, binBounds));      
+      solver.post(IntConstraintFactorySt.bincounts(valueVariables, binVariables, binBounds));      
    }
    
    @SuppressWarnings("unused")
@@ -97,6 +97,9 @@ public class BincountsDomainReductionGC extends AbstractProblem {
      }else{
         wipeout = !solver.findSolution();
      }
+     
+     System.out.println(Arrays.deepToString(valueVariables)+"\n");
+     System.out.println(Arrays.deepToString(binVariables)+"\n");
      
      /*StringBuilder st = new StringBuilder();
      boolean solution = solver.findSolution();
@@ -221,7 +224,7 @@ public class BincountsDomainReductionGC extends AbstractProblem {
      int[] binBounds = {0,5,10,15,20,25,30,35,40,valUB};                                // {1,3,5};
      int bins = binBounds.length - 1;
      
-     int instances = 50;
+     int instances = 1;
      double percentageVarAssigned = 0;
      
      StringBuilder results = new StringBuilder();

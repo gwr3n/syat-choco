@@ -8,18 +8,20 @@ import java.util.Set;
 import org.chocosolver.samples.AbstractProblem;
 import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.constraints.IntConstraintFactorySt;
+import org.chocosolver.solver.constraints.LogicalConstraintFactory;
 import org.chocosolver.solver.exception.ContradictionException;
 import org.chocosolver.solver.search.strategy.IntStrategyFactory;
 import org.chocosolver.solver.search.strategy.strategy.AbstractStrategy;
 import org.chocosolver.solver.variables.IntVar;
+import org.chocosolver.solver.variables.BoolVar;
 import org.chocosolver.solver.variables.VariableFactory;
 import org.chocosolver.util.iterators.DisposableValueIterator;
 import org.slf4j.LoggerFactory;
 
-public class BincountsDomainReductionDec extends AbstractProblem {
+public class BincountsDomainReductionDecGAC extends AbstractProblem {
    public IntVar[] valueVariables;
    public IntVar[] binVariables;
-   public IntVar[] valueOccurrenceVariables;
+   public BoolVar[] valueOccurrenceVariables;
    
    int[][] binCounts;
    int[][] values;
@@ -29,7 +31,7 @@ public class BincountsDomainReductionDec extends AbstractProblem {
    
    int assignedVariables = 0;
    
-   public BincountsDomainReductionDec(int[][] values,
+   public BincountsDomainReductionDecGAC(int[][] values,
                                    int[][] binCounts, 
                                    int[] binBounds,
                                    int assignedVariables){
@@ -48,6 +50,53 @@ public class BincountsDomainReductionDec extends AbstractProblem {
        solver = new Solver("Frequency");
    }
    
+   /**
+    * Ozgur's decomposition 1
+    * Choco GCC (GAC not guaranteed)
+    *
+   public void buildModel() {
+      //setUp();
+      valueVariables = new IntVar[this.values.length];
+      for(int i = 0; i < this.values.length; i++)
+         valueVariables[i] = VariableFactory.enumerated("Value "+(i+1), values[i], solver);
+      
+      valueOccurrenceVariables = new IntVar[this.values.length];
+      for(int i = 0; i < this.valueOccurrenceVariables.length; i++){
+         valueOccurrenceVariables[i] = VariableFactory.bounded("Value-Bin "+i, 0, this.binBounds.length - 2, solver);
+         for(int j = 0; j < this.binBounds.length - 1; j++){
+            solver.post(LogicalConstraintFactory.ifThen_reifiable(
+                  IntConstraintFactorySt.arithm(valueOccurrenceVariables[i], "=", j), 
+                  LogicalConstraintFactory.and(
+                        IntConstraintFactorySt.arithm(valueVariables[i], ">=", this.binBounds[j]),
+                        IntConstraintFactorySt.arithm(valueVariables[i], "<", this.binBounds[j+1])
+                        )));
+            
+            solver.post(LogicalConstraintFactory.ifThen_reifiable( 
+                  LogicalConstraintFactory.and(
+                        IntConstraintFactorySt.arithm(valueVariables[i], ">=", this.binBounds[j]),
+                        IntConstraintFactorySt.arithm(valueVariables[i], "<", this.binBounds[j+1])
+                        ),
+                        IntConstraintFactorySt.arithm(valueOccurrenceVariables[i], "=", j)
+                  ));
+         }
+      }
+      
+      binVariables = new IntVar[this.binCounts.length];
+      for(int i = 0; i < this.binCounts.length; i++)
+         binVariables[i] = VariableFactory.bounded("Bin "+(i+1), this.binCounts[i][0], this.binCounts[i][1], solver);
+      
+      int[] bins = new int[this.binBounds.length-1];
+      for(int k = 0; k < this.binBounds.length - 1; k++) bins[k] = k;
+      
+      solver.post(IntConstraintFactorySt.global_cardinality(valueOccurrenceVariables, bins, binVariables, true));
+      
+      //solver.post(IntConstraintFactorySt.sum(binVariables, VariableFactory.fixed(valueVariables.length, solver)));
+   }*/
+   
+   /**
+    * Ozgur's decomposition 2
+    * Choco GCC (GAC not guaranteed)
+    */
    @Override
    public void buildModel() {
       //setUp();
@@ -55,27 +104,27 @@ public class BincountsDomainReductionDec extends AbstractProblem {
       for(int i = 0; i < this.values.length; i++)
          valueVariables[i] = VariableFactory.enumerated("Value "+(i+1), values[i], solver);
       
-      valueOccurrenceVariables = new IntVar[this.binBounds[this.binBounds.length-1]-this.binBounds[0]];
-      int[] valuesArray = new int[valueOccurrenceVariables.length];
-      for(int i = 0; i < this.valueOccurrenceVariables.length; i++){
-         valueOccurrenceVariables[i] = VariableFactory.bounded("Value Occurrence "+i, 0, this.values.length, solver);
-         valuesArray[i] = i + this.binBounds[0];
-      }
-      
       binVariables = new IntVar[this.binCounts.length];
-      for(int i = 0; i < this.binCounts.length; i++){
+      for(int i = 0; i < this.binCounts.length; i++)
          binVariables[i] = VariableFactory.bounded("Bin "+(i+1), this.binCounts[i][0], this.binCounts[i][1], solver);
+      
+      for(int j = 0; j < this.binBounds.length - 1; j++){
+         valueOccurrenceVariables = new BoolVar[this.values.length];
+         for(int i = 0; i < this.valueOccurrenceVariables.length; i++){
+            valueOccurrenceVariables[i] = VariableFactory.bool("Value-Bin "+i+" "+j, solver);
+            
+            solver.post(LogicalConstraintFactory.reification_reifiable(
+                  valueOccurrenceVariables[i], 
+                  LogicalConstraintFactory.and(
+                        IntConstraintFactorySt.arithm(valueVariables[i], ">=", this.binBounds[j]),
+                        IntConstraintFactorySt.arithm(valueVariables[i], "<", this.binBounds[j+1])
+                        )));
+            
+         }
+         solver.post(IntConstraintFactorySt.sum(valueOccurrenceVariables, binVariables[j]));
       }
       
-      for(int i = 0; i < this.binBounds.length - 1; i++){
-         IntVar[] binOccurrences = new IntVar[this.binBounds[i+1]-this.binBounds[i]];
-         System.arraycopy(valueOccurrenceVariables, this.binBounds[i]-this.binBounds[0], binOccurrences, 0, this.binBounds[i+1]-this.binBounds[i]);
-         solver.post(IntConstraintFactorySt.sum(binOccurrences, binVariables[i]));
-      }
-      
-      solver.post(IntConstraintFactorySt.sum(binVariables, VariableFactory.fixed(valueVariables.length, solver)));
-      
-      solver.post(IntConstraintFactorySt.global_cardinality(valueVariables, valuesArray, valueOccurrenceVariables, true));  
+      //solver.post(IntConstraintFactorySt.sum(binVariables, VariableFactory.fixed(valueVariables.length, solver)));
    }
    
    @SuppressWarnings("unused")
@@ -251,9 +300,11 @@ public class BincountsDomainReductionDec extends AbstractProblem {
      int[] instanceNos = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50};
      do{
         int[][] values = generateRandomValues(rnd, vars, vals, valUB);    // {{3,4},{1,2,4},{2,3,4}};
+        System.out.println(Arrays.deepToString(values)+"\n");
         int[][] binCounts = generateRandomBinCounts(rnd, bins, vars);     // {{1,3},{0,1}};
+        System.out.println(Arrays.deepToString(binCounts)+"\n");
         
-        BincountsDomainReductionDec bc = new BincountsDomainReductionDec(values, binCounts, binBounds, (int)Math.floor(vars*percentageVarAssigned));
+        BincountsDomainReductionDecGAC bc = new BincountsDomainReductionDecGAC(values, binCounts, binBounds, (int)Math.floor(vars*percentageVarAssigned));
         
         long timeBefore = System.nanoTime();
         

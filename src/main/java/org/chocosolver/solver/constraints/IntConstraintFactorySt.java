@@ -1,8 +1,8 @@
 package org.chocosolver.solver.constraints;
 
 import org.chocosolver.solver.constraints.Operator;
+import org.chocosolver.solver.constraints.nary.bincounts.Bincounts;
 import org.chocosolver.solver.constraints.statistical.ArithmeticSt;
-import org.chocosolver.solver.constraints.statistical.bincounts.BincountsSt;
 import org.chocosolver.solver.variables.IntVar;
 import org.chocosolver.solver.variables.statistical.distributions.DistributionVar;
 
@@ -37,7 +37,7 @@ public class IntConstraintFactorySt extends IntConstraintFactory {
       return new ScalarSt(VARS, SAMPLES, SCALAR, confidence);
    }
 
-   public static Constraint bincountsSt(IntVar[] valueVariables, IntVar[] binVariables, int[] binBounds){
-      return new BincountsSt(valueVariables, binVariables, binBounds);
+   public static Constraint bincounts(IntVar[] valueVariables, IntVar[] binVariables, int[] binBounds){
+      return new Bincounts(valueVariables, binVariables, binBounds);
    }
 }
