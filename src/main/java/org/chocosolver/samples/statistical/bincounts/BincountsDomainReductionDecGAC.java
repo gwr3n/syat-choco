@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 public class BincountsDomainReductionDecGAC extends AbstractProblem {
    public IntVar[] valueVariables;
    public IntVar[] binVariables;
-   public BoolVar[] valueOccurrenceVariables;
+   public IntVar[] valueOccurrenceVariables;
    
    int[][] binCounts;
    int[][] values;
@@ -53,7 +53,7 @@ public class BincountsDomainReductionDecGAC extends AbstractProblem {
    /**
     * Ozgur's decomposition 1
     * Choco GCC (GAC not guaranteed)
-    *
+    */
    public void buildModel() {
       //setUp();
       valueVariables = new IntVar[this.values.length];
@@ -91,12 +91,12 @@ public class BincountsDomainReductionDecGAC extends AbstractProblem {
       solver.post(IntConstraintFactorySt.global_cardinality(valueOccurrenceVariables, bins, binVariables, true));
       
       //solver.post(IntConstraintFactorySt.sum(binVariables, VariableFactory.fixed(valueVariables.length, solver)));
-   }*/
+   }
    
    /**
     * Ozgur's decomposition 2
     * Choco GCC (GAC not guaranteed)
-    */
+    *
    @Override
    public void buildModel() {
       //setUp();
@@ -125,7 +125,7 @@ public class BincountsDomainReductionDecGAC extends AbstractProblem {
       }
       
       //solver.post(IntConstraintFactorySt.sum(binVariables, VariableFactory.fixed(valueVariables.length, solver)));
-   }
+   }*/
    
    @SuppressWarnings("unused")
    private static IntVar[] mergeArrays(IntVar[] var1, IntVar[] var2){
