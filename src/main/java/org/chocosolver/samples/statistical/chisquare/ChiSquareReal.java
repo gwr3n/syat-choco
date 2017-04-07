@@ -13,7 +13,10 @@ import org.chocosolver.solver.constraints.nary.bincounts.BincountsPropagatorType
 import org.chocosolver.solver.constraints.real.Ibex;
 import org.chocosolver.solver.constraints.real.RealConstraint;
 import org.chocosolver.solver.search.strategy.IntStrategyFactory;
+import org.chocosolver.solver.search.strategy.selectors.values.RealDomainMiddle;
+import org.chocosolver.solver.search.strategy.selectors.variables.Cyclic;
 import org.chocosolver.solver.search.strategy.strategy.AbstractStrategy;
+import org.chocosolver.solver.search.strategy.strategy.RealStrategy;
 import org.chocosolver.solver.variables.IntVar;
 import org.chocosolver.solver.variables.RealVar;
 import org.chocosolver.solver.variables.VF;
@@ -22,22 +25,22 @@ import org.slf4j.LoggerFactory;
 
 import umontreal.iro.lecuyer.probdist.ChiSquareDist;
 
-public class ChiSquare extends AbstractProblem {
+public class ChiSquareReal extends AbstractProblem {
    
-   public IntVar[] valueVariables;
+   public RealVar[] valueVariables;
    public IntVar[] binVariables;
    
    int[][] binCounts;
-   int[][] values;
-   int[] binBounds;
+   double[][] values;
+   double[] binBounds;
    int[] targetFrequencies;
    double pValue;
    
-   public ChiSquare(int[][] values,
-                    int[][] binCounts, 
-                    int[] binBounds,
-                    int[] targetFrequencies,
-                    double pValue){
+   public ChiSquareReal(double[][] values,
+                        int[][] binCounts, 
+                        double[] binBounds,
+                        int[] targetFrequencies,
+                        double pValue){
       this.values = values.clone();
       this.binCounts = binCounts.clone();
       this.binBounds = binBounds.clone();
@@ -48,7 +51,7 @@ public class ChiSquare extends AbstractProblem {
    RealVar chiSqStatistics;
    RealVar[] allRV;
    
-   double precision = 1.e-4;
+   double precision = 0.1;
    
    ChiSquareDist chiSqDist;
    
@@ -59,9 +62,9 @@ public class ChiSquare extends AbstractProblem {
    
    @Override
    public void buildModel() {
-      valueVariables = new IntVar[this.values.length];
+      valueVariables = new RealVar[this.values.length];
       for(int i = 0; i < this.values.length; i++)
-         valueVariables[i] = VariableFactory.enumerated("Value "+(i+1), values[i], solver);
+         valueVariables[i] = VariableFactory.real("Value "+(i+1), values[i][0], values[i][1], precision, solver);
       
       binVariables = new IntVar[this.binCounts.length];
       for(int i = 0; i < this.binCounts.length; i++)
@@ -71,14 +74,14 @@ public class ChiSquare extends AbstractProblem {
       
       chiSqStatistics = VF.real("chiSqStatistics", 0, this.chiSqDist.inverseF(1-pValue), precision, solver);
       
-      solver.post(IntConstraintFactorySt.bincounts(valueVariables, binVariables, binBounds, BincountsPropagatorType.EQFast));
-      //IntConstraintFactorySt.bincountsDecomposition(valueVariables, binVariables, binBounds, BincountsDecompositionType.Rossi2016);
+      RealVar[] realBinViews = VF.real(binVariables, precision);
       
-      RealVar[] realViews = VF.real(binVariables, precision);
+      solver.post(IntConstraintFactorySt.bincounts(valueVariables, realBinViews, binBounds, BincountsPropagatorType.EQFast));
+      //IntConstraintFactorySt.bincountsDecomposition(valueVariables, binVariables, binBounds, BincountsDecompositionType.Agkun2016_1);
       
-      allRV = new RealVar[realViews.length+1];
-      System.arraycopy(realViews, 0, allRV, 0, realViews.length);
-      allRV[realViews.length] = chiSqStatistics;
+      allRV = new RealVar[realBinViews.length+1];
+      System.arraycopy(realBinViews, 0, allRV, 0, realBinViews.length);
+      allRV[realBinViews.length] = chiSqStatistics;
       
       String chiSqExp = "";
       for(int i = 0; i < binVariables.length; i++)
@@ -104,13 +107,17 @@ public class ChiSquare extends AbstractProblem {
    @Override
    public void configureSearch() {
       //AbstractStrategy<IntVar> strat = IntStrategyFactory.domOverWDeg(mergeArrays(valueVariables,binVariables),1234);
-      AbstractStrategy<IntVar> strat = IntStrategyFactory.activity(valueVariables,1234);
+      //AbstractStrategy<IntVar> strat = IntStrategyFactory.activity(valueVariables,1234);
+      
+      //RealStrategy strat = new RealStrategy(valueVariables, new Cyclic(), new RealDomainMiddle());
+      //solver.set(strat);
+      
       // trick : top-down maximization
-      solver.set(strat);
-      /*solver.set(
-             new RealStrategy(new RealVar[]{chiSqStatistics}, new Cyclic(), new RealDomainMiddle()),
-             new RealStrategy(allRV, new Cyclic(), new RealDomainMiddle())
-       );*/
+      
+      solver.set(
+            IntStrategyFactory.activity(binVariables,1234),
+            new RealStrategy(valueVariables, new Cyclic(), new RealDomainMiddle())
+       );
        //SearchMonitorFactory.limitTime(solver,10000);
    }
    
@@ -122,11 +129,11 @@ public class ChiSquare extends AbstractProblem {
         st.append("---\n");
         if(solution) {
            for(int i = 0; i < valueVariables.length; i++){
-              st.append(valueVariables[i].getValue()+", ");
+              st.append(valueVariables[i].toString()+", ");
            }
            st.append("\n");
            for(int i = 0; i < binVariables.length; i++){
-              st.append(binVariables[i].getValue()+", ");
+              st.append(binVariables[i].toString()+", ");
            }
            st.append("\n");
            st.append(chiSqStatistics.getLB()+" "+chiSqStatistics.getUB());
@@ -158,15 +165,18 @@ public class ChiSquare extends AbstractProblem {
       return whitelist;
     }
    
-   public static int[][] generateRandomValues(Random rnd, int variables, int values, int valUB){ 
+   public static double[][] generateRandomValues(Random rnd, int variables, int values, int valUB){ 
       int[][] rndValues = new int[variables][values];
+      double[][] bounds = new double[variables][2];
       for(int i = 0; i < variables; i++){
          for(int j = 0; j < values; j++){
             rndValues[i][j] = rnd.nextInt(valUB);
          }
          rndValues[i] = removeDuplicates(rndValues[i]);
+         bounds[i][0] = Arrays.stream(rndValues[i]).mapToDouble(k -> k).min().getAsDouble();
+         bounds[i][1] = Arrays.stream(rndValues[i]).mapToDouble(k -> k).max().getAsDouble();
       }
-      return rndValues;
+      return bounds;
    }
    
    public static int[][] generateBinCounts(int bins, int binUB){
@@ -180,26 +190,26 @@ public class ChiSquare extends AbstractProblem {
    
    public static void main(String[] args) {
       String[] str={"-log","SOLUTION"};
-      /*int[][] values = {{2,3,4},{1,2},{0,3,5},{3,4},{1},{2,3,4}};
+      /*double[][] values = {{2,4},{1,2},{0,5},{3,4},{1,1},{2,4}};
       int[][] binCounts = {{0,6},{0,6},{0,6}};
-      int[] binBounds = {0,2,4,6};
+      double[] binBounds = {0,1.5,3.5,6};
       int[] targetFrequencies = {1,4,1};*/
       
       int vars = 24;
       int vals = 10;
       int valUB = 30;
-      int[] binBounds = {0,5,10,15,20,25,valUB};                                  
+      double[] binBounds = {0,5,10,15,20,25,valUB};                                  
       int bins = binBounds.length - 1;
       
-      Random rnd = new Random(1234);
-      int[][] values = generateRandomValues(rnd, vars, vals, valUB);   
+      Random rnd = new Random(123);
+      double[][] values = generateRandomValues(rnd, vars, vals, valUB);   
       int[][] binCounts = generateBinCounts(bins, vars);
       
       int[] targetFrequencies = {2,4,10,4,2,2};
       
       double pValue = 0.99;
       
-      ChiSquare cs = new ChiSquare(values, binCounts, binBounds, targetFrequencies, pValue);
+      ChiSquareReal cs = new ChiSquareReal(values, binCounts, binBounds, targetFrequencies, pValue);
       cs.execute(str);
    }
 

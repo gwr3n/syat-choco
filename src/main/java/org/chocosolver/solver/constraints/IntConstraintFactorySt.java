@@ -8,6 +8,7 @@ import org.chocosolver.solver.constraints.nary.bincounts.BincountsDecompositions
 import org.chocosolver.solver.constraints.statistical.ArithmeticSt;
 import org.chocosolver.solver.variables.BoolVar;
 import org.chocosolver.solver.variables.IntVar;
+import org.chocosolver.solver.variables.RealVar;
 import org.chocosolver.solver.variables.VariableFactory;
 import org.chocosolver.solver.variables.statistical.distributions.DistributionVar;
 import org.chocosolver.solver.Solver;
@@ -46,6 +47,10 @@ public class IntConstraintFactorySt extends IntConstraintFactory {
       return new Bincounts(valueVariables, binVariables, binBounds, propagatorType);
    }
    
+   public static Constraint bincounts(RealVar[] valueVariables, RealVar[] binVariables, double[] binBounds, BincountsPropagatorType propagatorType){
+      return new Bincounts(valueVariables, binVariables, binBounds, propagatorType);
+   }
+   
    public static void bincountsDecomposition(IntVar[] valueVariables, IntVar[] binVariables, int[] binBounds, BincountsDecompositionType decompositionType){
       switch(decompositionType){
       case Rossi2016:
@@ -54,6 +59,19 @@ public class IntConstraintFactorySt extends IntConstraintFactory {
       case Rossi2016_noGCC:   
          BincountsDecompositions.bincountsDecomposition1a(valueVariables, binVariables, binBounds);
          break;
+      case Agkun2016_1:
+         BincountsDecompositions.bincountsDecomposition2(valueVariables, binVariables, binBounds);
+         break;
+      case Agkun2016_2:
+         BincountsDecompositions.bincountsDecomposition3(valueVariables, binVariables, binBounds);
+         break;
+      default:
+         throw new NullPointerException();
+      }
+   }
+   
+   public static void bincountsDecomposition(RealVar[] valueVariables, IntVar[] binVariables, double[] binBounds, BincountsDecompositionType decompositionType){
+      switch(decompositionType){
       case Agkun2016_1:
          BincountsDecompositions.bincountsDecomposition2(valueVariables, binVariables, binBounds);
          break;

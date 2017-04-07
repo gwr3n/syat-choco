@@ -27,6 +27,13 @@ import org.chocosolver.solver.variables.VariableFactory;
 
 import umontreal.iro.lecuyer.probdist.ChiSquareDist;
 
+/**
+ * These are the instances used in our computational study 
+ * 
+ * @author Roberto Rossi
+ *
+ */
+
 public class BNWP_Ref_Chi_Bincounts_GC extends AbstractProblem {
    
    String instance;

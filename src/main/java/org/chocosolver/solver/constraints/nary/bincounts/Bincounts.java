@@ -3,6 +3,7 @@ package org.chocosolver.solver.constraints.nary.bincounts;
 import org.chocosolver.solver.constraints.Constraint;
 import org.chocosolver.solver.constraints.Propagator;
 import org.chocosolver.solver.variables.IntVar;
+import org.chocosolver.solver.variables.RealVar;
 
 public class Bincounts extends Constraint {
    
@@ -13,6 +14,10 @@ public class Bincounts extends Constraint {
             propagator == BincountsPropagatorType.EQFast ? new PropBincountsEQFast(valueVariables, binVariables, binBounds) :
                   new PropBincountsLE(valueVariables, binVariables, binBounds)
             );
+   }
+   
+   public Bincounts(RealVar[] valueVariables, RealVar[] binVariables, double[] binBounds, BincountsPropagatorType propagator){
+      super("Bincounts", new PropBincountsEQFastReal(valueVariables, binVariables, binBounds));
    }
 
 }
