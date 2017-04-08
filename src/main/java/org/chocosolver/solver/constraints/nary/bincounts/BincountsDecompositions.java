@@ -120,7 +120,7 @@ public class BincountsDecompositions {
     * @param binVariables
     * @param binBounds
     */
-   public static void bincountsDecomposition2(RealVar[] valueVariables, IntVar[] binVariables, double[] binBounds){
+   public static void bincountsDecomposition2(RealVar[] valueVariables, IntVar[] binVariables, double[] binBounds, double precision){
       Solver solver = valueVariables[0].getSolver();
       
       IntVar[] valueBinVariables = new IntVar[valueVariables.length];
@@ -128,13 +128,10 @@ public class BincountsDecompositions {
          valueBinVariables[i] = VariableFactory.bounded("Value-Bin "+i, 0, binBounds.length - 2, solver);
          for(int j = 0; j < binBounds.length - 1; j++){
             String constraintGEStr = "{0}>="+binBounds[j];
-            String constraintLEStr = "{0}<="+binBounds[j+1];
+            String constraintLEStr = "{0}<"+(binBounds[j+1] - precision);
             
-            RealVar[] var = new RealVar[1];
-            var[0] = valueVariables[i];
-            
-            RealConstraint constraintGE = new RealConstraint("constraintGE_"+i+"_"+j,constraintGEStr,Ibex.HC4_NEWTON, var);
-            RealConstraint constraintLE = new RealConstraint("constraintLE_"+i+"_"+j,constraintLEStr,Ibex.HC4_NEWTON, var);
+            RealConstraint constraintGE = new RealConstraint("constraintGE_"+i+"_"+j,constraintGEStr,Ibex.HC4_NEWTON, new RealVar[]{valueVariables[i]});
+            RealConstraint constraintLE = new RealConstraint("constraintLE_"+i+"_"+j,constraintLEStr,Ibex.HC4_NEWTON, new RealVar[]{valueVariables[i]});
            
             solver.post(LogicalConstraintFactory.ifThen_reifiable(
                   IntConstraintFactorySt.arithm(valueBinVariables[i], "=", j), 
@@ -149,7 +146,8 @@ public class BincountsDecompositions {
       }
       
       int[] bins = new int[binBounds.length-1];
-      for(int k = 0; k < binBounds.length - 1; k++) bins[k] = k;
+      for(int k = 0; k < binBounds.length - 1; k++) 
+         bins[k] = k;
       
       solver.post(IntConstraintFactorySt.global_cardinality(valueBinVariables, bins, binVariables, true));
    }
@@ -192,7 +190,7 @@ public class BincountsDecompositions {
     * @param binVariables
     * @param binBounds
     */
-   public static void bincountsDecomposition3(RealVar[] valueVariables, IntVar[] binVariables, double[] binBounds){
+   public static void bincountsDecomposition3(RealVar[] valueVariables, IntVar[] binVariables, double[] binBounds, double precision){
       Solver solver = valueVariables[0].getSolver();
       
       for(int j = 0; j < binBounds.length - 1; j++){
@@ -201,13 +199,10 @@ public class BincountsDecompositions {
             valueBinVariables[i] = VariableFactory.bool("Value-Bin "+i+" "+j, solver);
             
             String constraintGEStr = "{0}>="+binBounds[j];
-            String constraintLEStr = "{0}<="+binBounds[j+1];
+            String constraintLEStr = "{0}<"+(binBounds[j+1]-precision);
             
-            RealVar[] var = new RealVar[1];
-            var[0] = valueVariables[i];
-            
-            RealConstraint constraintGE = new RealConstraint("constraintGE_"+i+"_"+j,constraintGEStr,Ibex.HC4_NEWTON, var);
-            RealConstraint constraintLE = new RealConstraint("constraintLE_"+i+"_"+j,constraintLEStr,Ibex.HC4_NEWTON, var);
+            RealConstraint constraintGE = new RealConstraint("constraintGE_"+i+"_"+j,constraintGEStr,Ibex.HC4_NEWTON, new RealVar[]{valueVariables[i]});
+            RealConstraint constraintLE = new RealConstraint("constraintLE_"+i+"_"+j,constraintLEStr,Ibex.HC4_NEWTON, new RealVar[]{valueVariables[i]});
             
             solver.post(LogicalConstraintFactory.reification_reifiable(
                   valueBinVariables[i], 
@@ -217,5 +212,7 @@ public class BincountsDecompositions {
          }
          solver.post(IntConstraintFactorySt.sum(valueBinVariables, binVariables[j]));
       }
+      
+      solver.post(IntConstraintFactorySt.sum(binVariables, VariableFactory.fixed(valueVariables.length, solver)));
    }
 }

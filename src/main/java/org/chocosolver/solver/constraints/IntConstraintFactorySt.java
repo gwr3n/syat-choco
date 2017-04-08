@@ -70,13 +70,13 @@ public class IntConstraintFactorySt extends IntConstraintFactory {
       }
    }
    
-   public static void bincountsDecomposition(RealVar[] valueVariables, IntVar[] binVariables, double[] binBounds, BincountsDecompositionType decompositionType){
+   public static void bincountsDecomposition(RealVar[] valueVariables, IntVar[] binVariables, double[] binBounds, double precision, BincountsDecompositionType decompositionType){
       switch(decompositionType){
       case Agkun2016_1:
-         BincountsDecompositions.bincountsDecomposition2(valueVariables, binVariables, binBounds);
+         BincountsDecompositions.bincountsDecomposition2(valueVariables, binVariables, binBounds, precision);
          break;
       case Agkun2016_2:
-         BincountsDecompositions.bincountsDecomposition3(valueVariables, binVariables, binBounds);
+         BincountsDecompositions.bincountsDecomposition3(valueVariables, binVariables, binBounds, precision);
          break;
       default:
          throw new NullPointerException();
