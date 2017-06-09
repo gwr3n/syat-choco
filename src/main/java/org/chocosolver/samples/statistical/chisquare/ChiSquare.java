@@ -12,6 +12,7 @@ import org.chocosolver.solver.constraints.nary.bincounts.BincountsDecompositionT
 import org.chocosolver.solver.constraints.nary.bincounts.BincountsPropagatorType;
 import org.chocosolver.solver.constraints.real.Ibex;
 import org.chocosolver.solver.constraints.real.RealConstraint;
+import org.chocosolver.solver.constraints.statistical.chisquare.ChiSquareFitEmpirical;
 import org.chocosolver.solver.search.strategy.IntStrategyFactory;
 import org.chocosolver.solver.search.strategy.strategy.AbstractStrategy;
 import org.chocosolver.solver.variables.IntVar;
@@ -26,22 +27,23 @@ public class ChiSquare extends AbstractProblem {
    
    public IntVar[] valueVariables;
    public IntVar[] binVariables;
+   public IntVar[] targetFrequencyVariables;
    
    int[][] binCounts;
    int[][] values;
    int[] binBounds;
-   int[] targetFrequencies;
+   int[][] targetFrequencies;
    double pValue;
    
    public ChiSquare(int[][] values,
                     int[][] binCounts, 
                     int[] binBounds,
-                    int[] targetFrequencies,
+                    int[][] targetFrequencies,
                     double pValue){
       this.values = values.clone();
       this.binCounts = binCounts.clone();
       this.binBounds = binBounds.clone();
-      this.targetFrequencies = targetFrequencies;
+      this.targetFrequencies = targetFrequencies.clone();
       this.pValue = pValue;
    }
    
@@ -67,30 +69,14 @@ public class ChiSquare extends AbstractProblem {
       for(int i = 0; i < this.binCounts.length; i++)
          binVariables[i] = VariableFactory.bounded("Bin "+(i+1), this.binCounts[i][0], this.binCounts[i][1], solver);
       
+      targetFrequencyVariables = new IntVar[this.targetFrequencies.length];
+      for(int i = 0; i < this.targetFrequencies.length; i++)
+         targetFrequencyVariables[i] = VariableFactory.bounded("Target "+(i+1), this.targetFrequencies[i][0], this.targetFrequencies[i][1], solver);
+      
       this.chiSqDist = new ChiSquareDist(this.binVariables.length-1);
       
       chiSqStatistics = VF.real("chiSqStatistics", 0, this.chiSqDist.inverseF(1-pValue), precision, solver);
-      
-      solver.post(IntConstraintFactorySt.bincounts(valueVariables, binVariables, binBounds, BincountsPropagatorType.EQFast));
-      //IntConstraintFactorySt.bincountsDecomposition(valueVariables, binVariables, binBounds, BincountsDecompositionType.Rossi2016);
-      
-      RealVar[] realViews = VF.real(binVariables, precision);
-      
-      allRV = new RealVar[realViews.length+1];
-      System.arraycopy(realViews, 0, allRV, 0, realViews.length);
-      allRV[realViews.length] = chiSqStatistics;
-      
-      String chiSqExp = "";
-      for(int i = 0; i < binVariables.length; i++)
-         if(i == binVariables.length - 1)
-            chiSqExp += "(({"+i+"}-"+targetFrequencies[i]+")^2)/"+targetFrequencies[i]+"={"+(binVariables.length)+"}";
-         else
-            chiSqExp += "(({"+i+"}-"+targetFrequencies[i]+")^2)/"+targetFrequencies[i]+"+";
-      
-      solver.post(new RealConstraint("chiSqTest",
-            chiSqExp,
-            Ibex.HC4_NEWTON, allRV
-            ));
+      ChiSquareFitEmpirical.decomposition("chiSqTest", valueVariables, binVariables, binBounds, targetFrequencyVariables, chiSqStatistics, precision);
    }
    
    @SuppressWarnings("unused")
@@ -195,7 +181,7 @@ public class ChiSquare extends AbstractProblem {
       int[][] values = generateRandomValues(rnd, vars, vals, valUB);   
       int[][] binCounts = generateBinCounts(bins, vars);
       
-      int[] targetFrequencies = {2,4,10,4,2,2};
+      int[][] targetFrequencies = {{2,2},{4,4},{10,10},{4,4},{2,2},{2,2}};
       
       double pValue = 0.99;
       

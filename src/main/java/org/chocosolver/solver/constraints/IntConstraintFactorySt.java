@@ -3,6 +3,7 @@ package org.chocosolver.solver.constraints;
 import org.chocosolver.solver.constraints.Operator;
 import org.chocosolver.solver.constraints.nary.bincounts.Bincounts;
 import org.chocosolver.solver.constraints.nary.bincounts.BincountsPropagatorType;
+import org.chocosolver.solver.constraints.nary.contingency.ContingencyDecompositions;
 import org.chocosolver.solver.constraints.nary.bincounts.BincountsDecompositionType;
 import org.chocosolver.solver.constraints.nary.bincounts.BincountsDecompositions;
 import org.chocosolver.solver.constraints.statistical.ArithmeticSt;
@@ -81,5 +82,9 @@ public class IntConstraintFactorySt extends IntConstraintFactory {
       default:
          throw new NullPointerException();
       }
+   }
+   
+   public static void contingencyDecomposition(IntVar[] seriesA, IntVar[] seriesB, IntVar[][] binVariables, int[] binBounds){
+      ContingencyDecompositions.decomposition(seriesA, seriesB, binVariables, binBounds);
    }
 }

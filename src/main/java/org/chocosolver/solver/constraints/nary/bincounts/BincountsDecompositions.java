@@ -128,7 +128,7 @@ public class BincountsDecompositions {
          valueBinVariables[i] = VariableFactory.bounded("Value-Bin "+i, 0, binBounds.length - 2, solver);
          for(int j = 0; j < binBounds.length - 1; j++){
             String constraintGEStr = "{0}>="+binBounds[j];
-            String constraintLEStr = "{0}<"+(binBounds[j+1] - precision);
+            String constraintLEStr = "{0}<"+binBounds[j+1];
             
             RealConstraint constraintGE = new RealConstraint("constraintGE_"+i+"_"+j,constraintGEStr,Ibex.HC4_NEWTON, new RealVar[]{valueVariables[i]});
             RealConstraint constraintLE = new RealConstraint("constraintLE_"+i+"_"+j,constraintLEStr,Ibex.HC4_NEWTON, new RealVar[]{valueVariables[i]});
@@ -138,7 +138,7 @@ public class BincountsDecompositions {
                   LogicalConstraintFactory.and(constraintGE,constraintLE))
                   );
             
-            solver.post(LogicalConstraintFactory.ifThen_reifiable( 
+            solver.post(LogicalConstraintFactory.ifThen_reifiable(
                   LogicalConstraintFactory.and(constraintGE,constraintLE),
                   IntConstraintFactorySt.arithm(valueBinVariables[i], "=", j))
                   );
@@ -199,7 +199,7 @@ public class BincountsDecompositions {
             valueBinVariables[i] = VariableFactory.bool("Value-Bin "+i+" "+j, solver);
             
             String constraintGEStr = "{0}>="+binBounds[j];
-            String constraintLEStr = "{0}<"+(binBounds[j+1]-precision);
+            String constraintLEStr = "{0}<"+binBounds[j+1];
             
             RealConstraint constraintGE = new RealConstraint("constraintGE_"+i+"_"+j,constraintGEStr,Ibex.HC4_NEWTON, new RealVar[]{valueVariables[i]});
             RealConstraint constraintLE = new RealConstraint("constraintLE_"+i+"_"+j,constraintLEStr,Ibex.HC4_NEWTON, new RealVar[]{valueVariables[i]});

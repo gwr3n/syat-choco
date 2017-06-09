@@ -40,6 +40,8 @@ import umontreal.iro.lecuyer.probdist.NormalDist;
 import org.chocosolver.util.ESat;
 
 /**
+ * *********************** DEPRECATED ***********************
+ * 
  * @author Gregy4
  */
 public class RandomNumberGeneration extends AbstractProblem {

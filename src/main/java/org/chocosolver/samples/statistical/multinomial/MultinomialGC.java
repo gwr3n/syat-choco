@@ -103,6 +103,8 @@ public class MultinomialGC extends AbstractProblem {
       String chiSqExp = "";
       RealPropagator[] propagators = new RealPropagator[binVariables.length];
       for(int i = 0; i < binVariables.length; i++){
+         
+         /** Solving Goodman's quadratic form **/
          chiSqExp = "(({0}/"+this.nObs+"-{1})^2)={2}*(1-{1})*{1}/"+this.nObs;
          propagators[i] = new RealPropagator(chiSqExp, new RealVar[]{allRV[i],allRV[realViews.length+i],allRV[realViews.length+targetFrequencies.length]}, Ibex.HC4_NEWTON);
                
