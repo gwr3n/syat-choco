@@ -153,7 +153,7 @@ public class BincountsDecompositions {
    }
    
    /**
-    * Bincounts decomposition (Agkun, 2016) second decomposition 
+    * Bincounts decomposition (Agkun, 2016) second decomposition ***
     * 
     * BEWARE : it is automatically posted (it cannot be reified)
     * 
@@ -182,7 +182,7 @@ public class BincountsDecompositions {
    }
    
    /**
-    * Bincounts decomposition (Agkun, 2016) second decomposition (real) 
+    * Bincounts decomposition (Agkun, 2016) second decomposition (real) ***
     * 
     * BEWARE : it is automatically posted (it cannot be reified)
     * 
