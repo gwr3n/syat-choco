@@ -47,9 +47,9 @@ public class MultinomialGC extends AbstractProblem {
    double confidence;
    
    public MultinomialGC(double[][] observations,
-                    int[][] binCounts, 
-                    int[] binBounds,
-                    double confidence){
+                        int[][] binCounts, 
+                        int[] binBounds,
+                        double confidence){
       this.values = new int[observations.length][1];
       for(int i = 0; i < observations.length; i++){
          for(int j = 0; j < observations[i].length; j++){
