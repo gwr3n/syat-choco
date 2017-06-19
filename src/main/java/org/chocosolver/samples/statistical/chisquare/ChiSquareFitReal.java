@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import umontreal.iro.lecuyer.probdist.ChiSquareDist;
 
-public class ChiSquareReal extends AbstractProblem {
+public class ChiSquareFitReal extends AbstractProblem {
    
    public RealVar[] valueVariables;
    public IntVar[] binVariables;
@@ -38,7 +38,7 @@ public class ChiSquareReal extends AbstractProblem {
    int[][] targetFrequencies;
    double pValue;
    
-   public ChiSquareReal(double[][] values,
+   public ChiSquareFitReal(double[][] values,
                         int[][] binCounts, 
                         double[] binBounds,
                         int[][] targetFrequencies,
@@ -195,7 +195,7 @@ public class ChiSquareReal extends AbstractProblem {
       
       double pValue = 0.99;
       
-      ChiSquareReal cs = new ChiSquareReal(values, binCounts, binBounds, targetFrequencies, pValue);
+      ChiSquareFitReal cs = new ChiSquareFitReal(values, binCounts, binBounds, targetFrequencies, pValue);
       cs.execute(str);
    }
 
