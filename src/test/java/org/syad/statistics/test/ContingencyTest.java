@@ -29,7 +29,7 @@ public class ContingencyTest {
       int[][] valuesA = {{1},{2},{3}};
       int[][] valuesB = {{2},{1},{1}};
       int[] binCounts = {0,3};
-      int[] binBounds = {1,3,4};
+      int[][] binBounds = {{1,3,4},{1,3,4}};
       
       Contingency c = new Contingency(valuesA, valuesB, binCounts, binBounds);
       c.execute(str);
@@ -38,17 +38,19 @@ public class ContingencyTest {
    class Contingency extends AbstractProblem {
       public IntVar[] seriesA;
       public IntVar[] seriesB;
+      public IntVar[] marginalsH;
+      public IntVar[] marginalsV;
       public IntVar[][] binVariables;
       
       int[][] valuesA;
       int[][] valuesB;
       int[] binCounts;
-      int[] binBounds;
+      int[][] binBounds;
       
       public Contingency(int[][] valuesA,
                          int[][] valuesB,
                          int[] binCounts,
-                         int[] binBounds){
+                         int[][] binBounds){
          this.valuesA = valuesA.clone();
          this.valuesB = valuesB.clone();
          this.binCounts = binCounts.clone();
@@ -76,7 +78,12 @@ public class ContingencyTest {
                binVariables[i][j] = VariableFactory.bounded("Bin "+(i+1)+","+(j+1), this.binCounts[0], this.binCounts[1], solver);
             }
          }
-         ContingencyDecompositions.decomposition(seriesA, seriesB, binVariables, binBounds);
+         
+         marginalsH = VariableFactory.boundedArray("Marginals H", binVariables.length, 0, seriesA.length, solver);
+         
+         marginalsV = VariableFactory.boundedArray("Marginals V", binVariables[0].length, 0, seriesA.length, solver);
+         
+         ContingencyDecompositions.decomposition(seriesA, seriesB, binVariables, binBounds, marginalsH, marginalsV);
       }
       
       public void configureSearch() {
