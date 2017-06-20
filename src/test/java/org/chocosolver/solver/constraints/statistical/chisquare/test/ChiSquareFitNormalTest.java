@@ -26,6 +26,8 @@ public class ChiSquareFitNormalTest {
 
    @After
    public void tearDown() throws Exception {
+      Thread.sleep(1000);
+      System.gc();
    }
 
    @Test

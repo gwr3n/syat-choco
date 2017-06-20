@@ -51,7 +51,7 @@ public class StandardError {
       double max = Arrays.stream(observations).mapToDouble(o -> o.getUB()).max().getAsDouble();
 
       RealVar mean = VariableFactory.real("Mean", min, max, precision, solver);
-      Mean.decompose("MeanConstraint", observations, mean);
+      Mean.decompose("MeanConstraint", observations, mean, precision);
 
       String exp = "(1/sqrt("+observations.length+"))*sqrt((";
       for(int i = 0; i < observations.length; i++){

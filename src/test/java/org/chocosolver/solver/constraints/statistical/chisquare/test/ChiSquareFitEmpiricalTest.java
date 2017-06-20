@@ -29,13 +29,15 @@ public class ChiSquareFitEmpiricalTest {
 
    @After
    public void tearDown() throws Exception {
+      Thread.sleep(1000);
+      System.gc();
    }
    
    /**
     * Run one test at a time. Multiple Solver instances seem to create conflicts.
     */
 
-   //@Test
+   @Test
    public void testInteger() {
       String[] str={"-log","SOLUTION"};
       

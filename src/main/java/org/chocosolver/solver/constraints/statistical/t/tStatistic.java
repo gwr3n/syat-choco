@@ -45,7 +45,7 @@ public class tStatistic {
       double max = Arrays.stream(observations).mapToDouble(o -> o.getUB()).max().getAsDouble();
 
       RealVar sampleMean = VariableFactory.real("Mean", min, max, precision, solver);
-      Mean.decompose("Mean", observations, sampleMean);
+      Mean.decompose("Mean", observations, sampleMean, precision);
       RealVar standardError = VariableFactory.real("StandardError", 0, (1/Math.sqrt(observations.length))*Math.sqrt(Math.pow(max-min,2)), precision, solver);
       StandardError.decompose("StandardError", observations, standardError, precision);
 

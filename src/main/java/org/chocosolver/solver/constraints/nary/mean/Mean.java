@@ -32,7 +32,8 @@ public class Mean {
    
    public static void decompose(String name,
                                 RealVar[] observations,
-                                RealVar mean){
+                                RealVar mean,
+                                double precision){
       Solver solver = mean.getSolver();
       
       String exp = "(";

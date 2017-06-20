@@ -29,14 +29,16 @@ public class ChiSquareIndependenceTest {
 
    @After
    public void tearDown() throws Exception {
+      Thread.sleep(1000);
+      System.gc();
    }
 
    @Test
    public void testInteger() {
       String[] str={"-log","SOLUTION"};
       
-      int[][] valuesA = {{1},{1,2,3},{3},{1},{1,2,3}};
-      int[][] valuesB = {{2},{3},{1},{2},{1}};
+      int[][] valuesA = {{3},{3},{1},{1},{2}};
+      int[][] valuesB = {{1},{1},{2},{2},{3}};
       int[] binCounts = {0,valuesA.length};
       int[][] binBounds = {{1,2,3,4},{1,2,3,4}};
       double confidence = 0.95;
@@ -52,8 +54,8 @@ public class ChiSquareIndependenceTest {
    public void testReal() {
       String[] str={"-log","SOLUTION"};
       
-      double[][] valuesA = {{1,1},{1,1},{1,3},{1,1},{3,3}};
-      double[][] valuesB = {{1,2},{3,3},{1,1},{2,2},{1,1}};
+      double[][] valuesA = {{3,3},{3,3},{1,1},{1,1},{2,2}};
+      double[][] valuesB = {{1,1},{1,1},{2,2},{2,2},{3,3}};
       int[] binCounts = {0,valuesA.length};
       double[][] binBounds = {{0.5,1.5,2.5,3.5},{0.5,1.5,2.5,3.5}};
       double confidence = 0.95;
@@ -168,8 +170,8 @@ public class ChiSquareIndependenceTest {
               st.append(chiSqstatisticVariable.getLB()+" "+chiSqstatisticVariable.getUB());
               st.append("\n");*/
               
-              //assertTrue(chiSqstatisticVariable.getLB() <= 0);
-              //assertTrue(chiSqstatisticVariable.getUB() >= 0);
+              assertTrue(chiSqstatisticVariable.getLB() <= 10);
+              assertTrue(chiSqstatisticVariable.getUB() >= 9);
               
               st.append(chiSqstatisticVariable.getLB()+" "+chiSqstatisticVariable.getUB());
            }else{
@@ -288,8 +290,8 @@ public class ChiSquareIndependenceTest {
               st.append(chiSqstatisticVariable.getLB()+" "+chiSqstatisticVariable.getUB());
               st.append("\n");*/
               
-              //assertTrue(chiSqstatisticVariable.getLB() <= 0);
-              //assertTrue(chiSqstatisticVariable.getUB() >= 0);
+              assertTrue(chiSqstatisticVariable.getLB() <= 10);
+              assertTrue(chiSqstatisticVariable.getUB() >= 9);
               
               st.append(chiSqstatisticVariable.getLB()+" "+chiSqstatisticVariable.getUB());
            }else{
