@@ -35,5 +35,15 @@
     	<artifactId>ojalgo</artifactId>
     	<version>40.0.0</version>
     </dependency>
+    <dependency>
+    	<groupId>org.la4j</groupId>
+    	<artifactId>la4j</artifactId>
+    	<version>0.6.0</version>
+    </dependency>
+    <dependency>
+    	<groupId>org.apache.commons</groupId>
+    	<artifactId>commons-math3</artifactId>
+    	<version>3.6.1</version>
+    </dependency>
   </dependencies>
 </project>
