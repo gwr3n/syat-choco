@@ -1,4 +1,4 @@
-package org.chocosolver.solver.constraints.statistical.score;
+package org.chocosolver.solver.constraints.statistical.hotelling;
 
 import org.apache.commons.math3.stat.correlation.Covariance;
 import org.chocosolver.solver.Solver;
@@ -11,7 +11,14 @@ import org.la4j.Matrix;
 import org.la4j.inversion.GaussJordanInverter;
 import org.la4j.matrix.dense.Basic2DMatrix;
 
-public class ScoreStatistic {
+/**
+ * https://en.wikipedia.org/wiki/Hotelling%27s_T-squared_distribution
+ * 
+ * @author Roberto Rossi
+ *
+ */
+
+public class tSquareStatistic {
    public static void decompose(String name,
                                 RealVar[] mu, 
                                 double[][] sigma, 

@@ -5,7 +5,7 @@ import static org.junit.Assert.*;
 import org.chocosolver.samples.AbstractProblem;
 import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.constraints.nary.matrix.GaussJordan;
-import org.chocosolver.solver.constraints.statistical.score.ScoreStatistic;
+import org.chocosolver.solver.constraints.statistical.hotelling.tSquareStatistic;
 import org.chocosolver.solver.search.strategy.selectors.values.RealDomainMiddle;
 import org.chocosolver.solver.search.strategy.selectors.variables.Cyclic;
 import org.chocosolver.solver.search.strategy.strategy.RealStrategy;
@@ -30,10 +30,14 @@ public class GaussJordanTest {
    @Test
    public void test() {
       String[] str={"-log","SOLUTION"};
-      double[][] matrix = new double[][]{
+      /*double[][] matrix = new double[][]{
          { 1.0, 0.1, 0.2 },
          { 0.1, 1.0, 0.1 },
          { 0.2, 0.1, 1.0 }
+      };*/
+      double[][] matrix = new double[][]{
+         { 2, 6 },
+         { 1, 3 }
       };
       
       GaussJordanReal gjreal = new GaussJordanReal(matrix);

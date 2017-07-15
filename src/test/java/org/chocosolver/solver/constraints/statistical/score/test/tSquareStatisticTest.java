@@ -4,7 +4,7 @@ import static org.junit.Assert.*;
 
 import org.chocosolver.samples.AbstractProblem;
 import org.chocosolver.solver.Solver;
-import org.chocosolver.solver.constraints.statistical.score.ScoreStatistic;
+import org.chocosolver.solver.constraints.statistical.hotelling.tSquareStatistic;
 import org.chocosolver.solver.search.strategy.selectors.values.RealDomainMiddle;
 import org.chocosolver.solver.search.strategy.selectors.variables.Cyclic;
 import org.chocosolver.solver.search.strategy.strategy.RealStrategy;
@@ -20,7 +20,7 @@ import umontreal.iro.lecuyer.randvar.NormalGen;
 import umontreal.iro.lecuyer.randvarmulti.MultinormalCholeskyGen;
 import umontreal.iro.lecuyer.rng.MRG32k3a;
 
-public class ScoreStatisticTest {
+public class tSquareStatisticTest {
 
    @Before
    public void setUp() throws Exception {
@@ -168,7 +168,7 @@ public class ScoreStatisticTest {
          
          statisticVariable = VF.real("score", statistic[0], statistic[1], precision, solver);
          
-         ScoreStatistic.decompose("scoreConstraint", muVariable, sigma, observations, statisticVariable, precision);
+         tSquareStatistic.decompose("scoreConstraint", muVariable, sigma, observations, statisticVariable, precision);
       }
       
       @Override
@@ -239,7 +239,7 @@ public class ScoreStatisticTest {
          
          statisticVariable = VF.real("score", statistic[0], statistic[1], precision, solver);
          
-         ScoreStatistic.decompose("scoreConstraint", muVariable, observations, statisticVariable, precision);
+         tSquareStatistic.decompose("scoreConstraint", muVariable, observations, statisticVariable, precision);
       }
       
       @Override
@@ -327,7 +327,7 @@ public class ScoreStatisticTest {
          
          statisticVariable = VF.real("score", statistic[0], statistic[1], precision, solver);
          
-         ScoreStatistic.decompose("scoreConstraint", muVariable, observationVariable, sigmaVariable, statisticVariable, precision);
+         tSquareStatistic.decompose("scoreConstraint", muVariable, observationVariable, sigmaVariable, statisticVariable, precision);
       }
       
       @Override
@@ -417,7 +417,7 @@ public class ScoreStatisticTest {
          
          statisticVariable = VF.real("score", statistic[0], statistic[1], precision, solver);
          
-         ScoreStatistic.decompose("scoreConstraint", muVariable, observationVariable, statisticVariable, precision);
+         tSquareStatistic.decompose("scoreConstraint", muVariable, observationVariable, statisticVariable, precision);
       }
       
       @Override

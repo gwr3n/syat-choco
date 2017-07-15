@@ -26,10 +26,10 @@ public class ContingencyTest {
    @Test
    public void test() {
       String[] str={"-log","SOLUTION"};
-      int[][] valuesA = {{1},{2},{3}};
-      int[][] valuesB = {{2},{1},{1}};
+      int[][] valuesA = {{1},{3},{3}};
+      int[][] valuesB = {{2},{1},{2}};
       int[] binCounts = {0,3};
-      int[][] binBounds = {{1,3,4},{1,3,4}};
+      int[][] binBounds = {{1,3,4},{1,2,4}};
       
       Contingency c = new Contingency(valuesA, valuesB, binCounts, binBounds);
       c.execute(str);

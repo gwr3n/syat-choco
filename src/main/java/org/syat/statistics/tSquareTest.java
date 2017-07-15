@@ -14,7 +14,14 @@ import org.apache.commons.math3.stat.correlation.Covariance;
 
 import org.la4j.inversion.GaussJordanInverter;
 
-public class ScoreTest {
+/**
+ * https://en.wikipedia.org/wiki/Hotelling%27s_T-squared_distribution
+ * 
+ * @author Roberto Rossi
+ *
+ */
+
+public class tSquareTest {
 
    double[] mu;
    double[][] sigma;
@@ -22,21 +29,21 @@ public class ScoreTest {
    
    private boolean estimatedCovariance;
    
-   public ScoreTest(double[] mu, double[][] sigma, double[][] observations){
+   public tSquareTest(double[] mu, double[][] sigma, double[][] observations){
       this.mu = mu;
       this.sigma = sigma;
       this.observations = observations;
       estimatedCovariance = false;
    }
    
-   public ScoreTest(double[] mu, double[][] observations){
+   public tSquareTest(double[] mu, double[][] observations){
       this.mu = mu;
       this.sigma = computeCovarianceMatrix(observations);
       this.observations = observations;
       estimatedCovariance = true;
    }
    
-   public double scoreStatistic(){
+   public double tSquareStatistic(){
       double[] totals = getTotals(observations, mu);
       double[][] sigmaM = new double[sigma.length][sigma[0].length];
       for(int i = 0; i < sigmaM.length; i++){
@@ -51,21 +58,21 @@ public class ScoreTest {
       return statistic;
    }
    
-   public double scoreTestPValue(){
+   public double tSquareTestPValue(){
       double p;
       if(estimatedCovariance){
          ChiSquareDist dist = new ChiSquareDist(this.mu.length);
-         p = dist.cdf(scoreStatistic());
+         p = dist.cdf(tSquareStatistic());
       }else{
          FisherFDist dist = new FisherFDist(this.mu.length, this.observations.length - this.mu.length);
-         double statistic = scoreStatistic()*(this.observations.length - this.mu.length)/((this.observations.length - 1) * this.mu.length);
+         double statistic = tSquareStatistic()*(this.observations.length - this.mu.length)/((this.observations.length - 1) * this.mu.length);
          p = dist.cdf(statistic);
       }
       return 1 - p;
    }
    
-   public boolean scoreTest(double significance){
-      return scoreTestPValue() > significance;
+   public boolean tSquareTestBoolean(double significance){
+      return tSquareTestPValue() > significance;
    }
    
    double[] getTotals(double[][] observations, double[] mu){
@@ -146,11 +153,11 @@ public class ScoreTest {
       
       double[][] observations = generateObservations(new double[]{1,1,1}, sigma, M);
       
-      ScoreTest test = new ScoreTest(mu, observations);
+      tSquareTest test = new tSquareTest(mu, observations);
       
-      System.out.println(test.scoreStatistic());
-      System.out.println(test.scoreTestPValue());
-      System.out.println(test.scoreTest(0.05));
+      System.out.println(test.tSquareStatistic());
+      System.out.println(test.tSquareTestPValue());
+      System.out.println(test.tSquareTestBoolean(0.05));
    }
    
 }

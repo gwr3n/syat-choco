@@ -5,13 +5,13 @@ import static org.junit.Assert.*;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.syat.statistics.ScoreTest;
+import org.syat.statistics.tSquareTest;
 
 import umontreal.iro.lecuyer.randvar.NormalGen;
 import umontreal.iro.lecuyer.randvarmulti.MultinormalCholeskyGen;
 import umontreal.iro.lecuyer.rng.MRG32k3a;
 
-public class ScoreTestTest {
+public class tSquareTestTest {
    
    static double[][] generateObservations(MRG32k3a rng, double[] mu, double[][] sigma, int nbObservations){
       NormalGen gen = new NormalGen(rng);
@@ -53,16 +53,16 @@ public class ScoreTestTest {
       
          double[][] observations = generateObservations(rng, new double[]{1,1,1}, sigma, M);
       
-         ScoreTest test = new ScoreTest(mu, sigma, observations);
+         tSquareTest test = new tSquareTest(mu, sigma, observations);
       
-         if(test.scoreTest(0.05))
+         if(test.tSquareTestBoolean(0.05))
             counter++;
       }
       
       assertTrue("Success frequency: "+(counter/R), counter/R >= 0.94);
    }
 
-   //@Test
+   @Test
    public void testUnknownSigma() {
       
       double[] mu = {1, 1, 1};
@@ -83,9 +83,9 @@ public class ScoreTestTest {
       
          double[][] observations = generateObservations(rng, new double[]{1,1,1}, sigma, M);
       
-         ScoreTest test = new ScoreTest(mu, observations);
+         tSquareTest test = new tSquareTest(mu, observations);
       
-         if(test.scoreTest(0.05))
+         if(test.tSquareTestBoolean(0.05))
             counter++;
       }
       

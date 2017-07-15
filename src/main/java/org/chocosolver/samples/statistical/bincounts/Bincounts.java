@@ -56,7 +56,7 @@ public class Bincounts extends AbstractProblem {
          binVariables[i] = VariableFactory.bounded("Bin "+(i+1), this.binCounts[i][0], this.binCounts[i][1], solver);
       
       //solver.post(IntConstraintFactorySt.bincounts(valueVariables, binVariables, binBounds, BincountsPropagator.EQFast));
-      IntConstraintFactorySt.bincountsDecomposition(valueVariables, binVariables, binBounds, BincountsDecompositionType.Rossi2016);
+      IntConstraintFactorySt.bincountsDecomposition(valueVariables, binVariables, binBounds, BincountsDecompositionType.Agkun2016_1);
    }
    
    private static IntVar[] mergeArrays(IntVar[] var1, IntVar[] var2){
