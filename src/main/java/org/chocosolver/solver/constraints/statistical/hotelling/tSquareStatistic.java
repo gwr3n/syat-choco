@@ -19,6 +19,11 @@ import org.la4j.matrix.dense.Basic2DMatrix;
  */
 
 public class tSquareStatistic {
+   
+   /***************************************/
+   /* Observations are scalar             */
+   /***************************************/
+   
    public static void decompose(String name,
                                 RealVar[] mu, 
                                 double[][] sigma, 
@@ -27,27 +32,27 @@ public class tSquareStatistic {
                                 double precision){
       Solver solver = statistic.getSolver();
       
-      double[] totals = getTotals(observations);
+      double[] means = getMeans(observations);
       
-      double[][] sigmaM = new double[sigma.length][sigma[0].length];
+      /*double[][] sigmaM = new double[sigma.length][sigma[0].length];
       for(int i = 0; i < sigmaM.length; i++){
          for(int j = 0; j < sigmaM[i].length; j++){
             sigmaM[i][j] = sigma[i][j] * observations.length;
          }
-      }
+      }*/
       
-      Matrix a = new Basic2DMatrix(sigmaM);
+      Matrix a = new Basic2DMatrix(sigma);
       Matrix b = new GaussJordanInverter(a).inverse(); 
       
       int M = observations.length;
       
-      String statisticString = "";
+      String statisticString = M+"*(";
       for(int i = 0; i < mu.length; i++){
-         statisticString += "("+totals[i]+"-"+M+"*{"+i+"})*(";
+         statisticString += "("+means[i]+"-{"+i+"})*(";
          for(int j = 0; j < mu.length; j++){
-            statisticString += "("+totals[j]+"-"+M+"*{"+j+"})*"+b.get(j, i)+(j == mu.length - 1 ? "" : "+");
+            statisticString += "("+means[j]+"-{"+j+"})*"+b.get(j, i)+(j == mu.length - 1 ? "" : "+");
          }
-         statisticString += i == mu.length - 1 ? ")={"+mu.length+"}" : ")+";
+         statisticString += i == mu.length - 1 ? "))={"+mu.length+"}" : ")+";
       }
       
       RealVar[] allVars = new RealVar[mu.length + 1];
@@ -66,27 +71,27 @@ public class tSquareStatistic {
       
       double[][] sigma = computeCovarianceMatrix(observations);
       
-      double[] totals = getTotals(observations);
+      double[] totals = getMeans(observations);
 
-      double[][] sigmaM = new double[sigma.length][sigma[0].length];
+      /*double[][] sigmaM = new double[sigma.length][sigma[0].length];
       for(int i = 0; i < sigmaM.length; i++){
          for(int j = 0; j < sigmaM[i].length; j++){
             sigmaM[i][j] = sigma[i][j] * (observations.length - 1);
          }
-      }
+      }*/
       
-      Matrix a = new Basic2DMatrix(sigmaM);
+      Matrix a = new Basic2DMatrix(sigma);
       Matrix b = new GaussJordanInverter(a).inverse(); 
       
       int M = observations.length;
       
-      String statisticString = "";
+      String statisticString = M+"*(";
       for(int i = 0; i < mu.length; i++){
-         statisticString += "("+totals[i]+"-"+M+"*{"+i+"})*(";
+         statisticString += "("+totals[i]+"-{"+i+"})*(";
          for(int j = 0; j < mu.length; j++){
-            statisticString += "("+totals[j]+"-"+M+"*{"+j+"})*"+b.get(j, i)+(j == mu.length - 1 ? "" : "+");
+            statisticString += "("+totals[j]+"-{"+j+"})*"+b.get(j, i)+(j == mu.length - 1 ? "" : "+");
          }
-         statisticString += i == mu.length - 1 ? ")={"+mu.length+"}" : ")+";
+         statisticString += i == mu.length - 1 ? "))={"+mu.length+"}" : ")+";
       }
       
       RealVar[] allVars = new RealVar[mu.length + 1];
@@ -96,11 +101,11 @@ public class tSquareStatistic {
       solver.post(new RealConstraint(name, statisticString, Ibex.HC4_NEWTON, allVars));
    }
    
-   private static double[] getTotals(double[][] observations){
+   private static double[] getMeans(double[][] observations){
       double[] totals = new double[observations[0].length];
       for(int i = 0; i < observations.length; i++){
          for(int j = 0; j < observations[i].length; j++){
-            totals[j] += observations[i][j];
+            totals[j] += observations[i][j]/observations.length;
          }
       }
       return totals;
@@ -124,7 +129,9 @@ public class tSquareStatistic {
       return result;
    }
    
-   /***********************************/
+   /***************************************/
+   /* Observations are decision variables */
+   /***************************************/
    
    public static void decompose(String name,
                                 RealVar[] mu, 
@@ -142,43 +149,43 @@ public class tSquareStatistic {
 
       for(int i = 0; i < matrix.length; i++){
          for(int j = 0; j < matrix.length; j++){
-            inverseVariable[i][j] = VariableFactory.real("InverseCov_"+(i+1)+"_"+(j+1), -1000, 1000, precision, solver);
+            inverseVariable[i][j] = VariableFactory.real(name+"_inverseCov_"+(i+1)+"_"+(j+1), -1000, 1000, precision, solver);
          }
       }
 
-      RealVar[][] matrixM = new RealVar[n][n];
+      /*RealVar[][] matrixM = new RealVar[n][n];
       for(int i = 0; i < matrix.length; i++){
          for(int j = 0; j < matrix.length; j++){
-            matrixM[i][j] = VariableFactory.real("CovM_"+(i+1)+"_"+(j+1), -1000, 1000, precision, solver);
-            solver.post(new RealConstraint(name, "{0}="+M+"*{1}", Ibex.HC4_NEWTON, new RealVar[]{matrixM[i][j],matrix[i][j]}));
+            matrixM[i][j] = VariableFactory.real(name+"_CovM_"+(i+1)+"_"+(j+1), -1000, 1000, precision, solver);
+            solver.post(new RealConstraint(name+"_CovM_"+(i+1)+"_"+(j+1), "{0}="+M+"*{1}", Ibex.HC4_NEWTON, new RealVar[]{matrixM[i][j],matrix[i][j]}));
          }
+      }*/
+
+      RealVar[] means = new RealVar[observations[0].length];
+      for(int i = 0; i < means.length; i++){
+         means[i] = VariableFactory.real(name+"_Mean_"+(i+1), -1000, 1000, precision, solver);
       }
 
-      RealVar[] totals = new RealVar[observations[0].length];
-      for(int i = 0; i < totals.length; i++){
-         totals[i] = VariableFactory.real("Total_"+(i+1), -1000, 1000, precision, solver);
-      }
+      decomposeMeans(observations, means);
 
-      decomposeTotals(observations, totals);
+      GaussJordan.decompose(name+"_GaussJordan", matrix, inverseVariable);
 
-      GaussJordan.decompose("GaussJordan", matrixM, inverseVariable);
-
-      String statisticString = "";
+      String statisticString = M+"*(";
       for(int i = 0; i < mu.length; i++){
-         statisticString += "({"+(i+mu.length)+"}-"+M+"*{"+i+"})*(";
+         statisticString += "({"+(i+mu.length)+"}-{"+i+"})*(";
          for(int j = 0; j < mu.length; j++){
-            statisticString += "({"+(j+mu.length)+"}-"+M+"*{"+j+"})*({"+(mu.length + totals.length + j*n+i)+(j == mu.length - 1 ? "})" : "})+");
+            statisticString += "({"+(j+mu.length)+"}-{"+j+"})*({"+(mu.length + means.length + j*n+i)+(j == mu.length - 1 ? "})" : "})+");
          }
-         statisticString += i == mu.length - 1 ? ")={"+(mu.length+totals.length+n*n)+"}" : ")+";
+         statisticString += i == mu.length - 1 ? "))={"+(mu.length+means.length+n*n)+"}" : ")+";
       }
 
-      RealVar[] allVars = new RealVar[mu.length + totals.length + n*n + 1];
+      RealVar[] allVars = new RealVar[mu.length + means.length + n*n + 1];
       System.arraycopy(mu, 0, allVars, 0, mu.length);
-      System.arraycopy(totals, 0, allVars, mu.length, totals.length);
-      System.arraycopy(flatten(inverseVariable), 0, allVars, mu.length + totals.length, n*n);
+      System.arraycopy(means, 0, allVars, mu.length, means.length);
+      System.arraycopy(flatten(inverseVariable), 0, allVars, mu.length + means.length, n*n);
       allVars[allVars.length - 1] = statistic;
 
-      solver.post(new RealConstraint(name, statisticString, Ibex.HC4_NEWTON, allVars));
+      solver.post(new RealConstraint(name+"_chiSq", statisticString, Ibex.HC4_NEWTON, allVars));
    }
    
    public static void decompose(String name,
@@ -196,46 +203,46 @@ public class tSquareStatistic {
       
       for(int i = 0; i < matrix.length; i++){
          for(int j = 0; j < matrix.length; j++){
-            matrix[i][j] = VariableFactory.real("Cov_"+(i+1)+"_"+(j+1), -1000, 1000, precision, solver);
-            inverseVariable[i][j] = VariableFactory.real("InverseCov_"+(i+1)+"_"+(j+1), -1000, 1000, precision, solver);
+            matrix[i][j] = VariableFactory.real(name+"_Cov_"+(i+1)+"_"+(j+1), -1000, 1000, precision, solver);
+            inverseVariable[i][j] = VariableFactory.real(name+"_InverseCov_"+(i+1)+"_"+(j+1), -1000, 1000, precision, solver);
          }
       }
       
       computeCovarianceMatrix(observations, matrix, precision);
       
-      RealVar[][] matrixM = new RealVar[n][n];
+      /*RealVar[][] matrixM = new RealVar[n][n];
       for(int i = 0; i < matrix.length; i++){
          for(int j = 0; j < matrix.length; j++){
-            matrixM[i][j] = VariableFactory.real("CovM_"+(i+1)+"_"+(j+1), -1000, 1000, precision, solver);
-            solver.post(new RealConstraint(name, "{0}="+(M-1)+"*{1}", Ibex.HC4_NEWTON, new RealVar[]{matrixM[i][j],matrix[i][j]}));
+            matrixM[i][j] = VariableFactory.real(name+"_CovM_"+(i+1)+"_"+(j+1), -1000, 1000, precision, solver);
+            solver.post(new RealConstraint(name+"_CovM_"+(i+1)+"_"+(j+1), "{0}="+(M-1)+"*{1}", Ibex.HC4_NEWTON, new RealVar[]{matrixM[i][j],matrix[i][j]}));
          }
-      }
+      }*/
 
-      RealVar[] totals = new RealVar[observations[0].length];
-      for(int i = 0; i < totals.length; i++){
-         totals[i] = VariableFactory.real("Total_"+(i+1), -1000, 1000, precision, solver);
+      RealVar[] means = new RealVar[observations[0].length];
+      for(int i = 0; i < means.length; i++){
+         means[i] = VariableFactory.real(name+"_Mean_"+(i+1), -1000, 1000, precision, solver);
       }
       
-      decomposeTotals(observations, totals);
+      decomposeMeans(observations, means);
 
-      GaussJordan.decompose("GaussJordan", matrixM, inverseVariable);
+      GaussJordan.decompose(name+"_GaussJordan", matrix, inverseVariable);
 
-      String statisticString = "";
+      String statisticString = M+"*(";
       for(int i = 0; i < mu.length; i++){
-         statisticString += "({"+(i+mu.length)+"}-"+M+"*{"+i+"})*(";
+         statisticString += "({"+(i+mu.length)+"}-{"+i+"})*(";
          for(int j = 0; j < mu.length; j++){
-            statisticString += "({"+(j+mu.length)+"}-"+M+"*{"+j+"})*({"+(mu.length + totals.length + j*n+i)+(j == mu.length - 1 ? "})" : "})+");
+            statisticString += "({"+(j+mu.length)+"}-{"+j+"})*({"+(mu.length + means.length + j*n+i)+(j == mu.length - 1 ? "})" : "})+");
          }
-         statisticString += i == mu.length - 1 ? ")={"+(mu.length+totals.length+n*n)+"}" : ")+";
+         statisticString += i == mu.length - 1 ? "))={"+(mu.length+means.length+n*n)+"}" : ")+";
       }
 
-      RealVar[] allVars = new RealVar[mu.length + totals.length + n*n + 1];
+      RealVar[] allVars = new RealVar[mu.length + means.length + n*n + 1];
       System.arraycopy(mu, 0, allVars, 0, mu.length);
-      System.arraycopy(totals, 0, allVars, mu.length, totals.length);
-      System.arraycopy(flatten(inverseVariable), 0, allVars, mu.length + totals.length, n*n);
+      System.arraycopy(means, 0, allVars, mu.length, means.length);
+      System.arraycopy(flatten(inverseVariable), 0, allVars, mu.length + means.length, n*n);
       allVars[allVars.length - 1] = statistic;
 
-      solver.post(new RealConstraint(name, statisticString, Ibex.HC4_NEWTON, allVars));
+      solver.post(new RealConstraint(name+"_FDist", statisticString, Ibex.HC4_NEWTON, allVars));
    }
    
    private static void computeCovarianceMatrix(RealVar[][] observations, RealVar[][] matrix, double precision){
@@ -254,19 +261,19 @@ public class tSquareStatistic {
       return result;
    }
    
-   private static void decomposeTotals(RealVar[][] observations, RealVar[] totals){
+   private static void decomposeMeans(RealVar[][] observations, RealVar[] means){
       Solver solver = observations[0][0].getSolver();
       
       String totalStr = "";
       for(int i = 0; i < observations.length; i++){
-         totalStr += "{"+i+ (i == observations.length - 1 ? "}={"+observations.length+"}" : "}+");
+         totalStr += "{"+i+ (i == observations.length - 1 ? "}="+observations.length+"*{"+observations.length+"}" : "}+");
       }
       
       for(int j = 0; j < observations[0].length; j++){
          RealVar[] allVars = new RealVar[observations.length+1];
          System.arraycopy(getArray(j, observations), 0, allVars, 0, observations.length);
-         allVars[observations.length] = totals[j];
-         solver.post(new RealConstraint("Total_"+(j+1), totalStr, Ibex.HC4_NEWTON, allVars));    
+         allVars[observations.length] = means[j];
+         solver.post(new RealConstraint("Mean_"+(j+1), totalStr, Ibex.HC4_NEWTON, allVars));    
       }
    }
    

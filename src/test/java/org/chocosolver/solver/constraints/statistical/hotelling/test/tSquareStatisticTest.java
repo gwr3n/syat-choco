@@ -1,4 +1,4 @@
-package org.chocosolver.solver.constraints.statistical.score.test;
+package org.chocosolver.solver.constraints.statistical.hotelling.test;
 
 import static org.junit.Assert.*;
 
@@ -262,8 +262,8 @@ public class tSquareStatisticTest {
               st.append(statisticVariable.getLB()+" "+statisticVariable.getUB());
               st.append("\n");
               
-              assertTrue(statisticVariable.getLB() <= 2.77 && statisticVariable.getLB() >= 2.76);
-              assertTrue(statisticVariable.getUB() <= 2.77 && statisticVariable.getUB() >= 2.76);
+              assertTrue(statisticVariable.getLB() <= 2.71 && statisticVariable.getLB() >= 2.70);
+              assertTrue(statisticVariable.getUB() <= 2.71 && statisticVariable.getUB() >= 2.70);
            }else{
               st.append("No solution!");
            }
@@ -451,8 +451,8 @@ public class tSquareStatisticTest {
               st.append(statisticVariable.getLB()+" "+statisticVariable.getUB());
               st.append("\n");
               
-              assertTrue(statisticVariable.getLB() <= 2.77 && statisticVariable.getLB() >= 2.76);
-              assertTrue(statisticVariable.getUB() <= 2.77 && statisticVariable.getUB() >= 2.76);
+              assertTrue(statisticVariable.getLB() <= 2.71 && statisticVariable.getLB() >= 2.70);
+              assertTrue(statisticVariable.getUB() <= 2.71 && statisticVariable.getUB() >= 2.70);
            }else{
               st.append("No solution!");
            }
