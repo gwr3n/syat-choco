@@ -30,16 +30,20 @@ public class GaussJordanTest {
    @Test
    public void test() {
       String[] str={"-log","SOLUTION"};
+      double[][] matrix = new double[][]{
+         { 1.0, 0.1, 0.2 },
+         { 0.1, 1.0, 0.1 },
+         { 0.2, 0.1, 1.0 }
+      };
+      /*double[][] matrix = new double[][]{
+         { 2, 6 },
+         { 1, 3 }
+      };*/
       /*double[][] matrix = new double[][]{
          { 1.0, 0.1, 0.2 },
          { 0.1, 1.0, 0.1 },
          { 0.2, 0.1, 1.0 }
       };*/
-      double[][] matrix = new double[][]{
-         { 2, 6 },
-         { 1, 3 }
-      };
-      
       GaussJordanReal gjreal = new GaussJordanReal(matrix);
       gjreal.execute(str);
    }

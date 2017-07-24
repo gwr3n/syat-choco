@@ -85,6 +85,10 @@ public class IntConstraintFactorySt extends IntConstraintFactory {
    }
    
    public static void contingencyDecomposition(IntVar[] seriesA, IntVar[] seriesB, IntVar[][] binVariables, int[][] binBounds, IntVar[] marginalsH, IntVar[] marginalsV){
-      ContingencyDecompositions.decomposition(seriesA, seriesB, binVariables, binBounds, marginalsH, marginalsV);
+      ContingencyDecompositions.decompose(seriesA, seriesB, binVariables, binBounds, marginalsH, marginalsV);
+   }
+   
+   public static void contingencyDecomposition(RealVar[] seriesA, RealVar[] seriesB, IntVar[][] binVariables, double[][] binBounds, IntVar[] marginalsH, IntVar[] marginalsV){
+      ContingencyDecompositions.decompose(seriesA, seriesB, binVariables, binBounds, marginalsH, marginalsV);
    }
 }

@@ -11,12 +11,12 @@ import org.chocosolver.solver.variables.RealVar;
 import org.chocosolver.solver.variables.VariableFactory;
 
 public class ContingencyDecompositions {
-   public static void decomposition(IntVar[] seriesA,
-                                    IntVar[] seriesB,
-                                    IntVar[][] binVariables,
-                                    int[][] binBounds,
-                                    IntVar[] marginalsH,
-                                    IntVar[] marginalsV){
+   public static void decompose(IntVar[] seriesA,
+                                IntVar[] seriesB,
+                                IntVar[][] binVariables,
+                                int[][] binBounds,
+                                IntVar[] marginalsH,
+                                IntVar[] marginalsV){
       Solver solver = seriesA[0].getSolver();
       
       for(int i = 0; i < binVariables.length; i++){
@@ -51,12 +51,12 @@ public class ContingencyDecompositions {
       }
    }
    
-   public static void decomposition(RealVar[] seriesA,
-                                    RealVar[] seriesB,
-                                    IntVar[][] binVariables,
-                                    double[][] binBounds,
-                                    IntVar[] marginalsH,
-                                    IntVar[] marginalsV){
+   public static void decompose(RealVar[] seriesA,
+                                RealVar[] seriesB,
+                                IntVar[][] binVariables,
+                                double[][] binBounds,
+                                IntVar[] marginalsH,
+                                IntVar[] marginalsV){
       Solver solver = seriesA[0].getSolver();
 
       for(int i = 0; i < binVariables.length; i++){

@@ -6,6 +6,24 @@ import org.chocosolver.solver.constraints.real.RealConstraint;
 import org.chocosolver.solver.variables.RealVar;
 
 public class GaussJordan {
+   
+   public static void decompose(String name, RealVar[][] matrix, RealVar[][] inverse){
+      Solver solver = matrix[0][0].getSolver();
+      int n = matrix.length;
+      
+      String[][] matrixString = initialiseMatrixString(n);
+      String[][] inverseString = initialiseInverseMatrixString(n);
+      
+      gaussJordan(matrixString, inverseString);
+      
+      for(int i = 0; i < n; i++){
+         for(int j = 0; j < n; j++){
+            solver.post(new RealConstraint(name, inverseString[i][j]+"={"+(n*n)+"}", Ibex.HC4_NEWTON, flatten(matrix,inverse[i][j])));
+         }
+      }
+      System.out.println();
+   }
+   
    private static String[][] initialiseMatrixString(int n){
       String[][] matrixString = new String[n][n];
       for(int i = 0; i < n; i++){
@@ -26,7 +44,7 @@ public class GaussJordan {
       return inverseString;
    }
    
-   public static RealVar[] flatten(RealVar[][] matrix, RealVar out){
+   private static RealVar[] flatten(RealVar[][] matrix, RealVar out){
       int n = matrix.length;
       RealVar[] array = new RealVar[n*n+1];
       for(int i = 0; i < n; i++){
@@ -36,23 +54,6 @@ public class GaussJordan {
       }
       array[n*n]=out;
       return array;
-   }
-   
-   public static void decompose(String name, RealVar[][] matrix, RealVar[][] inverse){
-      Solver solver = matrix[0][0].getSolver();
-      int n = matrix.length;
-      
-      String[][] matrixString = initialiseMatrixString(n);
-      String[][] inverseString = initialiseInverseMatrixString(n);
-      
-      gaussJordan(matrixString, inverseString);
-      
-      for(int i = 0; i < n; i++){
-         for(int j = 0; j < n; j++){
-            solver.post(new RealConstraint(name, inverseString[i][j]+"={"+(n*n)+"}", Ibex.HC4_NEWTON, flatten(matrix,inverse[i][j])));
-         }
-      }
-      System.out.println();
    }
    
    private static void gaussJordan(String[][] matrixString, String[][] inverseString){
@@ -107,11 +108,7 @@ public class GaussJordan {
       return n*i + j;
    }
    
-   private static int convertIndexInverseMatrix(int i, int j, int n){
+   /*private static int convertIndexInverseMatrix(int i, int j, int n){
       return (int) Math.pow(n, 2) + n*i + j;
-   }
-   
-   public static void main(String args[]){
-      //decompose("", 2, null, null);
-   }
+   }*/
 }

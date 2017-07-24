@@ -81,7 +81,7 @@ public class ChiSquareIndependence {
       
       IntVar[] marginalsV = VariableFactory.boundedArray(name+"_Marginals V", binVariables[0].length, 0, observations, solver);
       
-      ContingencyDecompositions.decomposition(seriesA, seriesB, binVariables, binBounds, marginalsH, marginalsV);
+      ContingencyDecompositions.decompose(seriesA, seriesB, binVariables, binBounds, marginalsH, marginalsV);
       
       IntVar[] flattenedBins = new IntVar[binVariables.length*binVariables[0].length];
       for(int i = 0; i < binVariables.length; i++){
@@ -137,7 +137,7 @@ public class ChiSquareIndependence {
 
       IntVar[] marginalsV = VariableFactory.boundedArray(name+"_Marginals V", binVariables[0].length, 0, observations, solver);
 
-      ContingencyDecompositions.decomposition(seriesA, seriesB, binVariables, binBounds, marginalsH, marginalsV);
+      ContingencyDecompositions.decompose(seriesA, seriesB, binVariables, binBounds, marginalsH, marginalsV);
 
       IntVar[] flattenedBins = new IntVar[binVariables.length*binVariables[0].length];
       for(int i = 0; i < binVariables.length; i++){

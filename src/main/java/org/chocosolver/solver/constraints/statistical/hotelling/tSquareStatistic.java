@@ -149,7 +149,7 @@ public class tSquareStatistic {
 
       for(int i = 0; i < matrix.length; i++){
          for(int j = 0; j < matrix.length; j++){
-            inverseVariable[i][j] = VariableFactory.real(name+"_inverseCov_"+(i+1)+"_"+(j+1), -1000, 1000, precision, solver);
+            inverseVariable[i][j] = VariableFactory.real(name+"_inverseCov_"+(i+1)+"_"+(j+1), -10000, 10000, precision, solver);
          }
       }
 
@@ -163,7 +163,7 @@ public class tSquareStatistic {
 
       RealVar[] means = new RealVar[observations[0].length];
       for(int i = 0; i < means.length; i++){
-         means[i] = VariableFactory.real(name+"_Mean_"+(i+1), -1000, 1000, precision, solver);
+         means[i] = VariableFactory.real(name+"_Mean_"+(i+1), -10000, 10000, precision, solver);
       }
 
       decomposeMeans(observations, means);
@@ -203,8 +203,8 @@ public class tSquareStatistic {
       
       for(int i = 0; i < matrix.length; i++){
          for(int j = 0; j < matrix.length; j++){
-            matrix[i][j] = VariableFactory.real(name+"_Cov_"+(i+1)+"_"+(j+1), -1000, 1000, precision, solver);
-            inverseVariable[i][j] = VariableFactory.real(name+"_InverseCov_"+(i+1)+"_"+(j+1), -1000, 1000, precision, solver);
+            matrix[i][j] = VariableFactory.real(name+"_Cov_"+(i+1)+"_"+(j+1), -10000, 10000, precision, solver);
+            inverseVariable[i][j] = VariableFactory.real(name+"_InverseCov_"+(i+1)+"_"+(j+1), -10000, 10000, precision, solver);
          }
       }
       
@@ -220,7 +220,7 @@ public class tSquareStatistic {
 
       RealVar[] means = new RealVar[observations[0].length];
       for(int i = 0; i < means.length; i++){
-         means[i] = VariableFactory.real(name+"_Mean_"+(i+1), -1000, 1000, precision, solver);
+         means[i] = VariableFactory.real(name+"_Mean_"+(i+1), -10000, 10000, precision, solver);
       }
       
       decomposeMeans(observations, means);

@@ -13,10 +13,10 @@ import org.chocosolver.solver.variables.VariableFactory;
 
 public class Covariance {
    public static void decompose(String name,
-         IntVar[] observationsA,
-         IntVar[] observationsB,
-         RealVar variance,
-         double precision){
+                                IntVar[] observationsA,
+                                IntVar[] observationsB,
+                                RealVar variance,
+                                double precision){
       Solver solver = variance.getSolver();
 
       int minA = Arrays.stream(observationsA).mapToInt(o -> o.getLB()).min().getAsInt();

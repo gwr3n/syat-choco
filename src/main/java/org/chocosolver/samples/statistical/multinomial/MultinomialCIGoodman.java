@@ -8,20 +8,17 @@ import java.util.Set;
 import java.util.stream.IntStream;
 
 import org.chocosolver.samples.AbstractProblem;
-import org.chocosolver.solver.ResolutionPolicy;
 import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.constraints.IntConstraintFactorySt;
 import org.chocosolver.solver.constraints.LogicalConstraintFactory;
-import org.chocosolver.solver.constraints.nary.bincounts.BincountsPropagatorType;
+import org.chocosolver.solver.constraints.nary.bincounts.BincountsDecompositionType;
 import org.chocosolver.solver.constraints.real.Ibex;
 import org.chocosolver.solver.constraints.real.RealConstraint;
 import org.chocosolver.solver.constraints.real.RealPropagator;
 import org.chocosolver.solver.exception.ContradictionException;
 import org.chocosolver.solver.search.loop.monitors.IMonitorSolution;
-import org.chocosolver.solver.search.strategy.IntStrategyFactory;
 import org.chocosolver.solver.search.strategy.selectors.values.RealDomainMiddle;
 import org.chocosolver.solver.search.strategy.selectors.variables.Cyclic;
-import org.chocosolver.solver.search.strategy.strategy.AbstractStrategy;
 import org.chocosolver.solver.search.strategy.strategy.RealStrategy;
 import org.chocosolver.solver.variables.IntVar;
 import org.chocosolver.solver.variables.RealVar;
@@ -34,7 +31,7 @@ import umontreal.iro.lecuyer.randvar.UniformGen;
 import umontreal.iro.lecuyer.randvarmulti.MultinomialGen;
 import umontreal.iro.lecuyer.rng.MRG32k3a;
 
-public class MultinomialGC extends AbstractProblem {
+public class MultinomialCIGoodman extends AbstractProblem {
    
    public IntVar[] valueVariables;
    public IntVar[] binVariables;
@@ -46,7 +43,7 @@ public class MultinomialGC extends AbstractProblem {
    int[] binBounds;
    double confidence;
    
-   public MultinomialGC(double[][] observations,
+   public MultinomialCIGoodman(double[][] observations,
                         int[][] binCounts, 
                         int[] binBounds,
                         double confidence){
@@ -89,7 +86,8 @@ public class MultinomialGC extends AbstractProblem {
       
       chiSqStatistics = VF.real("chiSqStatistics", this.chiSqDist.inverseF(confidence), this.chiSqDist.inverseF(confidence), precision, solver);
       
-      solver.post(IntConstraintFactorySt.bincounts(valueVariables, binVariables, binBounds, BincountsPropagatorType.EQFast));
+      //solver.post(IntConstraintFactorySt.bincounts(valueVariables, binVariables, binBounds, BincountsPropagatorType.EQFast));
+      IntConstraintFactorySt.bincountsDecomposition(valueVariables, binVariables, binBounds, BincountsDecompositionType.Agkun2016_2);
       
       RealVar[] realViews = VF.real(binVariables, precision);
       
@@ -263,8 +261,8 @@ public class MultinomialGC extends AbstractProblem {
       
       double confidence = 0.9;
       double[] p = {0.3,0.3,0.4}; 
-      int replications = 1;
-      int sampleSize = 10;
+      int replications = 1000;
+      int sampleSize = 30;
       
       double coverageProbability = 0;
       MRG32k3a rng = new MRG32k3a();
@@ -278,7 +276,7 @@ public class MultinomialGC extends AbstractProblem {
             binCounts[k] = new int[]{0, sampleSize};
          }
          int[] binBounds = IntStream.iterate(0, k -> k + 1).limit(p.length + 1).toArray();
-         MultinomialGC cs = new MultinomialGC(variates, binCounts, binBounds, confidence);
+         MultinomialCIGoodman cs = new MultinomialCIGoodman(variates, binCounts, binBounds, confidence);
          cs.execute(str);
          System.gc();
          try {
@@ -290,11 +288,11 @@ public class MultinomialGC extends AbstractProblem {
          
          boolean covered = true;
          
-         for(int j = 0; j < p.length; j++){
+         /*for(int j = 0; j < p.length; j++){
             if(cs.targetFrequencies[j].getLB() >= p[j] || p[j] >= cs.targetFrequencies[j].getUB()){
                covered = false;
             }
-         }
+         }*/
          
          int[] frequencies = IntStream.iterate(0, k -> k + 1).limit(p.length).map(k -> cs.binVariables[k].getValue()).toArray();
          double[][] intervals = computeQuesenberryHurstCI(confidence, frequencies);
@@ -309,7 +307,7 @@ public class MultinomialGC extends AbstractProblem {
          if(covered) coverageProbability++;
       }
       
-      System.out.println("CP: "+coverageProbability/replications);
+      System.out.println("Coverage probability: "+coverageProbability/replications);
    }
 
 }
