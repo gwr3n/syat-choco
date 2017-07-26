@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
 import umontreal.iro.lecuyer.probdist.ChiSquareDist;
 import umontreal.iro.lecuyer.probdist.PoissonDist;
 
-public class Regression extends AbstractProblem {
+public class RegressionPoisson extends AbstractProblem {
    
    public RealVar slope;
    public RealVar quadratic;
@@ -41,7 +41,7 @@ public class Regression extends AbstractProblem {
    double[] binBounds;
    double significance;
    
-   public Regression(double[] observations,
+   public RegressionPoisson(double[] observations,
                      double[] binBounds,
                      double significance){
       this.observations = observations;
@@ -145,18 +145,18 @@ public class Regression extends AbstractProblem {
       
       int nbObservations = 100;
       
-      double truePoissonRate = 15;
+      double truePoissonRate = 30;
       
       Random rnd = new Random(123);
       observations = generateObservations(rnd, truePoissonRate, nbObservations);
       Arrays.stream(observations).forEach(k -> System.out.print(k+"\t"));
       System.out.println();
       
-      int bins = 15;
-      double[] binBounds = DoubleStream.iterate(0, i -> i + 2).limit(bins).toArray();                                 
+      int bins = 10;
+      double[] binBounds = DoubleStream.iterate(0, i -> i + 5).limit(bins+1).toArray();                                 
       double significance = 0.05;
    
-      Regression regression = new Regression(observations, binBounds, significance);
+      RegressionPoisson regression = new RegressionPoisson(observations, binBounds, significance);
       regression.execute(str);
    }
    

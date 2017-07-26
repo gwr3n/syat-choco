@@ -34,14 +34,15 @@ public class ChiSquareFitNormal {
 
       //RealVar[] realBinViews = VF.real(binCounts, precision);
       //solver.post(IntConstraintFactorySt.bincounts(observations, realBinViews, binBounds, BincountsPropagatorType.EQFast));
-      IntConstraintFactorySt.bincountsDecomposition(observations, binCounts, binBounds, precision, BincountsDecompositionType.Agkun2016_1);
+      IntConstraintFactorySt.bincountsDecomposition(observations, binCounts, binBounds, precision, BincountsDecompositionType.Agkun2016_2_LE);
 
       RealVar[] realBinCounts = VF.real(binCounts, precision);
 
       String[] targetFrequencies = new String[binCounts.length];
       for(int b = 0; b < binBounds.length-1; b++){
-         targetFrequencies[b] = observations.length+"*((2.718^(-358*(("+binBounds[b+1]+"-{"+(binCounts.length+1)+"})/{"+(binCounts.length+2)+"})/23+111*atan(37*(("+binBounds[b+1]+"-{"+(binCounts.length+1)+"})/{"+(binCounts.length+2)+"})/294))+1)^(-1) - " + 
-                                "(2.718^(-358*(("+binBounds[b]+"-{"+(binCounts.length+1)+"})/{"+(binCounts.length+2)+"})/23+111*atan(37*(("+binBounds[b]+"-{"+(binCounts.length+1)+"})/{"+(binCounts.length+2)+"})/294))+1)^(-1))";
+         targetFrequencies[b] = observations.length+
+                               "*((2.71828^(-358*(("+binBounds[b+1]+"-{"+(binCounts.length+1)+"})/{"+(binCounts.length+2)+"})/23+111*atan(37*(("+binBounds[b+1]+"-{"+(binCounts.length+1)+"})/{"+(binCounts.length+2)+"})/294))+1)^(-1) - " + 
+                                "(2.71828^(-358*(("+binBounds[b]+"-{"+(binCounts.length+1)+"})/{"+(binCounts.length+2)+"})/23+111*atan(37*(("+binBounds[b]+"-{"+(binCounts.length+1)+"})/{"+(binCounts.length+2)+"})/294))+1)^(-1))";
       }
 
       String chiSqExp = "";

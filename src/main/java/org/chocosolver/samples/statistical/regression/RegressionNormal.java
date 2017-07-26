@@ -26,6 +26,7 @@ import org.chocosolver.util.ESat;
 import org.slf4j.LoggerFactory;
 
 import umontreal.iro.lecuyer.probdist.ChiSquareDist;
+import umontreal.iro.lecuyer.probdist.NormalDist;
 import umontreal.iro.lecuyer.probdist.PoissonDist;
 
 public class RegressionNormal extends AbstractProblem {
@@ -39,15 +40,19 @@ public class RegressionNormal extends AbstractProblem {
    public IntVar[] binVariables;
    public RealVar[] realBinViews;
    
+   public double[] residualBounds;
+   
    double[] observations;
    double[] binBounds;
    double significance;
    
    public RegressionNormal(double[] observations,
-                          double[] binBounds,
-                          double significance){
+                           double[] residualBounds,
+                           double[] binBounds,
+                           double significance){
       this.observations = observations;
-      this.binBounds = binBounds.clone();
+      this.residualBounds = residualBounds;
+      this.binBounds = binBounds;
       this.significance = significance;
    }
    
@@ -65,15 +70,16 @@ public class RegressionNormal extends AbstractProblem {
    
    @Override
    public void buildModel() {
-      slope = VariableFactory.real("Slope", 0, 10, precision, solver);
-      intercept = VariableFactory.real("Intercept", 0, 10, precision, solver);
-      mean = VariableFactory.real("Mean", 0, 20, precision, solver);
-      stDeviation = VariableFactory.real("stDeviation", 3.87, 3.87, precision, solver);
+      slope = VariableFactory.real("Slope", 2, 2, precision, solver);
+      intercept = VariableFactory.real("Intercept", -20, 20, precision, solver);
+      mean = VariableFactory.real("Mean", 0, 0, precision, solver);
+      /** CAREFUL, VARIANCE CANNOT BE TOO SMALL ***/
+      stDeviation = VariableFactory.real("stDeviation", 1, 10, precision, solver);
       
       residual = new RealVar[this.observations.length];
       for(int i = 0; i < this.residual.length; i++){
-         residual[i] = VariableFactory.real("Residual "+(i+1), 0, this.binBounds[this.binBounds.length-2], precision, solver);
-         String residualExp = "{0}="+this.observations[i]+"-{1}*"+(i+1.0)+"+{2}";
+         residual[i] = VariableFactory.real("Residual "+(i+1), this.residualBounds[0], this.residualBounds[1], precision, solver);
+         String residualExp = "{0}="+this.observations[i]+"-{1}*"+i+"+{2}";
          solver.post(new RealConstraint("residual "+i,
                residualExp,
                Ibex.HC4_NEWTON, 
@@ -87,7 +93,8 @@ public class RegressionNormal extends AbstractProblem {
       
       this.chiSqDist = new ChiSquareDist(this.binVariables.length-1);
       
-      chiSqStatistics = VF.real("chiSqStatistics", 0, this.chiSqDist.inverseF(1-significance), precision, solver);
+      //chiSqStatistics = VF.real("chiSqStatistics", 0, this.chiSqDist.inverseF(1-significance), precision, solver);
+      chiSqStatistics = VF.real("chiSqStatistics", 0, 1000, precision, solver);
       ChiSquareFitNormal.decomposition("chiSqTest", residual, binVariables, binBounds, mean, stDeviation, chiSqStatistics, precision);
    }
    
@@ -134,9 +141,9 @@ public class RegressionNormal extends AbstractProblem {
        
    }
    
-   public static double[] generateObservations(Random rnd, double truePoissonRate, int nbObservations){
-      PoissonDist dist = new PoissonDist(truePoissonRate);
-      return DoubleStream.iterate(1, i -> i + 1).map(i -> 2*i - 10 + dist.inverseF(rnd.nextDouble())).limit(nbObservations).toArray();
+   public static double[] generateObservations(Random rnd, double normalMean, double normalstd, int nbObservations){
+      NormalDist dist = new NormalDist(normalMean, normalstd);
+      return DoubleStream.iterate(0, i -> i + 1).map(i -> 2*i - 10 + dist.inverseF(rnd.nextDouble())).limit(nbObservations).toArray();
    }
    
    public static void fitMostLikelyParameters(){
@@ -146,20 +153,23 @@ public class RegressionNormal extends AbstractProblem {
             26, 25, 23, 26, 25, 30, 28, 32, 32, 35, 32, 31, 37, 37, 40, 41, 39, 
             42, 42, 45, 42, 50, 46, 47, 49, 48, 49, 52, 53, 53, 55, 54};
       
-      int nbObservations = 10;
+      int nbObservations = 50;
       
-      double truePoissonRate = 15;
+      double normalMean = 0;
+      double normalstd = 3;
+      
+      double[] residualBounds = {normalMean-4*normalstd,normalMean+4*normalstd};
       
       Random rnd = new Random(123);
-      observations = generateObservations(rnd, truePoissonRate, nbObservations);
+      observations = generateObservations(rnd, normalMean, normalstd, nbObservations);
       Arrays.stream(observations).forEach(k -> System.out.print(k+"\t"));
       System.out.println();
       
-      int bins = 15;
-      double[] binBounds = DoubleStream.iterate(0, i -> i + 2).limit(bins).toArray();                                 
+      int bins = 8;
+      double[] binBounds = DoubleStream.iterate(-3, i -> i + 1).limit(bins + 1).toArray();                                 
       double significance = 0.05;
    
-      RegressionNormal regression = new RegressionNormal(observations, binBounds, significance);
+      RegressionNormal regression = new RegressionNormal(observations, residualBounds, binBounds, significance);
       regression.execute(str);
    }
    

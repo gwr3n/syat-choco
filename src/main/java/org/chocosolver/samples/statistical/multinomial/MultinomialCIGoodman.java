@@ -87,7 +87,7 @@ public class MultinomialCIGoodman extends AbstractProblem {
       chiSqStatistics = VF.real("chiSqStatistics", this.chiSqDist.inverseF(confidence), this.chiSqDist.inverseF(confidence), precision, solver);
       
       //solver.post(IntConstraintFactorySt.bincounts(valueVariables, binVariables, binBounds, BincountsPropagatorType.EQFast));
-      IntConstraintFactorySt.bincountsDecomposition(valueVariables, binVariables, binBounds, BincountsDecompositionType.Agkun2016_2);
+      IntConstraintFactorySt.bincountsDecomposition(valueVariables, binVariables, binBounds, BincountsDecompositionType.Agkun2016_2_EQ);
       
       RealVar[] realViews = VF.real(binVariables, precision);
       

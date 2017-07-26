@@ -63,8 +63,11 @@ public class IntConstraintFactorySt extends IntConstraintFactory {
       case Agkun2016_1:
          BincountsDecompositions.bincountsDecomposition2(valueVariables, binVariables, binBounds);
          break;
-      case Agkun2016_2:
-         BincountsDecompositions.bincountsDecomposition3(valueVariables, binVariables, binBounds);
+      case Agkun2016_2_EQ:
+         BincountsDecompositions.bincountsDecomposition3(valueVariables, binVariables, binBounds, true);
+         break;
+      case Agkun2016_2_LE:
+         BincountsDecompositions.bincountsDecomposition3(valueVariables, binVariables, binBounds, false);
          break;
       default:
          throw new NullPointerException();
@@ -76,8 +79,11 @@ public class IntConstraintFactorySt extends IntConstraintFactory {
       case Agkun2016_1:
          BincountsDecompositions.bincountsDecomposition2(valueVariables, binVariables, binBounds, precision);
          break;
-      case Agkun2016_2:
-         BincountsDecompositions.bincountsDecomposition3(valueVariables, binVariables, binBounds, precision);
+      case Agkun2016_2_EQ:
+         BincountsDecompositions.bincountsDecomposition3(valueVariables, binVariables, binBounds, precision, true);
+         break;
+      case Agkun2016_2_LE:
+         BincountsDecompositions.bincountsDecomposition3(valueVariables, binVariables, binBounds, precision, false);
          break;
       default:
          throw new NullPointerException();

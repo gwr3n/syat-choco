@@ -161,7 +161,7 @@ public class BincountsDecompositions {
     * @param binVariables
     * @param binBounds
     */
-   public static void bincountsDecomposition3(IntVar[] valueVariables, IntVar[] binVariables, int[] binBounds){
+   public static void bincountsDecomposition3(IntVar[] valueVariables, IntVar[] binVariables, int[] binBounds, boolean forceEquality){
       Solver solver = valueVariables[0].getSolver();
       
       for(int j = 0; j < binBounds.length - 1; j++){
@@ -179,6 +179,9 @@ public class BincountsDecompositions {
          }
          solver.post(IntConstraintFactorySt.sum(valueBinVariables, binVariables[j]));
       }
+      
+      if(forceEquality) 
+         solver.post(IntConstraintFactorySt.sum(binVariables, VariableFactory.fixed(valueVariables.length, solver)));
    }
    
    /**
@@ -190,7 +193,7 @@ public class BincountsDecompositions {
     * @param binVariables
     * @param binBounds
     */
-   public static void bincountsDecomposition3(RealVar[] valueVariables, IntVar[] binVariables, double[] binBounds, double precision){
+   public static void bincountsDecomposition3(RealVar[] valueVariables, IntVar[] binVariables, double[] binBounds, double precision, boolean forceEquality){
       Solver solver = valueVariables[0].getSolver();
       
       for(int j = 0; j < binBounds.length - 1; j++){
@@ -213,6 +216,7 @@ public class BincountsDecompositions {
          solver.post(IntConstraintFactorySt.sum(valueBinVariables, binVariables[j]));
       }
       
-      solver.post(IntConstraintFactorySt.sum(binVariables, VariableFactory.fixed(valueVariables.length, solver)));
+      if(forceEquality) 
+         solver.post(IntConstraintFactorySt.sum(binVariables, VariableFactory.fixed(valueVariables.length, solver)));
    }
 }
