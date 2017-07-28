@@ -21,7 +21,7 @@ import org.la4j.matrix.dense.Basic2DMatrix;
 public class tSquareStatistic {
    
    /***************************************/
-   /* Observations are scalar             */
+   /* Observations are scalar (DEPRECATED)*/
    /***************************************/
    
    public static void decompose(String name,
@@ -153,14 +153,6 @@ public class tSquareStatistic {
          }
       }
 
-      /*RealVar[][] matrixM = new RealVar[n][n];
-      for(int i = 0; i < matrix.length; i++){
-         for(int j = 0; j < matrix.length; j++){
-            matrixM[i][j] = VariableFactory.real(name+"_CovM_"+(i+1)+"_"+(j+1), -1000, 1000, precision, solver);
-            solver.post(new RealConstraint(name+"_CovM_"+(i+1)+"_"+(j+1), "{0}="+M+"*{1}", Ibex.HC4_NEWTON, new RealVar[]{matrixM[i][j],matrix[i][j]}));
-         }
-      }*/
-
       RealVar[] means = new RealVar[observations[0].length];
       for(int i = 0; i < means.length; i++){
          means[i] = VariableFactory.real(name+"_Mean_"+(i+1), -10000, 10000, precision, solver);
@@ -209,14 +201,6 @@ public class tSquareStatistic {
       }
       
       computeCovarianceMatrix(observations, matrix, precision);
-      
-      /*RealVar[][] matrixM = new RealVar[n][n];
-      for(int i = 0; i < matrix.length; i++){
-         for(int j = 0; j < matrix.length; j++){
-            matrixM[i][j] = VariableFactory.real(name+"_CovM_"+(i+1)+"_"+(j+1), -1000, 1000, precision, solver);
-            solver.post(new RealConstraint(name+"_CovM_"+(i+1)+"_"+(j+1), "{0}="+(M-1)+"*{1}", Ibex.HC4_NEWTON, new RealVar[]{matrixM[i][j],matrix[i][j]}));
-         }
-      }*/
 
       RealVar[] means = new RealVar[observations[0].length];
       for(int i = 0; i < means.length; i++){

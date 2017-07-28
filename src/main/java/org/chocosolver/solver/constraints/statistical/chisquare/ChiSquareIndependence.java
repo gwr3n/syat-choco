@@ -18,7 +18,7 @@ import org.chocosolver.solver.variables.VariableFactory;
  */
 
 public class ChiSquareIndependence {
-   public static void decomposition(String name,
+   /*public static void decomposition(String name,
                                     int observations,
                                     IntVar[][] binVariables,
                                     IntVar[] marginalsH,
@@ -58,7 +58,7 @@ public class ChiSquareIndependence {
       allRealVariables[flattenedBins.length + binVariables.length + binVariables[0].length] = statistic;
       
       solver.post(new RealConstraint(name, chiSqExp, Ibex.HC4_NEWTON, allRealVariables));
-   }
+   }*/
 
    public static void decomposition(String name,
                                     IntVar[] seriesA,
