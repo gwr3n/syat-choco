@@ -1,5 +1,7 @@
 package org.chocosolver.solver.constraints.statistical.chisquare;
 
+import java.math.BigDecimal;
+
 import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.constraints.IntConstraintFactorySt;
 import org.chocosolver.solver.constraints.nary.bincounts.BincountsDecompositionType;
@@ -43,9 +45,9 @@ public class ChiSquareFitPoisson {
       String chiSqExp = "";
       for(int i = 0; i < binCounts.length; i++)
          if(i == binCounts.length - 1)
-            chiSqExp += "(({"+i+"}-("+targetFrequencies[i]+"))^2)/("+targetFrequencies[i]+")={"+(binCounts.length)+"}";
+            chiSqExp += "(({"+i+"}-max("+targetFrequencies[i]+","+(new BigDecimal(precision).toPlainString())+"))^2)/max("+targetFrequencies[i]+","+(new BigDecimal(precision).toPlainString())+")={"+(binCounts.length)+"}";
          else
-            chiSqExp += "(({"+i+"}-("+targetFrequencies[i]+"))^2)/("+targetFrequencies[i]+")+";
+            chiSqExp += "(({"+i+"}-max("+targetFrequencies[i]+","+(new BigDecimal(precision).toPlainString())+"))^2)/max("+targetFrequencies[i]+","+(new BigDecimal(precision).toPlainString())+")+";
 
       RealVar[] allRealVariables = new RealVar[realBinCounts.length + 2];
       System.arraycopy(realBinCounts, 0, allRealVariables, 0, realBinCounts.length);

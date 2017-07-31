@@ -125,7 +125,7 @@ public class MultinomialCIChiSquareOpt extends AbstractProblem{
    @Override
    public void solve() {
      StringBuilder st = new StringBuilder();
-     solver.findOptimalSolution(ResolutionPolicy.MAXIMIZE, p[0], precision);
+     solver.findOptimalSolution(ResolutionPolicy.MAXIMIZE, p[2], precision);
      //do{
         st.append("---\n");
         if(solver.isFeasible() == ESat.TRUE) {
@@ -159,7 +159,7 @@ public class MultinomialCIChiSquareOpt extends AbstractProblem{
       /** CAREFUL this is actually a ChiSquareDist with n-1 DOF. There is a bug in the library **/
       //double[] statistic = {0,(new ChiSquareDist(p.length)).inverseF(confidence)};
       
-      int sampleSize = 30;
+      int sampleSize = 50;
       
       double[] statistic = {0, (new umontreal.iro.lecuyer.probdist.FisherFDist(p.length, sampleSize - p.length)).inverseF(confidence)};
       
@@ -168,6 +168,7 @@ public class MultinomialCIChiSquareOpt extends AbstractProblem{
       MultinomialGen multinomial = new MultinomialGen(gen1, p, 1);
       double[][] observations = new double[sampleSize][p.length];
       multinomial.nextArrayOfPoints(observations, 0, sampleSize);
+      observations = new double[][]{{0,1,0},{0,1,0},{0,0,1},{0,1,0},{0,1,0},{0,1,0},{1,0,0},{0,0,1},{1,0,0},{0,0,0}};
       MultinomialCIChiSquareOpt cs = new MultinomialCIChiSquareOpt(observations, statistic);
       cs.execute(str);
       System.gc();

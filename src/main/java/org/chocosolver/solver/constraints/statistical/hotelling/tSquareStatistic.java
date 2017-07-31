@@ -226,7 +226,7 @@ public class tSquareStatistic {
       System.arraycopy(flatten(inverseVariable), 0, allVars, mu.length + means.length, n*n);
       allVars[allVars.length - 1] = statistic;
 
-      solver.post(new RealConstraint(name+"_FDist", statisticString, Ibex.HC4_NEWTON, allVars));
+      solver.post(new RealConstraint(name+"_T2Dist", statisticString, Ibex.HC4_NEWTON, allVars));
    }
    
    private static void computeCovarianceMatrix(RealVar[][] observations, RealVar[][] matrix, double precision){

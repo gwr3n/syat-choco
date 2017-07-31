@@ -98,7 +98,7 @@ public class ChiSquareFitNormalTest {
          
          chiSqstatisticVariable = VF.real("chiSqStatistics", chiSqStatistic[0], chiSqStatistic[1], precision, solver);
          
-         ChiSquareFitNormal.decomposition("chiSqConstraint", valueVariables, binVariables, binBounds, meanVariable, stdVariable, chiSqstatisticVariable, precision);
+         ChiSquareFitNormal.decomposition("chiSqConstraint", valueVariables, binVariables, binBounds, meanVariable, stdVariable, chiSqstatisticVariable, precision, false);
       }
       
       @Override

@@ -1,10 +1,11 @@
-package org.chocosolver.samples.statistical.regression;
+package org.chocosolver.samples.statistical.regression.poisson;
 
 import java.util.Arrays;
 import java.util.Random;
 import java.util.stream.DoubleStream;
 
 import org.chocosolver.samples.AbstractProblem;
+import org.chocosolver.solver.ResolutionPolicy;
 import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.constraints.IntConstraintFactorySt;
 import org.chocosolver.solver.constraints.nary.bincounts.BincountsDecompositionType;
@@ -12,7 +13,6 @@ import org.chocosolver.solver.constraints.nary.bincounts.BincountsPropagatorType
 import org.chocosolver.solver.constraints.real.Ibex;
 import org.chocosolver.solver.constraints.real.RealConstraint;
 import org.chocosolver.solver.constraints.statistical.chisquare.ChiSquareFitPoisson;
-import org.chocosolver.solver.search.loop.monitors.SearchMonitorFactory;
 import org.chocosolver.solver.search.strategy.IntStrategyFactory;
 import org.chocosolver.solver.search.strategy.selectors.values.RealDomainMiddle;
 import org.chocosolver.solver.search.strategy.selectors.variables.Cyclic;
@@ -21,12 +21,13 @@ import org.chocosolver.solver.variables.IntVar;
 import org.chocosolver.solver.variables.RealVar;
 import org.chocosolver.solver.variables.VF;
 import org.chocosolver.solver.variables.VariableFactory;
+import org.chocosolver.util.ESat;
 import org.slf4j.LoggerFactory;
 
 import umontreal.iro.lecuyer.probdist.ChiSquareDist;
 import umontreal.iro.lecuyer.probdist.PoissonDist;
 
-public class RegressionConfidenceRegions extends AbstractProblem {
+public class RegressionPoisson extends AbstractProblem {
    
    public RealVar slope;
    public RealVar quadratic;
@@ -40,9 +41,9 @@ public class RegressionConfidenceRegions extends AbstractProblem {
    double[] binBounds;
    double significance;
    
-   public RegressionConfidenceRegions(double[] observations,
-                                      double[] binBounds,
-                                      double significance){
+   public RegressionPoisson(double[] observations,
+                     double[] binBounds,
+                     double significance){
       this.observations = observations;
       this.binBounds = binBounds.clone();
       this.significance = significance;
@@ -51,7 +52,7 @@ public class RegressionConfidenceRegions extends AbstractProblem {
    RealVar chiSqStatistics;
    RealVar[] allRV;
    
-   double precision = 0.0001;
+   double precision = 0.01;
    
    ChiSquareDist chiSqDist;
    
@@ -62,15 +63,13 @@ public class RegressionConfidenceRegions extends AbstractProblem {
    
    @Override
    public void buildModel() {
-      slope = VariableFactory.real("Slope", trueSlope-precision, trueSlope+precision, precision, solver);
-      quadratic = VariableFactory.real("Quadratic", trueQuadratic-precision, trueQuadratic+precision, precision, solver);
-      poissonRate = VariableFactory.real("Rate", truePoissonRate-precision, truePoissonRate+precision, precision, solver);
+      slope = VariableFactory.real("Slope", 0, 10, precision, solver);
+      quadratic = VariableFactory.real("Quadratic", 0, 10, precision, solver);
+      poissonRate = VariableFactory.real("Rate", 0, 50, precision, solver);
       
       residual = new RealVar[this.observations.length];
-      for(int i = 0; i < this.observations.length; i++)
-         residual[i] = VariableFactory.real("Residual "+(i+1), 0, this.binBounds[this.binBounds.length-2], precision, solver);
-      
       for(int i = 0; i < this.residual.length; i++){
+         residual[i] = VariableFactory.real("Residual "+(i+1), 0, this.binBounds[this.binBounds.length-2], precision, solver);
          String residualExp = "{0}="+this.observations[i]+"-{1}*"+(i+1.0)+"-"+(i+1.0)+"^{2}";
          solver.post(new RealConstraint("residual "+i,
                residualExp,
@@ -93,20 +92,22 @@ public class RegressionConfidenceRegions extends AbstractProblem {
    public void configureSearch() {
       
       solver.set(
-            new RealStrategy(new RealVar[]{slope,quadratic,poissonRate}, new Cyclic(), new RealDomainMiddle()),
-            new RealStrategy(residual, new Cyclic(), new RealDomainMiddle()),
-            IntStrategyFactory.activity(binVariables,1234)
+            new RealStrategy(new RealVar[]{slope,quadratic}, new Cyclic(), new RealDomainMiddle()),
+            //new RealStrategy(residual, new Cyclic(), new RealDomainMiddle()),
+            new RealStrategy(new RealVar[]{poissonRate}, new Cyclic(), new RealDomainMiddle())
+            //IntStrategyFactory.minDom_LB(binVariables),
+            //new RealStrategy(new RealVar[]{chiSqStatistics}, new Cyclic(), new RealDomainMiddle())
        );
-       SearchMonitorFactory.limitTime(solver,5000);
+       //SearchMonitorFactory.limitTime(solver,10000);
    }
    
    @Override
    public void solve() {
      StringBuilder st = new StringBuilder();
-     boolean solution = solver.findSolution();
+     solver.findOptimalSolution(ResolutionPolicy.MINIMIZE, chiSqStatistics, precision);
      //do{
         st.append("---\n");
-        if(solution) {
+        if(solver.isFeasible() == ESat.TRUE) {
            st.append(slope.toString()+", "+quadratic.toString()+", "+poissonRate.toString()+"\n");
            for(int i = 0; i < residual.length; i++){
               st.append(residual[i].toString()+", ");
@@ -118,7 +119,6 @@ public class RegressionConfidenceRegions extends AbstractProblem {
            st.append("\n");
            st.append(chiSqStatistics.getLB()+" "+chiSqStatistics.getUB());
            st.append("\n");
-           feasibleCount++;
         }else{
            st.append("No solution!");
         }
@@ -131,58 +131,38 @@ public class RegressionConfidenceRegions extends AbstractProblem {
        
    }
    
-   static double truePoissonRate = 10;
-   static double trueSlope = 1;
-   static double trueQuadratic = 0.5;
-   
-   public static double[] generateObservations(Random rnd, int nbObservations){
+   public static double[] generateObservations(Random rnd, double truePoissonRate, int nbObservations){
       PoissonDist dist = new PoissonDist(truePoissonRate);
-      return DoubleStream.iterate(1, i -> i + 1).map(i -> trueSlope*i+Math.pow(i, trueQuadratic)).map(i -> i + dist.inverseF(rnd.nextDouble())).limit(nbObservations).toArray();
+      return DoubleStream.iterate(1, i -> i + 1).map(i -> i+Math.pow(i, 0.5)).map(i -> i + dist.inverseF(rnd.nextDouble())).limit(nbObservations).toArray();
    }
    
-   static int feasibleCount = 0;
-   
-   public static void coverageProbability(){
+   public static void fitMostLikelyParameters(){
       String[] str={"-log","SOLUTION"};
       
-      Random rnd = new Random(1234);
+      double[] observations = {4, 6, 10, 6, 10, 11, 16, 19, 18, 15, 16, 17, 16, 17, 20, 19, 24, 24, 
+            26, 25, 23, 26, 25, 30, 28, 32, 32, 35, 32, 31, 37, 37, 40, 41, 39, 
+            42, 42, 45, 42, 50, 46, 47, 49, 48, 49, 52, 53, 53, 55, 54};
       
-      int nbObservations = 50;
+      int nbObservations = 100;
       
-      double replications = 1000;
+      double truePoissonRate = 30;
       
-      for(int k = 0; k < replications; k++){
-         double[] observations = generateObservations(rnd, nbObservations);
-         //Arrays.stream(observations).forEach(a -> System.out.print(a+"\t"));
-         int bins = 20;
-         double[] binBounds = DoubleStream.iterate(0, i -> i + 2).limit(bins).toArray();                                 
-         double significance = 0.05;
+      Random rnd = new Random(123);
+      observations = generateObservations(rnd, truePoissonRate, nbObservations);
+      Arrays.stream(observations).forEach(k -> System.out.print(k+"\t"));
+      System.out.println();
       
-         RegressionConfidenceRegions regression = new RegressionConfidenceRegions(observations, binBounds, significance);
-         regression.execute(str);
-         try {
-            regression.finalize();
-         } catch (Throwable e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-         }
-         regression = null;
-         System.gc();
-         
-         System.out.println(feasibleCount/(k+1.0) + "(" + k + ")");
-         try {
-            Thread.sleep(500);
-         } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-         }
-      }
-      System.out.println(feasibleCount/replications);
+      int bins = 10;
+      double[] binBounds = DoubleStream.iterate(0, i -> i + 5).limit(bins+1).toArray();                                 
+      double significance = 0.05;
+   
+      RegressionPoisson regression = new RegressionPoisson(observations, binBounds, significance);
+      regression.execute(str);
    }
    
    public static void main(String[] args) {
       
-      coverageProbability();
+      fitMostLikelyParameters();
       
    }
 }

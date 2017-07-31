@@ -1,4 +1,4 @@
-package org.chocosolver.samples.statistical.regression;
+package org.chocosolver.samples.statistical.regression.poisson;
 
 import java.util.Arrays;
 import java.util.Random;
@@ -142,7 +142,7 @@ public class RegressionParametersFit extends AbstractProblem {
    @Override
    public void solve() {
      StringBuilder st = new StringBuilder();
-     solver.findOptimalSolution(ResolutionPolicy.MINIMIZE, chiSqStatistics1, precision);
+     solver.findOptimalSolution(ResolutionPolicy.MINIMIZE, slope2, precision);
      //do{
         st.append("---\n");
         if(solver.isFeasible() == ESat.TRUE) {
@@ -180,7 +180,7 @@ public class RegressionParametersFit extends AbstractProblem {
       
       double[] observations2;
       
-      int nbObservations = 70;
+      int nbObservations = 100;
       
       double truePoissonRate = 15;
       

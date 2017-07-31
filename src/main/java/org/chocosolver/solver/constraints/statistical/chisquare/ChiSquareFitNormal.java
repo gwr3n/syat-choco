@@ -1,5 +1,7 @@
 package org.chocosolver.solver.constraints.statistical.chisquare;
 
+import java.math.BigDecimal;
+
 import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.constraints.IntConstraintFactorySt;
 import org.chocosolver.solver.constraints.nary.bincounts.BincountsDecompositionType;
@@ -29,12 +31,18 @@ public class ChiSquareFitNormal {
                                     RealVar meanVariable, 
                                     RealVar stdVariable, 
                                     RealVar statistic, 
-                                    double precision) {
+                                    double precision,
+                                    boolean allowOutOfBinObservations) {
       Solver solver = statistic.getSolver();
 
       //RealVar[] realBinViews = VF.real(binCounts, precision);
       //solver.post(IntConstraintFactorySt.bincounts(observations, realBinViews, binBounds, BincountsPropagatorType.EQFast));
-      IntConstraintFactorySt.bincountsDecomposition(observations, binCounts, binBounds, precision, BincountsDecompositionType.Agkun2016_2_LE);
+      IntConstraintFactorySt.bincountsDecomposition(observations, 
+                                                    binCounts, 
+                                                    binBounds, 
+                                                    precision, 
+                                                    allowOutOfBinObservations ? BincountsDecompositionType.Agkun2016_2_LE :
+                                                                                BincountsDecompositionType.Agkun2016_2_EQ);
 
       RealVar[] realBinCounts = VF.real(binCounts, precision);
 
@@ -48,9 +56,9 @@ public class ChiSquareFitNormal {
       String chiSqExp = "";
       for(int i = 0; i < binCounts.length; i++)
          if(i == binCounts.length - 1)
-            chiSqExp += "(({"+i+"}-("+targetFrequencies[i]+"))^2)/("+targetFrequencies[i]+")={"+(binCounts.length)+"}";
+            chiSqExp += "(({"+i+"}-max("+targetFrequencies[i]+","+(new BigDecimal(precision).toPlainString())+"))^2)/max("+targetFrequencies[i]+","+(new BigDecimal(precision).toPlainString())+")={"+(binCounts.length)+"}";
          else
-            chiSqExp += "(({"+i+"}-("+targetFrequencies[i]+"))^2)/("+targetFrequencies[i]+")+";
+            chiSqExp += "(({"+i+"}-max("+targetFrequencies[i]+","+(new BigDecimal(precision).toPlainString())+"))^2)/max("+targetFrequencies[i]+","+(new BigDecimal(precision).toPlainString())+")+";
 
       RealVar[] allRealVariables = new RealVar[realBinCounts.length + 3];
       System.arraycopy(realBinCounts, 0, allRealVariables, 0, realBinCounts.length);

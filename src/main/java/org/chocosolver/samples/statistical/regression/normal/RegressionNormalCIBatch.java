@@ -1,5 +1,6 @@
-package org.chocosolver.samples.statistical.regression;
+package org.chocosolver.samples.statistical.regression.normal;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Random;
 import java.util.stream.DoubleStream;
@@ -7,14 +8,9 @@ import java.util.stream.DoubleStream;
 import org.chocosolver.samples.AbstractProblem;
 import org.chocosolver.solver.ResolutionPolicy;
 import org.chocosolver.solver.Solver;
-import org.chocosolver.solver.constraints.IntConstraintFactorySt;
-import org.chocosolver.solver.constraints.nary.bincounts.BincountsDecompositionType;
-import org.chocosolver.solver.constraints.nary.bincounts.BincountsPropagatorType;
 import org.chocosolver.solver.constraints.real.Ibex;
 import org.chocosolver.solver.constraints.real.RealConstraint;
 import org.chocosolver.solver.constraints.statistical.chisquare.ChiSquareFitNormal;
-import org.chocosolver.solver.constraints.statistical.chisquare.ChiSquareFitPoisson;
-import org.chocosolver.solver.search.strategy.IntStrategyFactory;
 import org.chocosolver.solver.search.strategy.selectors.values.RealDomainMiddle;
 import org.chocosolver.solver.search.strategy.selectors.variables.Cyclic;
 import org.chocosolver.solver.search.strategy.strategy.RealStrategy;
@@ -27,59 +23,55 @@ import org.slf4j.LoggerFactory;
 
 import umontreal.iro.lecuyer.probdist.ChiSquareDist;
 import umontreal.iro.lecuyer.probdist.NormalDist;
-import umontreal.iro.lecuyer.probdist.PoissonDist;
 
-public class RegressionNormal extends AbstractProblem {
+public class RegressionNormalCIBatch extends AbstractProblem {
    
-   public RealVar slope;
-   public RealVar intercept;
-   public RealVar mean;
-   public RealVar stDeviation;
+   private RealVar slope;
+   private RealVar intercept;
+   private RealVar mean;
+   private RealVar stDeviation;
    
-   public RealVar[] residual;
-   public IntVar[] binVariables;
-   public RealVar[] realBinViews;
+   private RealVar[] residual;
+   private IntVar[] binVariables;
    
-   public double[] residualBounds;
+   private RealVar chiSqStatistics;
    
-   double[] observations;
-   double[] binBounds;
-   double significance;
+   private double[] residualBounds;
    
-   public RegressionNormal(double[] observations,
-                           double[] residualBounds,
-                           double[] binBounds,
-                           double significance){
+   private double[] observations;
+   private double[] binBounds;
+   private double significance;
+   
+   private double precision = 1.e-2;
+   
+   private ChiSquareDist chiSqDist;
+   
+   public RegressionNormalCIBatch(double[] observations,
+                                  double[] residualBounds,
+                                  double[] binBounds,
+                                  double significance){
       this.observations = observations;
       this.residualBounds = residualBounds;
       this.binBounds = binBounds;
       this.significance = significance;
    }
    
-   RealVar chiSqStatistics;
-   RealVar[] allRV;
-   
-   double precision = 0.01;
-   
-   ChiSquareDist chiSqDist;
-   
    @Override
    public void createSolver() {
-       solver = new Solver("Regression");
+       solver = new Solver("Regression Normal");
    }
    
    @Override
    public void buildModel() {
-      slope = VariableFactory.real("Slope", 2, 2, precision, solver);
-      intercept = VariableFactory.real("Intercept", -20, 20, precision, solver);
+      slope = VariableFactory.real("Slope", 1, 1, precision, solver);
+      intercept = VariableFactory.real("Intercept", 5, 5, precision, solver);
       mean = VariableFactory.real("Mean", 0, 0, precision, solver);
-      /** CAREFUL, VARIANCE CANNOT BE TOO SMALL ***/
-      stDeviation = VariableFactory.real("stDeviation", 1, 10, precision, solver);
+      stDeviation = VariableFactory.real("stDeviation", 5, 5, precision, solver);
       
       residual = new RealVar[this.observations.length];
       for(int i = 0; i < this.residual.length; i++){
          residual[i] = VariableFactory.real("Residual "+(i+1), this.residualBounds[0], this.residualBounds[1], precision, solver);
-         String residualExp = "{0}="+this.observations[i]+"-{1}*"+i+"+{2}";
+         String residualExp = "{0}="+(new BigDecimal(this.observations[i]).toPlainString())+"-{1}*"+(i+1)+"+{2}";
          solver.post(new RealConstraint("residual "+i,
                residualExp,
                Ibex.HC4_NEWTON, 
@@ -93,19 +85,15 @@ public class RegressionNormal extends AbstractProblem {
       
       this.chiSqDist = new ChiSquareDist(this.binVariables.length-1);
       
-      //chiSqStatistics = VF.real("chiSqStatistics", 0, this.chiSqDist.inverseF(1-significance), precision, solver);
-      chiSqStatistics = VF.real("chiSqStatistics", 0, 1000, precision, solver);
-      ChiSquareFitNormal.decomposition("chiSqTest", residual, binVariables, binBounds, mean, stDeviation, chiSqStatistics, precision);
+      chiSqStatistics = VF.real("chiSqStatistics", 0, this.chiSqDist.inverseF(1-significance), precision, solver);
+      ChiSquareFitNormal.decomposition("chiSqTest", residual, binVariables, binBounds, mean, stDeviation, chiSqStatistics, precision, true);
    }
    
    @Override
    public void configureSearch() {
       
       solver.set(
-            new RealStrategy(new RealVar[]{slope,intercept}, new Cyclic(), new RealDomainMiddle()),
-            //new RealStrategy(residual, new Cyclic(), new RealDomainMiddle()),
-            new RealStrategy(new RealVar[]{mean,stDeviation}, new Cyclic(), new RealDomainMiddle()),
-            //IntStrategyFactory.minDom_LB(binVariables),
+            new RealStrategy(new RealVar[]{slope,intercept,stDeviation}, new Cyclic(), new RealDomainMiddle()),
             new RealStrategy(new RealVar[]{chiSqStatistics}, new Cyclic(), new RealDomainMiddle())
        );
        //SearchMonitorFactory.limitTime(solver,10000);
@@ -114,10 +102,10 @@ public class RegressionNormal extends AbstractProblem {
    @Override
    public void solve() {
      StringBuilder st = new StringBuilder();
-     solver.findOptimalSolution(ResolutionPolicy.MINIMIZE, chiSqStatistics, precision);
+     boolean solution = solver.findSolution();
      //do{
         st.append("---\n");
-        if(solver.isFeasible() == ESat.TRUE) {
+        if(solution) {
            st.append(slope.toString()+", "+intercept.toString()+", "+mean.toString()+", "+stDeviation.toString()+"\n");
            for(int i = 0; i < residual.length; i++){
               st.append(residual[i].toString()+", ");
@@ -129,6 +117,7 @@ public class RegressionNormal extends AbstractProblem {
            st.append("\n");
            st.append(chiSqStatistics.getLB()+" "+chiSqStatistics.getUB());
            st.append("\n");
+           feasibleCount++;
         }else{
            st.append("No solution!");
         }
@@ -141,41 +130,61 @@ public class RegressionNormal extends AbstractProblem {
        
    }
    
-   public static double[] generateObservations(Random rnd, double normalMean, double normalstd, int nbObservations){
+   public static double[] generateObservations(Random rnd, double slope, double intercept, double normalMean, double normalstd, int nbObservations){
       NormalDist dist = new NormalDist(normalMean, normalstd);
-      return DoubleStream.iterate(0, i -> i + 1).map(i -> 2*i - 10 + dist.inverseF(rnd.nextDouble())).limit(nbObservations).toArray();
+      return DoubleStream.iterate(1, i -> i + 1).map(i -> slope*i - intercept + dist.inverseF(rnd.nextDouble())).limit(nbObservations).toArray();
    }
    
-   public static void fitMostLikelyParameters(){
+   static int feasibleCount = 0;
+   
+   public static void coverageProbability(){
       String[] str={"-log","SOLUTION"};
       
-      double[] observations = {4, 6, 10, 6, 10, 11, 16, 19, 18, 15, 16, 17, 16, 17, 20, 19, 24, 24, 
-            26, 25, 23, 26, 25, 30, 28, 32, 32, 35, 32, 31, 37, 37, 40, 41, 39, 
-            42, 42, 45, 42, 50, 46, 47, 49, 48, 49, 52, 53, 53, 55, 54};
+      double replications = 1000;
       
       int nbObservations = 50;
       
+      double slope = 1;
+      double intercept = 5;
       double normalMean = 0;
-      double normalstd = 3;
+      double normalstd = 5;
       
       double[] residualBounds = {normalMean-4*normalstd,normalMean+4*normalstd};
       
-      Random rnd = new Random(123);
-      observations = generateObservations(rnd, normalMean, normalstd, nbObservations);
-      Arrays.stream(observations).forEach(k -> System.out.print(k+"\t"));
-      System.out.println();
+      Random rnd = new Random(1234);
       
-      int bins = 8;
-      double[] binBounds = DoubleStream.iterate(-3, i -> i + 1).limit(bins + 1).toArray();                                 
-      double significance = 0.05;
-   
-      RegressionNormal regression = new RegressionNormal(observations, residualBounds, binBounds, significance);
-      regression.execute(str);
+      for(int k = 0; k < replications; k++){
+         double[] observations = generateObservations(rnd, slope, intercept, normalMean, normalstd, nbObservations);
+                  
+         int bins = 5;
+         double[] binBounds = DoubleStream.iterate(-10, i -> i + 4).limit(bins + 1).toArray();                                 
+         double significance = 0.05;
+      
+         RegressionNormalCIBatch regression = new RegressionNormalCIBatch(observations, residualBounds, binBounds, significance);
+         regression.execute(str);
+         try {
+            regression.finalize();
+         } catch (Throwable e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+         }
+         regression = null;
+         System.gc();
+         
+         System.out.println(feasibleCount/(k+1.0) + "(" + k + ")");
+         try {
+            Thread.sleep(100);
+         } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+         }
+      }
+      System.out.println(feasibleCount/replications);
    }
    
    public static void main(String[] args) {
       
-      fitMostLikelyParameters();
+      coverageProbability();
       
    }
 }

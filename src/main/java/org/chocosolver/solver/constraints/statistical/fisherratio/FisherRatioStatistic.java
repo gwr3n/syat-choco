@@ -38,7 +38,7 @@ public class FisherRatioStatistic {
       RealVar varianceB = VariableFactory.real(name+"varianceB", 0, Math.pow(maxB-minB,2), precision, solver);
       Variance.decompose(name+"_varianceB_cons", seriesB, varianceB, precision);
       
-      String exp = "{0}/{1}={2}";
+      String exp = "max({0},"+precision+")/max({1},"+precision+")={2}";
       
       solver.post(new RealConstraint(name, exp, Ibex.HC4_NEWTON, new RealVar[]{varianceA,varianceB,statistic}));
    }
