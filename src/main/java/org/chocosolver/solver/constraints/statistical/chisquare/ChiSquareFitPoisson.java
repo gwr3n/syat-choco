@@ -20,12 +20,18 @@ public class ChiSquareFitPoisson {
                                     double[] binBounds, 
                                     RealVar lambda, 
                                     RealVar statistic, 
-                                    double precision){
+                                    double precision,
+                                    boolean allowOutOfBinObservations){
       Solver solver = statistic.getSolver();
 
       //RealVar[] realBinViews = VF.real(binCounts, precision);
       //solver.post(IntConstraintFactorySt.bincounts(observations, realBinViews, binBounds, BincountsPropagatorType.EQFast));
-      IntConstraintFactorySt.bincountsDecomposition(observations, binCounts, binBounds, precision, BincountsDecompositionType.Agkun2016_1);
+      IntConstraintFactorySt.bincountsDecomposition(observations, 
+                                                    binCounts, 
+                                                    binBounds, 
+                                                    precision, 
+                                                    allowOutOfBinObservations ? BincountsDecompositionType.Agkun2016_2_LE :
+                                                                                BincountsDecompositionType.Agkun2016_2_EQ);
 
       RealVar[] realBinCounts = VF.real(binCounts, precision);
 
@@ -62,11 +68,16 @@ public class ChiSquareFitPoisson {
                                     int[] binBounds, 
                                     RealVar lambda, 
                                     RealVar statistic, 
-                                    double precision){
+                                    double precision,
+                                    boolean allowOutOfBinObservations){
       Solver solver = statistic.getSolver();
       
       //solver.post(IntConstraintFactorySt.bincounts(observations, binCounts, binBounds, BincountsPropagatorType.EQFast));
-      IntConstraintFactorySt.bincountsDecomposition(observations, binCounts, binBounds, BincountsDecompositionType.Agkun2016_1);
+      IntConstraintFactorySt.bincountsDecomposition(observations, 
+                                                    binCounts, 
+                                                    binBounds, 
+                                                    allowOutOfBinObservations ? BincountsDecompositionType.Agkun2016_2_LE :
+                                                                                BincountsDecompositionType.Agkun2016_2_EQ);
       
       RealVar[] realBinCounts = VF.real(binCounts, precision);
       

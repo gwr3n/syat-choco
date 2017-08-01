@@ -105,14 +105,14 @@ public class RegressionParametersFit extends AbstractProblem {
                ));
       }
       
-      this.chiSqDist1 = new ChiSquareDist((residual1.length - 1)*(residual2.length - 1));
+      this.chiSqDist1 = new ChiSquareDist((this.binBounds1.length - 1)*(this.binBounds2.length - 1));
       
       double[][] binBounds = new double[2][];
       binBounds[0] = this.binBounds1;
       binBounds[1] = this.binBounds2;
       
       chiSqStatistics1 = VF.real("chiSqStatistics 1", 0, this.chiSqDist1.inverseF(1-significance), precision, solver);
-      ChiSquareIndependence.decomposition("chiSqTest 1", residual1, residual2, binBounds, chiSqStatistics1, precision);
+      ChiSquareIndependence.decomposition("chiSqTest 1", residual1, residual2, binBounds, chiSqStatistics1, precision, true);
       
       binVariables = new IntVar[this.binBounds1.length-1];
       for(int i = 0; i < this.binVariables.length; i++)
@@ -123,7 +123,7 @@ public class RegressionParametersFit extends AbstractProblem {
       lambda = VariableFactory.real("lambda", 0, 20, precision, solver);
       
       chiSqStatistics2 = VF.real("chiSqStatistics 2", 0, this.chiSqDist2.inverseF(1-significance), precision, solver);
-      ChiSquareFitPoisson.decomposition("chiSqTest 2", residual1, binVariables, binBounds1, lambda, chiSqStatistics2, precision);
+      ChiSquareFitPoisson.decomposition("chiSqTest 2", residual1, binVariables, binBounds1, lambda, chiSqStatistics2, precision, true);
    }
    
    @Override

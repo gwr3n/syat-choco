@@ -127,7 +127,7 @@ public class ChiSquareIndependenceTest {
          chiSqstatisticVariable = VF.real("chiSqStatistics", chiSqStatistic[0], chiSqStatistic[1], precision, solver);
          
          //ChiSquareIndependence.decomposition("chiSqConstraint", seriesA.length, binVariables, marginalsH, marginalsV, chiSqstatisticVariable, precision);
-         ChiSquareIndependence.decomposition("chiSqConstraint", seriesA, seriesB, this.binBounds, chiSqstatisticVariable, precision);
+         ChiSquareIndependence.decomposition("chiSqConstraint", seriesA, seriesB, this.binBounds, chiSqstatisticVariable, precision, false);
       }
       
       @Override
@@ -248,7 +248,7 @@ public class ChiSquareIndependenceTest {
          chiSqstatisticVariable = VF.real("chiSqStatistics", chiSqStatistic[0], chiSqStatistic[1], precision, solver);
          
          //ChiSquareIndependence.decomposition("chiSqConstraint", seriesA.length, binVariables, marginalsH, marginalsV, chiSqstatisticVariable, precision);
-         ChiSquareIndependence.decomposition("chiSqConstraint", seriesA, seriesB, this.binBounds, chiSqstatisticVariable, precision);
+         ChiSquareIndependence.decomposition("chiSqConstraint", seriesA, seriesB, this.binBounds, chiSqstatisticVariable, precision, false);
       }
       
       @Override

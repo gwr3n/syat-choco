@@ -1,6 +1,7 @@
 package org.chocosolver.samples.statistical.multinomial;
 
 import java.util.Arrays;
+import java.util.stream.IntStream;
 
 import org.chocosolver.samples.AbstractProblem;
 import org.chocosolver.solver.ResolutionPolicy;
@@ -125,7 +126,7 @@ public class MultinomialCIChiSquareOpt extends AbstractProblem{
    @Override
    public void solve() {
      StringBuilder st = new StringBuilder();
-     solver.findOptimalSolution(ResolutionPolicy.MAXIMIZE, p[2], precision);
+     solver.findOptimalSolution(ResolutionPolicy.MINIMIZE, statisticVariable, precision);
      //do{
         st.append("---\n");
         if(solver.isFeasible() == ESat.TRUE) {
@@ -168,7 +169,11 @@ public class MultinomialCIChiSquareOpt extends AbstractProblem{
       MultinomialGen multinomial = new MultinomialGen(gen1, p, 1);
       double[][] observations = new double[sampleSize][p.length];
       multinomial.nextArrayOfPoints(observations, 0, sampleSize);
-      observations = new double[][]{{0,1,0},{0,1,0},{0,0,1},{0,1,0},{0,1,0},{0,1,0},{1,0,0},{0,0,1},{1,0,0},{0,0,0}};
+      //Original
+      //observations = new double[][]{{0,1,0},{0,1,0},{0,0,1},{0,1,0},{0,1,0},{0,1,0},{1,0,0},{0,0,1},{1,0,0},{0,0,0}};
+      //Reduced
+      //observations = new double[][]{{0,1},{0,1},{0,0},{0,1},{0,1},{0,1},{1,0},{0,0},{1,0},{1,0}};
+      //observations = new double[][]{{0,1},{0,1},{1,0},{0,1},{0,1},{0,1},{0,0},{1,0},{0,0},{0,0}};
       MultinomialCIChiSquareOpt cs = new MultinomialCIChiSquareOpt(observations, statistic);
       cs.execute(str);
       System.gc();
@@ -178,6 +183,30 @@ public class MultinomialCIChiSquareOpt extends AbstractProblem{
          // TODO Auto-generated catch block
          e.printStackTrace();
       }
+      
+      int[] frequencies = {3,5,2};
+      double[][] intervals = computeQuesenberryHurstCI(confidence, frequencies);
+      System.out.println(Arrays.deepToString(intervals));
+   }
+   
+   /* http://www.jstor.org/stable/1266673?seq=1 */
+   public static double[][] computeQuesenberryHurstCI(double confidence, int[] counts){
+      int N = Arrays.stream(counts).sum();
+      double[][] intervals = new double[counts.length][2];
+      ChiSquareDist chiSq = new ChiSquareDist(counts.length-1);
+      double A = chiSq.inverseF(confidence);
+      
+      double[] n = new double[counts.length];
+      
+      for(int i = 0; i < counts.length; i++){
+         n[i] = counts[i];
+      }
+      
+      for(int i = 0; i < counts.length; i++){
+         intervals[i][0] = (A + 2*n[i] - Math.sqrt(A*(A+4*n[i]*(N-n[i])/N)))/(2*(N+A));
+         intervals[i][1] = (A + 2*n[i] + Math.sqrt(A*(A+4*n[i]*(N-n[i])/N)))/(2*(N+A));
+      }
+      return intervals;
    }
    
 }

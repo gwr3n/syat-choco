@@ -90,7 +90,7 @@ public class ChiSquareFitPoissonTest {
          
          chiSqstatisticVariable = VF.real("chiSqStatistics", chiSqStatistic[0], chiSqStatistic[1], precision, solver);
          
-         ChiSquareFitPoisson.decomposition("chiSqConstraint", valueVariables, binVariables, binBounds, poissonRateVariable, chiSqstatisticVariable, precision);
+         ChiSquareFitPoisson.decomposition("chiSqConstraint", valueVariables, binVariables, binBounds, poissonRateVariable, chiSqstatisticVariable, precision, false);
       }
       
       @Override

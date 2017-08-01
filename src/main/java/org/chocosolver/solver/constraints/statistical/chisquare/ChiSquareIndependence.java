@@ -65,7 +65,8 @@ public class ChiSquareIndependence {
                                     IntVar[] seriesB,
                                     int[][] binBounds,
                                     RealVar statistic,
-                                    double precision){
+                                    double precision,
+                                    boolean allowOutOfBinObservations){
       Solver solver = statistic.getSolver();
       
       int observations = seriesA.length;
@@ -89,10 +90,11 @@ public class ChiSquareIndependence {
             flattenedBins[binVariables[0].length*i + j] = binVariables[i][j]; 
          }
       }
-
-      IntVar totalCount = VariableFactory.fixed(name+"_total count", observations, solver);
-
-      solver.post(IntConstraintFactorySt.sum(flattenedBins, totalCount));
+      
+      if(!allowOutOfBinObservations){
+         IntVar totalCount = VariableFactory.fixed(name+"_total count", observations, solver);
+         solver.post(IntConstraintFactorySt.sum(flattenedBins, totalCount));
+      }
 
       String chiSqExp = "";
       for(int i = 0; i < binVariables.length; i++){
@@ -121,7 +123,8 @@ public class ChiSquareIndependence {
                                     RealVar[] seriesB,
                                     double[][] binBounds,
                                     RealVar statistic,
-                                    double precision){
+                                    double precision,
+                                    boolean allowOutOfBinObservations){
       Solver solver = statistic.getSolver();
 
       int observations = seriesA.length;
@@ -146,9 +149,10 @@ public class ChiSquareIndependence {
          }
       }
 
-      IntVar totalCount = VariableFactory.fixed(name+"_total count", observations, solver);
-
-      solver.post(IntConstraintFactorySt.sum(flattenedBins, totalCount));
+      if(!allowOutOfBinObservations){
+         IntVar totalCount = VariableFactory.fixed(name+"_total count", observations, solver);
+         solver.post(IntConstraintFactorySt.sum(flattenedBins, totalCount));
+      }
 
       String chiSqExp = "";
       for(int i = 0; i < binVariables.length; i++){
