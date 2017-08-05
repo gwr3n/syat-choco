@@ -173,7 +173,7 @@ public class TwoAR1 extends AbstractProblem {
       
       double[] observations2;
       
-      int nbObservations = 100;
+      int nbObservations = 500;
       
       double replications = 1;
       
@@ -181,7 +181,7 @@ public class TwoAR1 extends AbstractProblem {
       
       for(int k = 0; k < replications; k++){
       
-         double truePoissonRate = 10;
+         double truePoissonRate = 5;
          
          observations1 = generateObservations(rnd, 5, 0.5, truePoissonRate, nbObservations);
          //Arrays.stream(observations1).forEach(k -> System.out.print(k+"\t"));
