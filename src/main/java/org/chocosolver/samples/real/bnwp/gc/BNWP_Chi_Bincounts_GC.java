@@ -8,7 +8,6 @@ import java.util.Arrays;
 import java.util.stream.IntStream;
 
 import org.chocosolver.samples.AbstractProblem;
-import org.chocosolver.solver.ResolutionPolicy;
 import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.constraints.IntConstraintFactory;
 import org.chocosolver.solver.constraints.IntConstraintFactorySt;

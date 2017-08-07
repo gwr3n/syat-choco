@@ -1,7 +1,5 @@
 package org.chocosolver.solver.constraints.statistical.fisherratio.test;
 
-import static org.junit.Assert.*;
-
 import org.chocosolver.samples.AbstractProblem;
 import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.constraints.statistical.fisherratio.FisherRatioStatistic;
@@ -36,7 +34,6 @@ public class FisherRatioStatisticTest {
       
       int[][] valuesA = {{3},{3},{1},{1},{2}};
       int[][] valuesB = {{1},{1},{2},{2},{3}};
-      double confidence = 0.95;
       
       double[] fStatistic = {0,1000};
       
@@ -50,7 +47,6 @@ public class FisherRatioStatisticTest {
       
       double[][] valuesA = {{9.84321,9.84321}, {11.0656,11.0656}, {10.0497,10.0497}, {8.9333,8.9333}, {7.94843,7.94843}};
       double[][] valuesB = {{10.3289,10.3289}, {8.83811,8.83811}, {11.344,11.344}, {13.2178,13.2178}, {9.64139,9.64139}};
-      double confidence = 0.95;
       
       double[] fStatistic = {0,1000};
       

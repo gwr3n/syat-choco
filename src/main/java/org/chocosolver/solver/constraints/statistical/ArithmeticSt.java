@@ -37,6 +37,7 @@ import org.chocosolver.solver.constraints.statistical.unary.PropNotEqualXCStMean
  * @author Charles Prud'homme
  * @since 21/06/12
  */
+@SuppressWarnings("serial")
 public class ArithmeticSt extends Constraint {
 
     protected final Operator op1, op2; // operators.
@@ -48,7 +49,8 @@ public class ArithmeticSt extends Constraint {
         return operator.equals(Operator.PL) || operator.equals(Operator.MN);
     }
 
-    private static Propagator<IntVar>[] createProp(IntVar[] var, Operator op1, Operator op2, int cste, double confidence){
+    @SuppressWarnings("unchecked")
+   private static Propagator<IntVar>[] createProp(IntVar[] var, Operator op1, Operator op2, int cste, double confidence){
     	switch (op2) {
         case MEAN:
 	        switch (op1) {
@@ -82,7 +84,8 @@ public class ArithmeticSt extends Constraint {
         
     }
     
-    private static Propagator<IntVar>[] createProp(IntVar[] var1, DistributionVar dist, Operator op1, double confidence) {
+    @SuppressWarnings("unchecked")
+   private static Propagator<IntVar>[] createProp(IntVar[] var1, DistributionVar dist, Operator op1, double confidence) {
     	switch (op1) {
 			case EQ: // X = Y
 				return new Propagator[]{new PropGreaterOrEqualX_DStDist(var1, dist, 1-(1-confidence)/2.0), new PropLessOrEqualX_DStDist(var1, dist, 1-(1-confidence)/2.0)};
@@ -106,7 +109,8 @@ public class ArithmeticSt extends Constraint {
     	
     }
     
-    private static Propagator<IntVar>[] createProp(IntVar[] var1, Distribution dist, Operator op1, double confidence) {
+    @SuppressWarnings("unchecked")
+   private static Propagator<IntVar>[] createProp(IntVar[] var1, Distribution dist, Operator op1, double confidence) {
     	switch (op1) {
 	        case EQ: // X = Y
 	        	return new Propagator[]{new PropGreaterOrEqualXCStDist(var1, dist, 1-(1-confidence)/2.0), new PropLessOrEqualXCStDist(var1, dist, 1-(1-confidence)/2.0)};
@@ -143,7 +147,8 @@ public class ArithmeticSt extends Constraint {
     	return var3;
     }
     
-    private static Propagator<IntVar>[] createProp(IntVar[] var1, IntVar[] var2, Operator op1, Operator op2, double confidence) {
+    @SuppressWarnings("unchecked")
+   private static Propagator<IntVar>[] createProp(IntVar[] var1, IntVar[] var2, Operator op1, Operator op2, double confidence) {
     	switch (op2) {
         case MEAN:
 	        switch (op1) {

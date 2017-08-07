@@ -50,6 +50,7 @@ import org.chocosolver.solver.variables.IntVar;
  * @author Charles Prud'homme
  * @since 21/06/12
  */
+@SuppressWarnings("serial")
 public class Arithmetic extends Constraint {
 
    protected final Operator op1, op2; // operators.

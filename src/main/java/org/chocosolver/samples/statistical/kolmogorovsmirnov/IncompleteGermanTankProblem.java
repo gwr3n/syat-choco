@@ -4,9 +4,6 @@ import java.util.Arrays;
 
 import org.slf4j.LoggerFactory;
 
-import umontreal.iro.lecuyer.randvar.UniformIntGen;
-import umontreal.iro.lecuyer.rng.MRG32k3a;
-
 import org.chocosolver.samples.AbstractProblem;
 import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.constraints.IntConstraintFactorySt;
@@ -53,6 +50,7 @@ public class IncompleteGermanTankProblem extends AbstractProblem {
         solver.post(IntConstraintFactorySt.arithmSt(populationX, new UniformDistVar(uniformUB), "=", 0.9));
     }
     
+    @SuppressWarnings("unused")
     private static IntVar[] mergeArrays(IntVar[] var1, IntVar[] var2){
     	//return ArrayUtils.append(var1,var2);
     	IntVar[] var3 = new IntVar[var1.length+var2.length];

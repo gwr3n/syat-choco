@@ -1,12 +1,10 @@
 package org.chocosolver.samples.statistical.regression.normal;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
 import java.util.Random;
 import java.util.stream.DoubleStream;
 
 import org.chocosolver.samples.AbstractProblem;
-import org.chocosolver.solver.ResolutionPolicy;
 import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.constraints.real.Ibex;
 import org.chocosolver.solver.constraints.real.RealConstraint;
@@ -18,7 +16,6 @@ import org.chocosolver.solver.variables.IntVar;
 import org.chocosolver.solver.variables.RealVar;
 import org.chocosolver.solver.variables.VF;
 import org.chocosolver.solver.variables.VariableFactory;
-import org.chocosolver.util.ESat;
 import org.slf4j.LoggerFactory;
 
 import umontreal.iro.lecuyer.probdist.ChiSquareDist;

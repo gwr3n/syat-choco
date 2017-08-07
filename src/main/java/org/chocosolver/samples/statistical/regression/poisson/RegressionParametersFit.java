@@ -1,6 +1,5 @@
 package org.chocosolver.samples.statistical.regression.poisson;
 
-import java.util.Arrays;
 import java.util.Random;
 import java.util.stream.DoubleStream;
 

@@ -27,6 +27,7 @@ import org.syat.statistics.KolmogorovSmirnovTest;
  * @author Charles Prud'homme
  * @since 16/06/11
  */
+@SuppressWarnings("serial")
 public class PropNotEqualXCStDist extends Propagator<IntVar> {
 
 	private final Distribution dist;

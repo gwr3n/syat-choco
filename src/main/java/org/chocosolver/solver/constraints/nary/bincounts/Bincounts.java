@@ -5,8 +5,9 @@ import org.chocosolver.solver.constraints.Propagator;
 import org.chocosolver.solver.variables.IntVar;
 import org.chocosolver.solver.variables.RealVar;
 
+@SuppressWarnings("serial")
 public class Bincounts extends Constraint {
-   
+
    public Bincounts(IntVar[] valueVariables, IntVar[] binVariables, int[] binBounds, BincountsPropagatorType propagator){
       super("Bincounts", 
             propagator == BincountsPropagatorType.EQ ?

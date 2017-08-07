@@ -25,6 +25,7 @@ import umontreal.iro.lecuyer.probdist.EmpiricalDist;
  * @author Charles Prud'homme
  * @since 1 oct. 2010
  */
+@SuppressWarnings("serial")
 public final class PropGreaterOrEqualX_YStDist extends Propagator<IntVar> {
 
     final IntVar[] x;

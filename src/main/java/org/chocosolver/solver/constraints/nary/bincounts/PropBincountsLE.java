@@ -10,9 +10,9 @@ import org.chocosolver.solver.explanations.Explanation;
 import org.chocosolver.solver.explanations.ExplanationEngine;
 import org.chocosolver.solver.variables.IntVar;
 import org.chocosolver.solver.variables.events.IntEventType;
-import org.chocosolver.solver.variables.events.PropagatorEventType;
 import org.chocosolver.util.ESat;
 import org.chocosolver.util.iterators.DisposableValueIterator;
+
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation.Result;
@@ -28,6 +28,7 @@ import gnu.trove.map.hash.THashMap;
  * @author Roberto Rossi
  *
  */
+@SuppressWarnings("serial")
 public class PropBincountsLE extends Propagator<IntVar> {
    
    int m, n;

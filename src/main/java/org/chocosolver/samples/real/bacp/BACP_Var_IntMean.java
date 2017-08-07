@@ -372,7 +372,8 @@ public class BACP_Var_IntMean extends AbstractProblem {
         solver.post(IntConstraintFactory.arithm(course_period[b - 1], "<", course_period[a - 1]));
     }
 
-    @Override
+    @SuppressWarnings("serial")
+   @Override
     public void configureSearch() {      
        //IntVar[] vars = new IntVar[load.length+1];
        //System.arraycopy(load, 0, vars, 0, load.length);
@@ -405,7 +406,8 @@ public class BACP_Var_IntMean extends AbstractProblem {
        );
     }
 
-    @Override
+    @SuppressWarnings("serial")
+   @Override
     public void solve() {
        solver.getSearchLoop().plugSearchMonitor(new IMonitorSolution() {
           public void onSolution() {

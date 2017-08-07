@@ -16,8 +16,8 @@ public class ScenarioTree {
         int[] values = {1,2,3};
         double[] prob = {0.5,0.3,0.2};
         stage1.addRandomVar(new RandomVar(values,prob));
-        int[] values1 = {3,4};
-        double[] prob1 = {0.6,0.4};
+        //int[] values1 = {3,4};
+        //double[] prob1 = {0.6,0.4};
         //stage1.addRandomVar(new RandomVar(values1,prob1));
         tree.addStage(stage1);
         Stage stage2 = new Stage();
@@ -88,7 +88,8 @@ public class ScenarioTree {
     }
 
     public void fillScenarioIntDecVarsTableRows(Solver solver){
-        ArrayList<Stage> stagesBuffer = (ArrayList<Stage>)this.stages.clone();
+        @SuppressWarnings("unchecked")
+      ArrayList<Stage> stagesBuffer = (ArrayList<Stage>)this.stages.clone();
         fillIntDecVarsScenario(stagesBuffer, 0, solver);
     }
 
@@ -126,7 +127,8 @@ public class ScenarioTree {
     }
 
     public void fillProbabilityValuesTableRows(){
-        ArrayList<Stage> stagesBuffer = (ArrayList<Stage>)this.stages.clone();
+        @SuppressWarnings("unchecked")
+      ArrayList<Stage> stagesBuffer = (ArrayList<Stage>)this.stages.clone();
         fillStageScenarioProbabilities(stagesBuffer, 0);
     }
 
@@ -154,7 +156,8 @@ public class ScenarioTree {
     }
 
     public void fillScenarioValuesTableRows(){
-        ArrayList<Stage> stagesBuffer = (ArrayList<Stage>)this.stages.clone();
+        @SuppressWarnings("unchecked")
+      ArrayList<Stage> stagesBuffer = (ArrayList<Stage>)this.stages.clone();
         fillStageScenario(stagesBuffer, 0);
     }
 
@@ -182,7 +185,8 @@ public class ScenarioTree {
     }
 
     public int getScenarioTableRows(){
-        ArrayList<Stage> stagesBuffer = (ArrayList<Stage>)this.stages.clone();
+        @SuppressWarnings("unchecked")
+      ArrayList<Stage> stagesBuffer = (ArrayList<Stage>)this.stages.clone();
         return handleStageScenario(stagesBuffer);
     }
 

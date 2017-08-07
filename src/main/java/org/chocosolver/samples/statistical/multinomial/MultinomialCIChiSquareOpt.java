@@ -1,7 +1,6 @@
 package org.chocosolver.samples.statistical.multinomial;
 
 import java.util.Arrays;
-import java.util.stream.IntStream;
 
 import org.chocosolver.samples.AbstractProblem;
 import org.chocosolver.solver.ResolutionPolicy;
@@ -113,6 +112,7 @@ public class MultinomialCIChiSquareOpt extends AbstractProblem{
       solver.set(strat1, strat4);
    }
    
+   @SuppressWarnings("unused")
    private RealVar[] flatten(RealVar[][] matrix){
       RealVar[] array = new RealVar[matrix.length*matrix[0].length];
       for(int i = 0; i < matrix.length; i++){

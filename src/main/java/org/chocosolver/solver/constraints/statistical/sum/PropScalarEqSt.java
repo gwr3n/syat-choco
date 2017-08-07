@@ -54,6 +54,7 @@ import umontreal.iro.lecuyer.probdist.EmpiricalDist;
  * @revision 04/03/12 use I in filterOn{G,L}eg
  * @since 18/03/11
  */
+@SuppressWarnings("serial")
 public class PropScalarEqSt extends Propagator<IntVar> {
 
     final int[][] samples; // list of coefficients

@@ -19,8 +19,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.LoggerFactory;
 
-import umontreal.iro.lecuyer.probdist.ChiSquareDist;
-
 public class ChiSquareFitEmpiricalTest {
 
    @Before

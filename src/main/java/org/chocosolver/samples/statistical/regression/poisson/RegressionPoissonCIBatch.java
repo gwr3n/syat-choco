@@ -1,14 +1,10 @@
 package org.chocosolver.samples.statistical.regression.poisson;
 
-import java.util.Arrays;
 import java.util.Random;
 import java.util.stream.DoubleStream;
 
 import org.chocosolver.samples.AbstractProblem;
 import org.chocosolver.solver.Solver;
-import org.chocosolver.solver.constraints.IntConstraintFactorySt;
-import org.chocosolver.solver.constraints.nary.bincounts.BincountsDecompositionType;
-import org.chocosolver.solver.constraints.nary.bincounts.BincountsPropagatorType;
 import org.chocosolver.solver.constraints.real.Ibex;
 import org.chocosolver.solver.constraints.real.RealConstraint;
 import org.chocosolver.solver.constraints.statistical.chisquare.ChiSquareFitPoisson;

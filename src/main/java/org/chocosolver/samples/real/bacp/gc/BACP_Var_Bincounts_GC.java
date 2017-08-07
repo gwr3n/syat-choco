@@ -387,7 +387,8 @@ public class BACP_Var_Bincounts_GC extends AbstractProblem {
        //SearchMonitorFactory.limitTime(solver,120000);
     }
 
-    @Override
+    @SuppressWarnings("serial")
+   @Override
     public void solve() {
        solver.getSearchLoop().plugSearchMonitor(new IMonitorSolution() {
           public void onSolution() {

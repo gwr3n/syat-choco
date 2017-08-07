@@ -109,8 +109,6 @@ public class Hotelling extends AbstractProblem {
    public static void hotelling(){
       String[] str={"-log","SOLUTION"};
       
-      int M = 6;
-      
       double[][] observations = {
             {3.57329, 9.83132, 9.80335}, 
             {6.5655, 9.7379, 8.79726}, 

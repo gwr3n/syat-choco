@@ -39,6 +39,7 @@ import org.chocosolver.solver.variables.IntVar;
  * @author Charles Prud'homme
  * @since 18/03/11
  */
+@SuppressWarnings("serial")
 public class ScalarSt extends Constraint {
 
     final int[][] samples;

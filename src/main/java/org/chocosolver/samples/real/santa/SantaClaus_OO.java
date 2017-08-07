@@ -115,7 +115,8 @@ public class SantaClaus_OO extends AbstractProblem {
         SearchMonitorFactory.limitTime(solver,10000);
     }
 
-    @Override
+    @SuppressWarnings("serial")
+   @Override
     public void solve() {
         solver.getSearchLoop().plugSearchMonitor(new IMonitorSolution() {
             public void onSolution() {

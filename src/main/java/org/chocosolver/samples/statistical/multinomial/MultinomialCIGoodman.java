@@ -148,6 +148,7 @@ public class MultinomialCIGoodman extends AbstractProblem {
        //SearchMonitorFactory.limitTime(solver,10000);
    }
    
+   @SuppressWarnings("serial")
    @Override
    public void solve() {
      StringBuilder st = new StringBuilder();

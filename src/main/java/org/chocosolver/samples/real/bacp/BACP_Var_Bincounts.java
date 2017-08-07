@@ -47,7 +47,6 @@ import org.chocosolver.solver.variables.BoolVar;
 import org.chocosolver.solver.variables.IntVar;
 import org.chocosolver.solver.variables.RealVar;
 import org.chocosolver.solver.variables.VariableFactory;
-import org.chocosolver.util.iterators.DisposableValueIterator;
 
 /**
  * The balanced academic curriculum problem: 
@@ -423,7 +422,8 @@ public class BACP_Var_Bincounts extends AbstractProblem {
        );
     }
 
-    @Override
+    @SuppressWarnings("serial")
+   @Override
     public void solve() {
        solver.getSearchLoop().plugSearchMonitor(new IMonitorSolution() {
           public void onSolution() {

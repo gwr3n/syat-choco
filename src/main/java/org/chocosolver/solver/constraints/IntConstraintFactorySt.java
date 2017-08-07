@@ -7,14 +7,12 @@ import org.chocosolver.solver.constraints.nary.contingency.ContingencyDecomposit
 import org.chocosolver.solver.constraints.nary.bincounts.BincountsDecompositionType;
 import org.chocosolver.solver.constraints.nary.bincounts.BincountsDecompositions;
 import org.chocosolver.solver.constraints.statistical.ArithmeticSt;
-import org.chocosolver.solver.variables.BoolVar;
 import org.chocosolver.solver.variables.IntVar;
 import org.chocosolver.solver.variables.RealVar;
-import org.chocosolver.solver.variables.VariableFactory;
 import org.chocosolver.solver.variables.statistical.distributions.DistributionVar;
-import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.constraints.Constraint;
 import org.chocosolver.solver.constraints.statistical.sum.ScalarSt;
+
 import umontreal.iro.lecuyer.probdist.Distribution;
 
 public class IntConstraintFactorySt extends IntConstraintFactory {

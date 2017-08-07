@@ -24,6 +24,7 @@ import org.syat.statistics.TTest;
  * @author Charles Prud'homme
  * @since 16/06/11
  */
+@SuppressWarnings("serial")
 public class PropNotEqualXCStMean extends Propagator<IntVar> {
 
     private final int constant;

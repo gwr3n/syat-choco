@@ -30,6 +30,7 @@ import gnu.trove.map.hash.THashMap;
  * @author Roberto Rossi
  *
  */
+@SuppressWarnings("serial")
 public class PropBincountsEQFast extends Propagator<IntVar> {
    
    public static ExpressionsBasedModel modelInstance = null;
@@ -71,6 +72,7 @@ public class PropBincountsEQFast extends Propagator<IntVar> {
       modelInstance = null;
       //long timeBefore = System.nanoTime();
       if (PropagatorEventType.isFullPropagation(evtmask)) {
+         @SuppressWarnings("unused")
          boolean anyChange = updateDomains();
          //if(anyChange) 
             //this.forcePropagate(PropagatorEventType.CUSTOM_PROPAGATION);
@@ -79,6 +81,7 @@ public class PropBincountsEQFast extends Propagator<IntVar> {
       //LoggerFactory.getLogger("bench").info("Prop main time: "+(timeAfter-timeBefore)*1e-9);
    }
    
+   @SuppressWarnings("unused")
    @Override
    public void propagate(int i, int mask) throws ContradictionException {
       modelInstance = null;

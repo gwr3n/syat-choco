@@ -46,7 +46,6 @@ import org.chocosolver.solver.variables.BoolVar;
 import org.chocosolver.solver.variables.IntVar;
 import org.chocosolver.solver.variables.RealVar;
 import org.chocosolver.solver.variables.VariableFactory;
-import org.chocosolver.util.iterators.DisposableValueIterator;
 
 import umontreal.iro.lecuyer.probdist.ChiSquareDist;
 
@@ -422,7 +421,8 @@ public class BACP_Chi_Bincounts extends AbstractProblem {
        );
     }
 
-    @Override
+    @SuppressWarnings("serial")
+   @Override
     public void solve() {
        solver.getSearchLoop().plugSearchMonitor(new IMonitorSolution() {
           public void onSolution() {

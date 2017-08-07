@@ -1,7 +1,5 @@
 package org.syad.statistics.test;
 
-import static org.junit.Assert.*;
-
 import org.chocosolver.samples.AbstractProblem;
 import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.constraints.nary.contingency.ContingencyDecompositions;
@@ -104,7 +102,8 @@ public class ContingencyTest {
         //this.prettyOut();
         
         StringBuilder st = new StringBuilder();
-        boolean solution = solver.findSolution();
+        @SuppressWarnings("unused")
+      boolean solution = solver.findSolution();
         do{
            st.append("\n---SOLUTION---\n");
            /*if(solution) {

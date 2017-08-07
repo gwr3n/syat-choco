@@ -347,7 +347,8 @@ public class BACP_Var_RealMean_GC extends AbstractProblem {
         solver.post(IntConstraintFactory.arithm(course_period[b - 1], "<", course_period[a - 1]));
     }
 
-    @Override
+    @SuppressWarnings("serial")
+   @Override
     public void configureSearch() {
        //IntVar[] variables = new IntVar[load.length+course_period.length];
        //System.arraycopy(course_period, 0, variables, 0, course_period.length);
@@ -385,7 +386,8 @@ public class BACP_Var_RealMean_GC extends AbstractProblem {
        //SearchMonitorFactory.limitTime(solver,120000);
     }
 
-    @Override
+    @SuppressWarnings("serial")
+   @Override
     public void solve() {
        solver.getSearchLoop().plugSearchMonitor(new IMonitorSolution() {
           public void onSolution() {

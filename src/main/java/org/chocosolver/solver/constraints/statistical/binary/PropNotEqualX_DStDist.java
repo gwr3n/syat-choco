@@ -28,6 +28,7 @@ import umontreal.iro.lecuyer.probdist.EmpiricalDist;
  * @author Charles Prud'homme
  * @since 16/06/11
  */
+@SuppressWarnings("serial")
 public class PropNotEqualX_DStDist extends Propagator<IntVar> {
 
     private final DistributionVar dist;

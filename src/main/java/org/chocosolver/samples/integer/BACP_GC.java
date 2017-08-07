@@ -309,7 +309,8 @@ public class BACP_GC extends AbstractProblem {
     }
 
 
-    @Override
+    @SuppressWarnings("serial")
+   @Override
     public void configureSearch() {
        //solver.set(org.chocosolver.solver.search.strategy.IntStrategyFactory.domOverWDeg(course_period, 2222));
        solver.set(
