@@ -21,7 +21,6 @@ public class GaussJordan {
             solver.post(new RealConstraint(name, inverseString[i][j]+"={"+(n*n)+"}", Ibex.HC4_NEWTON, flatten(matrix,inverse[i][j])));
          }
       }
-      System.out.println();
    }
    
    private static String[][] initialiseMatrixString(int n){
