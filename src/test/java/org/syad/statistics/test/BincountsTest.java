@@ -7,7 +7,7 @@ import java.util.Arrays;
 import org.chocosolver.samples.AbstractProblem;
 import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.constraints.IntConstraintFactorySt;
-import org.chocosolver.solver.constraints.nary.bincounts.BincountsPropagatorType;
+import org.chocosolver.solver.constraints.nary.bincounts.BincountsDecompositionType;
 import org.chocosolver.solver.exception.ContradictionException;
 import org.chocosolver.solver.search.strategy.IntStrategyFactory;
 import org.chocosolver.solver.search.strategy.strategy.AbstractStrategy;
@@ -17,7 +17,6 @@ import org.chocosolver.util.iterators.DisposableValueIterator;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.slf4j.LoggerFactory;
 
 public class BincountsTest {
 
@@ -97,7 +96,7 @@ public class BincountsTest {
          for(int i = 0; i < this.binCounts.length; i++)
             binVariables[i] = VariableFactory.bounded("Bin "+(i+1), this.binCounts[i][0], this.binCounts[i][1], solver);
          
-         solver.post(IntConstraintFactorySt.bincounts(valueVariables, binVariables, binBounds, BincountsPropagatorType.EQFast));      
+         IntConstraintFactorySt.bincountsDecomposition(valueVariables, binVariables, binBounds, BincountsDecompositionType.Agkun2016_2_EQ);      
       }
       
       private IntVar[] mergeArrays(IntVar[] var1, IntVar[] var2){
@@ -202,7 +201,7 @@ public class BincountsTest {
          for(int i = 0; i < binVariables.length; i++){
             st.append(binVariables[i].toString()+", ");
          }
-         LoggerFactory.getLogger("bench").info(st.toString());
+         System.out.println(st.toString());
       }
    }
 }
