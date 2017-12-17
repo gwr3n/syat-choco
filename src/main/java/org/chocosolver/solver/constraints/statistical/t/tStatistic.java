@@ -17,7 +17,8 @@ public class tStatistic {
     * One sample
     */
    
-   public static void decompose(IntVar[] observations,
+   public static void decompose(String name,
+                                IntVar[] observations,
                                 RealVar mean,
                                 RealVar t,
                                 double precision){
@@ -32,12 +33,13 @@ public class tStatistic {
       RealVar standardError = VariableFactory.real("StandardError", 0, max-min, precision, solver);
       StandardError.decompose("StandardErrorDecomposition", observations, standardError, precision);
       
-      String exp = "{0}+[-"+String.format("%f", precision)+","+String.format("%f", precision)+"]=({1}-{2})/{3}";
+      String exp = "{0}=({1}-{2})/{3}";
 
-      solver.post(new RealConstraint(exp, new RealVar[]{t,sampleMean,mean,standardError}));
+      solver.post(new RealConstraint(name+"_t", exp, new RealVar[]{t,sampleMean,mean,standardError}));
    }
 
-   public static void decompose(RealVar[] observations,
+   public static void decompose(String name,
+                                RealVar[] observations,
                                 RealVar mean,
                                 RealVar t,
                                 double precision){
@@ -52,16 +54,17 @@ public class tStatistic {
       RealVar standardError = VariableFactory.real("StandardError", 0, (1/Math.sqrt(observations.length))*Math.sqrt(Math.pow(max-min,2)), precision, solver);
       StandardError.decompose("StandardError", observations, standardError, precision);
 
-      String exp = "{0}+[-"+String.format("%f", precision)+","+String.format("%f", precision)+"]=({1}-{2})/{3}";
+      String exp = "{0}=({1}-{2})/{3}";
 
-      solver.post(new RealConstraint(exp, new RealVar[]{t,sampleMean,mean,standardError}));
+      solver.post(new RealConstraint(name+"_t", exp, new RealVar[]{t,sampleMean,mean,standardError}));
    }
    
    /**
     * Two samples
     */
    
-   public static void decompose(IntVar[] observationsA,
+   public static void decompose(String name,
+                                IntVar[] observationsA,
                                 IntVar[] observationsB,
                                 RealVar t,
                                 double precision){
@@ -83,12 +86,13 @@ public class tStatistic {
       RealVar pooledVariance = VariableFactory.real("PooledVariance", 0, Math.pow(Math.max(maxA, maxB) - Math.min(minA, minB),2), precision, solver);
       PooledVariance.decompose("PooledVarianceDecomposition", observationsA, observationsB, pooledVariance, precision);
 
-      String exp = "{0}+[-"+String.format("%f", precision)+","+String.format("%f", precision)+"]=({1}-{2})/sqrt({3}*(1/"+observationsA.length+"+1/"+observationsB.length+"))";
+      String exp = "{0}=({1}-{2})/sqrt({3}*(1/"+observationsA.length+"+1/"+observationsB.length+"))";
 
-      solver.post(new RealConstraint(exp, new RealVar[]{t,sampleMeanA, sampleMeanB, pooledVariance}));
+      solver.post(new RealConstraint(name+"_t", exp, new RealVar[]{t,sampleMeanA, sampleMeanB, pooledVariance}));
    }
 
-   public static void decompose(RealVar[] observationsA,
+   public static void decompose(String name,
+                                RealVar[] observationsA,
                                 RealVar[] observationsB,
                                 RealVar t,
                                 double precision){
@@ -110,8 +114,8 @@ public class tStatistic {
       RealVar pooledVariance = VariableFactory.real("PooledVariance", 0, Math.pow(Math.max(maxA, maxB) - Math.min(minA, minB),2), precision, solver);
       PooledVariance.decompose("PooledVarianceDecomposition", observationsA, observationsB, pooledVariance, precision);
 
-      String exp = "{0}+[-"+String.format("%f", precision)+","+String.format("%f", precision)+"]=({1}-{2})/sqrt({3}*(1/"+observationsA.length+"+1/"+observationsB.length+"))";
+      String exp = "{0}=({1}-{2})/sqrt({3}*(1/"+observationsA.length+"+1/"+observationsB.length+"))";
 
-      solver.post(new RealConstraint(exp, new RealVar[]{t,sampleMeanA, sampleMeanB, pooledVariance}));
+      solver.post(new RealConstraint(name+"_t", exp, new RealVar[]{t,sampleMeanA, sampleMeanB, pooledVariance}));
    }
 }

@@ -49,14 +49,7 @@ public class TTest extends AbstractProblem {
         
         RealVar t = VariableFactory.real("tStatistic", tDist.inverseF(alpha/2), tDist.inverseF(1-alpha/2), precision, solver);
         
-        tStatistic.decompose(population, VariableFactory.real(mean, precision), t, precision);
-    }
-
-    private static IntVar[] mergeArrays(IntVar[] var1, IntVar[] var2){
-    	IntVar[] var3 = new IntVar[var1.length+var2.length];
-    	System.arraycopy(var1, 0, var3, 0, var1.length);
-    	System.arraycopy(var2, 0, var3, var1.length, var2.length);
-    	return var3;
+        tStatistic.decompose("tStatistic_cons", population, VariableFactory.real(mean, precision), t, precision);
     }
     
     @Override

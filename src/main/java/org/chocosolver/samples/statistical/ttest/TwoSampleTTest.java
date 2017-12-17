@@ -2,7 +2,6 @@ package org.chocosolver.samples.statistical.ttest;
 
 import org.chocosolver.samples.AbstractProblem;
 import org.chocosolver.solver.Solver;
-import org.chocosolver.solver.constraints.IntConstraintFactorySt;
 import org.chocosolver.solver.constraints.statistical.t.tStatistic;
 import org.chocosolver.solver.search.strategy.IntStrategyFactory;
 import org.chocosolver.solver.search.strategy.strategy.AbstractStrategy;
@@ -54,7 +53,7 @@ public class TwoSampleTTest extends AbstractProblem {
         RealVar t = VariableFactory.real("tStatistic", tDist.inverseF(alpha/2), tDist.inverseF(1-alpha/2), precision, solver);
         
         //solver.post(IntConstraintFactorySt.arithmSt(populationX, populationY, "!=", "MEAN", 0.95));
-        tStatistic.decompose(populationX, populationY, t, precision);
+        tStatistic.decompose("tStatistic_cons", populationX, populationY, t, precision);
     }
     
     private static IntVar[] mergeArrays(IntVar[] var1, IntVar[] var2){
