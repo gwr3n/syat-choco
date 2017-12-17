@@ -8,7 +8,6 @@ import org.chocosolver.solver.constraints.statistical.ArithmeticSt;
 import org.chocosolver.solver.variables.IntVar;
 import org.chocosolver.solver.variables.RealVar;
 import org.chocosolver.solver.variables.statistical.distributions.DistributionVar;
-import org.chocosolver.solver.constraints.Constraint;
 
 import umontreal.iro.lecuyer.probdist.Distribution;
 

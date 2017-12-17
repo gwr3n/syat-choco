@@ -24,7 +24,6 @@ import org.chocosolver.solver.variables.IntVar;
 import org.chocosolver.solver.variables.RealVar;
 import org.chocosolver.solver.variables.VF;
 import org.chocosolver.solver.variables.VariableFactory;
-import org.slf4j.LoggerFactory;
 
 import umontreal.iro.lecuyer.probdist.ChiSquareDist;
 import umontreal.iro.lecuyer.randvar.UniformGen;
@@ -154,7 +153,7 @@ public class MultinomialCIGoodman extends AbstractProblem {
      StringBuilder st = new StringBuilder();
      try {
         solver.propagate();
-        solver.getSearchLoop().plugSearchMonitor(new IMonitorSolution() {
+        solver.plugMonitor(new IMonitorSolution() {
            public void onSolution() {
               st.append("-------------NEW SOLUTION----------------");
               for(int i = 0; i < valueVariables.length; i++){
@@ -194,7 +193,7 @@ public class MultinomialCIGoodman extends AbstractProblem {
      st.append("\n");
      st.append(chiSqStatistics.getLB()+" "+chiSqStatistics.getUB());
      st.append("\n");*/
-     LoggerFactory.getLogger("bench").info(st.toString());
+     System.out.println(st.toString());
    }
    
    @Override

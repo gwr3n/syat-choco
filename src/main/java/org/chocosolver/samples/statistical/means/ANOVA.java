@@ -14,7 +14,6 @@ import org.chocosolver.solver.search.strategy.strategy.RealStrategy;
 import org.chocosolver.solver.variables.RealVar;
 import org.chocosolver.solver.variables.VF;
 import org.chocosolver.solver.variables.VariableFactory;
-import org.slf4j.LoggerFactory;
 
 import umontreal.iro.lecuyer.probdist.FisherFDist;
 import umontreal.iro.lecuyer.probdist.NormalDist;
@@ -157,7 +156,7 @@ public class ANOVA extends AbstractProblem {
            st.append("No solution!");
         }
      //}while(solution = solver.nextSolution());
-     LoggerFactory.getLogger("bench").info(st.toString());
+     System.out.println(st.toString());
    }
 
    @Override

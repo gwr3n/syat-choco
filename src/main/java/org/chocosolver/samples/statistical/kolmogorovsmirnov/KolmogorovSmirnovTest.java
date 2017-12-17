@@ -1,7 +1,5 @@
 package org.chocosolver.samples.statistical.kolmogorovsmirnov;
 
-import org.slf4j.LoggerFactory;
-
 import org.chocosolver.samples.AbstractProblem;
 import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.constraints.IntConstraintFactorySt;
@@ -63,7 +61,7 @@ public class KolmogorovSmirnovTest extends AbstractProblem {
     			st.append("No solution!");
     		}
     	}while(solution = solver.nextSolution());
-    	LoggerFactory.getLogger("bench").info(st.toString());
+    	System.out.println(st.toString());
     }
 
     @Override

@@ -2,8 +2,6 @@ package org.chocosolver.samples.statistical.kolmogorovsmirnov;
 
 import java.util.Arrays;
 
-import org.slf4j.LoggerFactory;
-
 import org.chocosolver.samples.AbstractProblem;
 import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.constraints.IntConstraintFactorySt;
@@ -159,7 +157,7 @@ All data known
 		for(int i = 0; i < dataX.length; i++){
 			st.append(i+": "+populationXLB[i]+"\t"+populationXUB[i]+"\n");
 		}
-		LoggerFactory.getLogger("bench").info(st.toString());
+		System.out.println(st.toString());
     }
 }
 
