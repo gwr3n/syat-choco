@@ -41,7 +41,6 @@ import org.chocosolver.solver.search.strategy.strategy.RealStrategy;
 import org.chocosolver.solver.variables.IntVar;
 import org.chocosolver.solver.variables.RealVar;
 import org.chocosolver.solver.variables.VF;
-import org.slf4j.LoggerFactory;
 
 /**
  * <br/>
@@ -118,18 +117,16 @@ public class SantaClaus_OO extends AbstractProblem {
     @SuppressWarnings("serial")
    @Override
     public void solve() {
-        solver.getSearchLoop().plugSearchMonitor(new IMonitorSolution() {
+        solver.plugMonitor(new IMonitorSolution() {
             public void onSolution() {
-                if (LoggerFactory.getLogger("solver").isInfoEnabled()) {
-                    LoggerFactory.getLogger("solver").info("*******************");
-                    for (int i = 0; i < n_kids; i++) {
-                        LoggerFactory.getLogger("solver").info("Kids #{} has received the gift #{} at a cost of {} euros",
-                                new Object[]{i, kid_gift[i].getValue(), kid_price[i].getValue()});
-                    }
-                    LoggerFactory.getLogger("solver").info("Total cost: {} euros", total_cost.getValue());
-                    LoggerFactory.getLogger("solver").info("Average: [{},{}] euros per kid", average.getLB(), average.getUB());
-                    LoggerFactory.getLogger("solver").info("Average deviation: [{},{}] euros per kid", average_deviation.getLB(), average_deviation.getUB());
+               System.out.println("*******************");
+                for (int i = 0; i < n_kids; i++) {
+                   System.out.printf("Kids #%d has received the gift #%s at a cost of %d euros\n",
+                            new Object[]{i, kid_gift[i].getValue(), kid_price[i].getValue()});
                 }
+                System.out.printf("Total cost: %d euros", total_cost.getValue());
+                System.out.printf("Average: [%f,%f] euros per kid", average.getLB(), average.getUB());
+                System.out.printf("Average deviation: [%f,%f] euros per kid", average_deviation.getLB(), average_deviation.getUB());
             }
         });
         solver.findOptimalSolution(ResolutionPolicy.MINIMIZE, average_deviation, precision);

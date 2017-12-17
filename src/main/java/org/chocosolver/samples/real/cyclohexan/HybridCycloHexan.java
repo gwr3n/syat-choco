@@ -37,7 +37,6 @@ import org.chocosolver.solver.search.strategy.strategy.RealStrategy;
 import org.chocosolver.solver.variables.IntVar;
 import org.chocosolver.solver.variables.RealVar;
 import org.chocosolver.solver.variables.VariableFactory;
-import org.slf4j.LoggerFactory;
 
 
 /**
@@ -66,7 +65,7 @@ public class HybridCycloHexan extends AbstractProblem {
       st.append("This example comes from the Elisa project (LINA) examples. \n");
       st.append("This example restricts x to be integer, as an illustration to hybrid finite/continuous problems. \n");
       st.append("It has no solution. \n");
-      LoggerFactory.getLogger("bench").info(st.toString());
+      System.out.println(st.toString());
    }
 
    @Override
