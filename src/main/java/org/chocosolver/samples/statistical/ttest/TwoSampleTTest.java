@@ -1,14 +1,16 @@
 package org.chocosolver.samples.statistical.ttest;
 
-import org.slf4j.LoggerFactory;
-
 import org.chocosolver.samples.AbstractProblem;
 import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.constraints.IntConstraintFactorySt;
+import org.chocosolver.solver.constraints.statistical.t.tStatistic;
 import org.chocosolver.solver.search.strategy.IntStrategyFactory;
 import org.chocosolver.solver.search.strategy.strategy.AbstractStrategy;
 import org.chocosolver.solver.variables.IntVar;
+import org.chocosolver.solver.variables.RealVar;
 import org.chocosolver.solver.variables.VariableFactory;
+
+import umontreal.iro.lecuyer.probdist.StudentDist;
 
 public class TwoSampleTTest extends AbstractProblem {
 
@@ -20,6 +22,10 @@ public class TwoSampleTTest extends AbstractProblem {
     // variables
     public IntVar[] populationX;
     public IntVar[] populationY;
+    
+    double precision = 1.e-4;
+    
+    double alpha = 0.1;
 
     public void setUp() {
         // read data
@@ -43,7 +49,12 @@ public class TwoSampleTTest extends AbstractProblem {
         for(int i = 0; i < populationYSize; i++)
         	populationY[i] = VariableFactory.bounded("sample "+i, dataY[i], dataY[i], solver);
         
-        solver.post(IntConstraintFactorySt.arithmSt(populationX, populationY, "!=", "MEAN", 0.95));
+        StudentDist tDist = new StudentDist(populationXSize + populationYSize - 2);
+        
+        RealVar t = VariableFactory.real("tStatistic", tDist.inverseF(alpha/2), tDist.inverseF(1-alpha/2), precision, solver);
+        
+        //solver.post(IntConstraintFactorySt.arithmSt(populationX, populationY, "!=", "MEAN", 0.95));
+        tStatistic.decompose(populationX, populationY, t, precision);
     }
     
     private static IntVar[] mergeArrays(IntVar[] var1, IntVar[] var2){
@@ -77,7 +88,7 @@ public class TwoSampleTTest extends AbstractProblem {
     			st.append("No solution!");
     		}
     	}while(solution = solver.nextSolution());
-    	LoggerFactory.getLogger("bench").info(st.toString());
+    	System.out.println(st.toString());
     }
 
     @Override
