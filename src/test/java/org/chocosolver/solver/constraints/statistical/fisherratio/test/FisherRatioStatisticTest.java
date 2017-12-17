@@ -14,7 +14,6 @@ import org.chocosolver.solver.variables.VariableFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.slf4j.LoggerFactory;
 
 public class FisherRatioStatisticTest {
 
@@ -133,7 +132,7 @@ public class FisherRatioStatisticTest {
               st.append("No solution!");
            }
         //}while(solution = solver.nextSolution());
-        LoggerFactory.getLogger("bench").info(st.toString());
+        System.out.println(st.toString());
       }
       
       @Override
@@ -221,7 +220,7 @@ public class FisherRatioStatisticTest {
               st.append("No solution!");
            }
         //}while(solution = solver.nextSolution());
-        LoggerFactory.getLogger("bench").info(st.toString());
+        System.out.println(st.toString());
       }
       
       @Override
