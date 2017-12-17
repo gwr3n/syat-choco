@@ -1,13 +1,14 @@
 package org.chocosolver.samples.statistical.ttest;
 
-import org.slf4j.LoggerFactory;
+import umontreal.iro.lecuyer.probdist.StudentDist;
 
 import org.chocosolver.samples.AbstractProblem;
 import org.chocosolver.solver.Solver;
-import org.chocosolver.solver.constraints.IntConstraintFactorySt;
+import org.chocosolver.solver.constraints.statistical.t.tStatistic;
 import org.chocosolver.solver.search.strategy.IntStrategyFactory;
 import org.chocosolver.solver.search.strategy.strategy.AbstractStrategy;
 import org.chocosolver.solver.variables.IntVar;
+import org.chocosolver.solver.variables.RealVar;
 import org.chocosolver.solver.variables.VariableFactory;
 
 public class TTest extends AbstractProblem {
@@ -17,7 +18,11 @@ public class TTest extends AbstractProblem {
 
     // variables
     public IntVar[] population;
-    public IntVar[] mean;
+    public IntVar mean;
+    
+    double precision = 1.e-4;
+    
+    double alpha = 0.1;
 
     public void setUp() {
         // read data
@@ -35,11 +40,16 @@ public class TTest extends AbstractProblem {
         population = new IntVar[populationSize];
         for(int i = 0; i < populationSize; i++)
         	population[i] = VariableFactory.bounded("sample "+i, data[i], data[i], solver);
-        mean = new IntVar[1];
-        mean[0] = VariableFactory.bounded("mean ", 0, 20, solver);
+        mean = VariableFactory.bounded("mean ", 0, 20, solver);
 
         //solver.post(IntConstraintFactory.arithmSt(population, "=", "MEAN", 0.95, mean));
-        solver.post(IntConstraintFactorySt.arithmSt(population, mean, "=", "MEAN", 0.95));
+        //solver.post(IntConstraintFactorySt.arithmSt(population, mean, "=", "MEAN", 0.95));
+        
+        StudentDist tDist = new StudentDist(populationSize - 1);
+        
+        RealVar t = VariableFactory.real("tStatistic", tDist.inverseF(alpha/2), tDist.inverseF(1-alpha/2), precision, solver);
+        
+        tStatistic.decompose(population, VariableFactory.real(mean, precision), t, precision);
     }
 
     private static IntVar[] mergeArrays(IntVar[] var1, IntVar[] var2){
@@ -51,9 +61,10 @@ public class TTest extends AbstractProblem {
     
     @Override
     public void configureSearch() {
-    	AbstractStrategy<IntVar> strat = IntStrategyFactory.domOverWDeg(mergeArrays(population,mean),2211);
+    	AbstractStrategy<IntVar> stratPop = IntStrategyFactory.domOverWDeg(population,2211);
+    	AbstractStrategy<IntVar> stratMean = IntStrategyFactory.domOverWDeg(new IntVar[]{mean},2211);
         // trick : top-down maximization
-        solver.set(strat);
+        solver.set(stratPop,stratMean);
     }
 
     @Override
@@ -65,12 +76,12 @@ public class TTest extends AbstractProblem {
     			/*for(int i = 0; i < population.length; i++){
     				st.append(population[i].getValue()+", ");
     			}*/
-    			st.append(mean[0].getValue()+", ");
+    			st.append(mean.getValue()+", ");
     		}else{
     			st.append("No solution!");
     		}
     	}while(solution = solver.nextSolution());
-    	LoggerFactory.getLogger("bench").info(st.toString());
+    	System.out.println(st.toString());
     }
 
     @Override

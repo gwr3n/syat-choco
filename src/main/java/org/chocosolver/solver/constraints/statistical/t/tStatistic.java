@@ -6,7 +6,6 @@ import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.constraints.nary.deviation.PooledVariance;
 import org.chocosolver.solver.constraints.nary.deviation.StandardError;
 import org.chocosolver.solver.constraints.nary.mean.Mean;
-import org.chocosolver.solver.constraints.real.Ibex;
 import org.chocosolver.solver.constraints.real.RealConstraint;
 import org.chocosolver.solver.variables.IntVar;
 import org.chocosolver.solver.variables.RealVar;
