@@ -27,8 +27,6 @@ package org.chocosolver.samples.statistical.inspectionscheduling;
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import org.slf4j.LoggerFactory;
-
 import org.chocosolver.samples.AbstractProblem;
 import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.constraints.IntConstraintFactorySt;
@@ -157,9 +155,9 @@ public class InspectionSchedulingSatisfaction extends AbstractProblem {
 				}
 				st.append("\n");
 			}
-	        LoggerFactory.getLogger("bench").info(st.toString());
-	        LoggerFactory.getLogger("bench").info("\n");
-	        LoggerFactory.getLogger("bench").info(schedule.toString());
+			System.out.println(st.toString());
+			System.out.println("\n");
+			System.out.println(schedule.toString());
 		}
 	}
 

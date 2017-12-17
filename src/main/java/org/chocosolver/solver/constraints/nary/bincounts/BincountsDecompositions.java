@@ -42,37 +42,6 @@ public class BincountsDecompositions {
    }
    
    /**
-    * Bincounts decomposition (Rossi, 2016) GCC replaced by a bincounts for sanity check
-    * 
-    * BEWARE : it is automatically posted (it cannot be reified)
-    * 
-    * @param valueVariables
-    * @param binVariables
-    * @param binBounds
-    */
-   public static void bincountsDecomposition1a(IntVar[] valueVariables, IntVar[] binVariables, int[] binBounds){
-      Solver solver = valueVariables[0].getSolver();
-      
-      IntVar[] valueOccurrenceVariables = new IntVar[binBounds[binBounds.length-1]-binBounds[0]];
-      int[] valuesArray = new int[binBounds[binBounds.length-1]-binBounds[0]+1];
-      for(int i = 0; i < valueOccurrenceVariables.length; i++){
-         valueOccurrenceVariables[i] = VariableFactory.bounded("Value Occurrence "+i, 0, valueVariables.length, solver);
-         valuesArray[i] = i + binBounds[0];
-      }
-      valuesArray[valuesArray.length-1] = binBounds[binBounds.length-1];
-      
-      for(int i = 0; i < binBounds.length - 1; i++){
-         IntVar[] binOccurrences = new IntVar[binBounds[i+1]-binBounds[i]];
-         System.arraycopy(valueOccurrenceVariables, binBounds[i]-binBounds[0], binOccurrences, 0, binBounds[i+1]-binBounds[i]);
-         solver.post(IntConstraintFactorySt.sum(binOccurrences, binVariables[i]));
-      }
-      
-      solver.post(IntConstraintFactorySt.sum(binVariables, VariableFactory.fixed(valueVariables.length, solver)));
-      
-      solver.post(IntConstraintFactorySt.bincounts(valueVariables, valueOccurrenceVariables, valuesArray, BincountsPropagatorType.EQFast));
-   }
-   
-   /**
     * Bincounts decomposition (Agkun, 2016) first decomposition 
     * 
     * BEWARE : it is automatically posted (it cannot be reified)

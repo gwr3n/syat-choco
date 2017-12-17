@@ -16,8 +16,6 @@ import org.chocosolver.solver.variables.IntVar;
 import org.chocosolver.solver.variables.VariableFactory;
 import org.chocosolver.util.iterators.DisposableValueIterator;
 
-import org.slf4j.LoggerFactory;
-
 public class BincountsDomainReduction extends AbstractProblem {
    public IntVar[] valueVariables;
    public IntVar[] binVariables;
@@ -256,8 +254,8 @@ public class BincountsDomainReduction extends AbstractProblem {
         else
            counter++;
         
-        LoggerFactory.getLogger("bench").info("Domain reduction: "+(1 - bc.getPercentRemainingValuesCount(values, binCounts)));
-        LoggerFactory.getLogger("bench").info("Time(sec): "+(timeAfter-timeBefore)*1e-9);
+        System.out.println("Domain reduction: "+(1 - bc.getPercentRemainingValuesCount(values, binCounts)));
+        System.out.println("Time(sec): "+(timeAfter-timeBefore)*1e-9);
         
         results.append(instance+"\t"+(1 - bc.getPercentRemainingValuesCount(values, binCounts))+"\t"+(timeAfter-timeBefore)*1e-9+"\n");
      }while(counter < instances);

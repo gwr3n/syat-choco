@@ -36,7 +36,7 @@ import gnu.trove.map.hash.THashMap;
  */
 public enum Operator {
 
-    NONE(-1), EQ(0), LT(1), GT(2), NQ(3), LE(4), GE(5), PL(6), MN(7), MEAN(8), DISTRIBUTION(9);
+    NONE(-1), EQ(0), LT(1), GT(2), NQ(3), LE(4), GE(5), PL(6), MN(7), DISTRIBUTION(9);
 
     int num;
 
@@ -56,7 +56,6 @@ public enum Operator {
         operators.put("!=", Operator.NQ);
         operators.put("+", Operator.PL);
         operators.put("-", Operator.MN);
-        operators.put("MEAN", Operator.MEAN);
         operators.put("DISTRIBUTION", Operator.DISTRIBUTION);
     }
 

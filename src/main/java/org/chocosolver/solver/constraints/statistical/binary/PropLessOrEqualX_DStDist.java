@@ -1,15 +1,9 @@
 package org.chocosolver.solver.constraints.statistical.binary;
 
-import gnu.trove.map.hash.THashMap;
-
-import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.constraints.Propagator;
 import org.chocosolver.solver.constraints.PropagatorPriority;
 import org.chocosolver.solver.exception.ContradictionException;
 import org.chocosolver.solver.exception.SolverException;
-import org.chocosolver.solver.explanations.Deduction;
-import org.chocosolver.solver.explanations.Explanation;
-import org.chocosolver.solver.explanations.ExplanationEngine;
 import org.chocosolver.solver.variables.IntVar;
 import org.chocosolver.solver.variables.events.IntEventType;
 import org.chocosolver.util.ESat;
@@ -76,7 +70,7 @@ public class PropLessOrEqualX_DStDist extends Propagator<IntVar> {
         	this.dist.setParameters(new double[]{this.dist.getVarParatemers()[0].getUB()});
 			KolmogorovSmirnovTest ksTest = new KolmogorovSmirnovTest(emp, this.dist, this.confidence);
 			while(!ksTest.testD1GeqE1()){
-				pivotVar.updateUpperBound(pivotVar.getUB()-1, aCause);
+				pivotVar.updateUpperBound(pivotVar.getUB()-1, this);
 				samples[0] = pivotVar.getUB();
 				emp = new EmpiricalDist(samples);
 				ksTest = new KolmogorovSmirnovTest(emp, this.dist, this.confidence);
@@ -92,7 +86,7 @@ public class PropLessOrEqualX_DStDist extends Propagator<IntVar> {
     	this.dist.setParameters(new double[]{this.dist.getVarParatemers()[0].getLB()});
     	KolmogorovSmirnovTest ksTest = new KolmogorovSmirnovTest(emp, this.dist, this.confidence);
     	while(!ksTest.testD1GeqE1()){
-    		pivotVar.updateLowerBound(pivotVar.getLB()+1, aCause);
+    		pivotVar.updateLowerBound(pivotVar.getLB()+1, this);
     		this.dist.setParameters(new double[]{this.dist.getVarParatemers()[0].getLB()});
     		ksTest = new KolmogorovSmirnovTest(emp, this.dist, this.confidence);
     	}
@@ -118,16 +112,6 @@ public class PropLessOrEqualX_DStDist extends Propagator<IntVar> {
     @Override
     public String toString() {
         return vars[0].getName() + " <= " + dist.toString();
-    }
-
-    @Override
-    public void explain(ExplanationEngine xengine, Deduction d, Explanation e) {
-    	throw new SolverException("Constraint duplication not implemented");
-    }
-    
-    @Override
-    public void duplicate(Solver solver, THashMap<Object, Object> identitymap) {
-        throw new SolverException("Constraint duplication not implemented");
     }
 }
 

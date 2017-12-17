@@ -1,15 +1,9 @@
 package org.chocosolver.solver.constraints.statistical.binary;
 
-import gnu.trove.map.hash.THashMap;
-
-import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.constraints.Propagator;
 import org.chocosolver.solver.constraints.PropagatorPriority;
 import org.chocosolver.solver.exception.ContradictionException;
 import org.chocosolver.solver.exception.SolverException;
-import org.chocosolver.solver.explanations.Deduction;
-import org.chocosolver.solver.explanations.Explanation;
-import org.chocosolver.solver.explanations.ExplanationEngine;
 import org.chocosolver.solver.variables.IntVar;
 import org.chocosolver.solver.variables.events.IntEventType;
 import org.chocosolver.util.ESat;
@@ -105,7 +99,7 @@ public final class PropNotEqualX_YStDist extends Propagator<IntVar> {
     			KolmogorovSmirnovTestTwoSamples ksTestXUBYLB = new KolmogorovSmirnovTestTwoSamples(empYLB, empXUB, this.confidence);
     			
     			if(ksTestXLBYUB.testE2GeqE1() && ksTestXUBYLB.testE2GeqE1()){
-    				pivotVar.removeValue(value, aCause);
+    				pivotVar.removeValue(value, this);
     			}	
         	}
         }
@@ -149,7 +143,7 @@ public final class PropNotEqualX_YStDist extends Propagator<IntVar> {
     			KolmogorovSmirnovTestTwoSamples ksTestXUBYLB = new KolmogorovSmirnovTestTwoSamples(empYLB, empXUB, this.confidence);
     			
     			if(ksTestXLBYUB.testE2GeqE1() && ksTestXUBYLB.testE2GeqE1()){
-    				pivotVar.removeValue(value, aCause);
+    				pivotVar.removeValue(value, this);
     			}	
         	}
         }
@@ -171,15 +165,5 @@ public final class PropNotEqualX_YStDist extends Propagator<IntVar> {
         StringBuilder bf = new StringBuilder();
         bf.append("prop(").append(vars[0].getName()).append(".GEQ.").append(vars[1].getName()).append(")");
         return bf.toString();
-    }
-
-    @Override
-    public void explain(ExplanationEngine xengine, Deduction d, Explanation e) {
-    	throw new SolverException("Constraint duplication not implemented");
-    }
-    
-    @Override
-    public void duplicate(Solver solver, THashMap<Object, Object> identitymap) {
-        throw new SolverException("Constraint duplication not implemented");
     }
 }

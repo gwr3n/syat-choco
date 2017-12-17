@@ -10,8 +10,6 @@ import org.chocosolver.solver.search.strategy.strategy.AbstractStrategy;
 import org.chocosolver.solver.variables.IntVar;
 import org.chocosolver.solver.variables.VariableFactory;
 
-import org.slf4j.LoggerFactory;
-
 public class Bincounts extends AbstractProblem {
   
    public IntVar[] valueVariables;
@@ -73,7 +71,7 @@ public class Bincounts extends AbstractProblem {
    
    @Override
    public void solve() {
-     LoggerFactory.getLogger("bench").info("---");
+     System.out.println("---");
      this.prettyOut();
      try {
       solver.propagate();
@@ -81,7 +79,7 @@ public class Bincounts extends AbstractProblem {
       // TODO Auto-generated catch block
       e.printStackTrace();
      }
-     LoggerFactory.getLogger("bench").info("---");
+     System.out.println("---");
      this.prettyOut();
      
      StringBuilder st = new StringBuilder();
@@ -101,7 +99,7 @@ public class Bincounts extends AbstractProblem {
            st.append("No solution!");
         }
      }while(solution = solver.nextSolution());
-     LoggerFactory.getLogger("bench").info(st.toString());
+     System.out.println(st.toString());
    }
    
    @Override
@@ -115,7 +113,7 @@ public class Bincounts extends AbstractProblem {
       for(int i = 0; i < binVariables.length; i++){
          st.append(binVariables[i].toString()+", ");
       }
-      LoggerFactory.getLogger("bench").info(st.toString());
+      System.out.println(st.toString());
    }
 
    public static void main(String[] args) {

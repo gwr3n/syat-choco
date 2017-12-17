@@ -1,15 +1,9 @@
 package org.chocosolver.solver.constraints.statistical.unary;
 
-import gnu.trove.map.hash.THashMap;
-
-import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.constraints.Propagator;
 import org.chocosolver.solver.constraints.PropagatorPriority;
 import org.chocosolver.solver.exception.ContradictionException;
 import org.chocosolver.solver.exception.SolverException;
-import org.chocosolver.solver.explanations.Deduction;
-import org.chocosolver.solver.explanations.Explanation;
-import org.chocosolver.solver.explanations.ExplanationEngine;
 import org.chocosolver.solver.variables.IntVar;
 import org.chocosolver.util.ESat;
 
@@ -77,7 +71,7 @@ public class PropNotEqualXCStDist extends Propagator<IntVar> {
     			KolmogorovSmirnovTest ksTestUB = new KolmogorovSmirnovTest(empUB, this.dist, this.confidence);
     			
     			if(ksTestLB.testD1GeqE1() && ksTestUB.testE1GeqD1()){
-    				pivotVar.removeValue(value, aCause);
+    				pivotVar.removeValue(value, this);
     			}
         	}
         }
@@ -103,17 +97,6 @@ public class PropNotEqualXCStDist extends Propagator<IntVar> {
     @Override
     public String toString() {
         return vars[0].getName() + " <= " + dist.toString();
-    }
-
-    @Override
-    public void explain(ExplanationEngine xengine, Deduction d, Explanation e) {
-        //e.add(xengine.getPropagatorActivation(this));
-        throw new SolverException("Constraint duplication not implemented");
-    }
-    
-    @Override
-    public void duplicate(Solver solver, THashMap<Object, Object> identitymap) {
-        throw new SolverException("Constraint duplication not implemented");
     }
 }
 
