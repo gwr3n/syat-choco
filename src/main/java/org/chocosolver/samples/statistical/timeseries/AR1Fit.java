@@ -18,7 +18,6 @@ import org.chocosolver.solver.variables.RealVar;
 import org.chocosolver.solver.variables.VF;
 import org.chocosolver.solver.variables.VariableFactory;
 import org.chocosolver.util.ESat;
-import org.slf4j.LoggerFactory;
 
 import umontreal.iro.lecuyer.probdist.ChiSquareDist;
 import umontreal.iro.lecuyer.probdist.PoissonDist;
@@ -115,7 +114,7 @@ public class AR1Fit extends AbstractProblem {
            st.append("No solution!");
         }
      //}while(solution = solver.nextSolution());
-     LoggerFactory.getLogger("bench").info(st.toString());
+     System.out.println(st.toString());
    }
 
    @Override

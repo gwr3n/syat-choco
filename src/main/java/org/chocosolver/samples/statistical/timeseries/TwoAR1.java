@@ -18,7 +18,6 @@ import org.chocosolver.solver.variables.RealVar;
 import org.chocosolver.solver.variables.VF;
 import org.chocosolver.solver.variables.VariableFactory;
 import org.chocosolver.util.ESat;
-import org.slf4j.LoggerFactory;
 
 import umontreal.iro.lecuyer.probdist.ChiSquareDist;
 import umontreal.iro.lecuyer.probdist.PoissonDist;
@@ -59,13 +58,13 @@ public class TwoAR1 extends AbstractProblem {
       this.significance = significance;
    }
    
-   RealVar chiSqStatistics1;
+   RealVar chiSqStatistics;
    
    RealVar[] allRV;
    
-   double precision = 0.05;
+   double precision = 0.2;
    
-   ChiSquareDist chiSqDist1;
+   ChiSquareDist chiSqDist;
    
    @Override
    public void createSolver() {
@@ -75,7 +74,7 @@ public class TwoAR1 extends AbstractProblem {
    @Override
    public void buildModel() {
       parameter1 = VariableFactory.real("Parameter 1", 0, 2, precision, solver);
-      constant1 = VariableFactory.real("Constant 1", 0, 20, precision, solver);
+      constant1 = VariableFactory.real("Constant 1", 0, 10, precision, solver);
       
       residual1 = new RealVar[this.observations1.length];
       for(int i = 0; i < this.residual1.length; i++){
@@ -89,7 +88,7 @@ public class TwoAR1 extends AbstractProblem {
       }
       
       parameter2 = VariableFactory.real("Parameter 2", 0, 2, precision, solver);
-      constant2 = VariableFactory.real("Constant 2", 0, 20, precision, solver);
+      constant2 = VariableFactory.real("Constant 2", 0, 10, precision, solver);
       
       residual2 = new RealVar[this.observations2.length];
       for(int i = 0; i < this.residual2.length; i++){
@@ -102,14 +101,14 @@ public class TwoAR1 extends AbstractProblem {
                ));
       }
       
-      this.chiSqDist1 = new ChiSquareDist((this.binBounds1.length - 1)*(this.binBounds2.length - 1));
+      this.chiSqDist = new ChiSquareDist((this.binBounds1.length - 1)*(this.binBounds2.length - 1));
       
       double[][] binBounds = new double[2][];
       binBounds[0] = this.binBounds1;
       binBounds[1] = this.binBounds2;
       
-      chiSqStatistics1 = VF.real("chiSqStatistics 1", 0, this.chiSqDist1.inverseF(1-significance), precision, solver);
-      ChiSquareIndependence.decomposition("chiSqTest 1", residual1, residual2, binBounds, chiSqStatistics1, precision, false);
+      chiSqStatistics = VF.real("chiSqStatistics", 0, this.chiSqDist.inverseF(1-significance), precision, solver);
+      ChiSquareIndependence.decomposition("chiSqTest", residual1, residual2, binBounds, chiSqStatistics, precision, true);
    }
    
    @Override
@@ -118,7 +117,7 @@ public class TwoAR1 extends AbstractProblem {
       solver.set(
             new RealStrategy(new RealVar[]{constant1,parameter1,constant2,parameter2}, new Cyclic(), new RealDomainMiddle()),
             //new RealStrategy(new RealVar[]{parameter1,parameter2,constant1,constant2,lambda1,lambda2}, new Cyclic(), new RealDomainMiddle()),
-            new RealStrategy(new RealVar[]{chiSqStatistics1}, new Cyclic(), new RealDomainMiddle())
+            new RealStrategy(new RealVar[]{chiSqStatistics}, new Cyclic(), new RealDomainMiddle())
             //new RealStrategy(residual1, new Cyclic(), new RealDomainMiddle())
        );
        //SearchMonitorFactory.limitTime(solver,10000);
@@ -127,7 +126,7 @@ public class TwoAR1 extends AbstractProblem {
    @Override
    public void solve() {
      StringBuilder st = new StringBuilder();
-     solver.findOptimalSolution(ResolutionPolicy.MINIMIZE, chiSqStatistics1, precision);
+     solver.findOptimalSolution(ResolutionPolicy.MINIMIZE, chiSqStatistics, precision);
      //do{
         st.append("---\n");
         if(solver.isFeasible() == ESat.TRUE) {
@@ -135,14 +134,14 @@ public class TwoAR1 extends AbstractProblem {
            st.append("\n");
            st.append("Curve 2: "+parameter2.toString()+" "+constant2.toString());
            st.append("\n");
-           st.append(chiSqStatistics1.getLB()+" "+chiSqStatistics1.getUB());
+           st.append(chiSqStatistics.getLB()+" "+chiSqStatistics.getUB());
            st.append("\n");
            feasibleCount++;
         }else{
            st.append("No solution!");
         }
      //}while(solution = solver.nextSolution());
-     LoggerFactory.getLogger("bench").info(st.toString());
+     System.out.println(st.toString());
    }
 
    @Override
@@ -172,7 +171,7 @@ public class TwoAR1 extends AbstractProblem {
       
       double[] observations2;
       
-      int nbObservations = 500;
+      int nbObservations = 100;
       
       double replications = 1;
       
@@ -188,9 +187,9 @@ public class TwoAR1 extends AbstractProblem {
          //Arrays.stream(observations2).forEach(k -> System.out.print(k+"\t"));
          System.out.println();
          
-         int bins = 13;
-         double[] binBounds1 = DoubleStream.iterate(0, i -> i + 2).limit(bins).toArray();
-         double[] binBounds2 = DoubleStream.iterate(0, i -> i + 2).limit(bins).toArray();
+         int bins = 4;
+         double[] binBounds1 = DoubleStream.iterate(0, i -> i + 3).limit(bins).toArray();
+         double[] binBounds2 = DoubleStream.iterate(0, i -> i + 3).limit(bins).toArray();
          double significance = 0.05;
       
          TwoAR1 regression = new TwoAR1(observations1, binBounds1, observations2, binBounds2, significance);
@@ -206,7 +205,7 @@ public class TwoAR1 extends AbstractProblem {
          
          System.out.println(feasibleCount/(k+1.0) + "(" + k + ")");
          try {
-            Thread.sleep(2000);
+            Thread.sleep(1000);
          } catch (InterruptedException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
