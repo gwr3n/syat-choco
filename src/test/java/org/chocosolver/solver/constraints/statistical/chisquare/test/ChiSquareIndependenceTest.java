@@ -134,7 +134,7 @@ public class ChiSquareIndependenceTest {
               assertTrue(chiSqstatisticVariable.getLB() <= 10+precision);
               assertTrue(chiSqstatisticVariable.getUB() >= 10-precision);
               
-              st.append(chiSqstatisticVariable.getLB()+" "+chiSqstatisticVariable.getUB() +"Roberto");
+              st.append(chiSqstatisticVariable.getLB()+" "+chiSqstatisticVariable.getUB());
            }else{
               st.append("No solution!");
               assertTrue(false);
