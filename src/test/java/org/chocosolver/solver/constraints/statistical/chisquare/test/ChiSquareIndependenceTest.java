@@ -96,7 +96,7 @@ public class ChiSquareIndependenceTest {
       
       @Override
       public void createSolver() {
-          solver = new Solver("ChiSquare");
+          solver = new Solver("ChiSquareInteger");
       }
       
       @Override
@@ -119,7 +119,7 @@ public class ChiSquareIndependenceTest {
          /*solver.set(
                IntStrategyFactory.activity(seriesA,1234),
                IntStrategyFactory.activity(seriesB,1234),
-               new RealStrategy(new RealVar[]{chiSqstatisticVariable}, new Cyclic(), new RealDomainMiddle())
+               RealStrategyFactory.cyclic_middle(new RealVar[]{chiSqstatisticVariable})
                );*/
       }
       
@@ -199,8 +199,8 @@ public class ChiSquareIndependenceTest {
       public void configureSearch() {    
          /*solver.set(
                RealStrategyFactory.cyclic_middle(seriesA),
-               RealStrategyFactory.cyclic_middle(seriesB)
-               //RealStrategyFactory.cyclic_middle(new RealVar[]{chiSqstatisticVariable})
+               RealStrategyFactory.cyclic_middle(seriesB),
+               RealStrategyFactory.cyclic_middle(new RealVar[]{chiSqstatisticVariable})
                );*/
       }
       
