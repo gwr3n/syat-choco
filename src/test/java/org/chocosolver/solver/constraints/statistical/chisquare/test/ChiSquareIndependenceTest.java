@@ -6,6 +6,7 @@ import org.chocosolver.samples.AbstractProblem;
 import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.constraints.statistical.chisquare.ChiSquareIndependence;
 import org.chocosolver.solver.search.strategy.IntStrategyFactory;
+import org.chocosolver.solver.search.strategy.RealStrategyFactory;
 import org.chocosolver.solver.search.strategy.selectors.values.RealDomainMiddle;
 import org.chocosolver.solver.search.strategy.selectors.variables.Cyclic;
 import org.chocosolver.solver.search.strategy.strategy.RealStrategy;
@@ -54,14 +55,13 @@ public class ChiSquareIndependenceTest {
       
       double[][] valuesA = {{3,3},{3,3},{1,1},{1,1},{2,2}};
       double[][] valuesB = {{1,1},{1,1},{2,2},{2,2},{3,3}};
-      int[] binCounts = {0,valuesA.length};
       double[][] binBounds = {{0.5,1.5,2.5,3.5},{0.5,1.5,2.5,3.5}};
       double confidence = 0.95;
       double chiSqUB = new ChiSquareDist((binBounds[0].length-1)*(binBounds[1].length-1)).inverseF(confidence);
       
       double[] chiSqStatistic = {0,chiSqUB};
       
-      ChiSquareIndependenceReal cs = new ChiSquareIndependenceReal(valuesA, valuesB, binCounts, binBounds, chiSqStatistic);
+      ChiSquareIndependenceReal cs = new ChiSquareIndependenceReal(valuesA, valuesB, binBounds, chiSqStatistic);
       cs.execute(str);
    }
 
@@ -116,11 +116,11 @@ public class ChiSquareIndependenceTest {
       
       @Override
       public void configureSearch() {         
-         solver.set(
+         /*solver.set(
                IntStrategyFactory.activity(seriesA,1234),
                IntStrategyFactory.activity(seriesB,1234),
                new RealStrategy(new RealVar[]{chiSqstatisticVariable}, new Cyclic(), new RealDomainMiddle())
-               );
+               );*/
       }
       
       @Override
@@ -131,8 +131,8 @@ public class ChiSquareIndependenceTest {
            st.append("---\n");
            if(solution) {
               
-              assertTrue(chiSqstatisticVariable.getLB() <= 10);
-              assertTrue(chiSqstatisticVariable.getUB() >= 9);
+              assertTrue(chiSqstatisticVariable.getLB() <= 10+precision);
+              assertTrue(chiSqstatisticVariable.getUB() >= 10-precision);
               
               st.append(chiSqstatisticVariable.getLB()+" "+chiSqstatisticVariable.getUB());
            }else{
@@ -159,7 +159,6 @@ public class ChiSquareIndependenceTest {
       
       double[][] valuesA;
       double[][] valuesB;
-      int[] binCounts;
       double[][] binBounds;
       
       double[] chiSqStatistic;
@@ -168,19 +167,17 @@ public class ChiSquareIndependenceTest {
       
       public ChiSquareIndependenceReal(double[][] valuesA,
                                        double[][] valuesB, 
-                                       int[] binCounts,
                                        double[][] binBounds,
                                        double[] chiSqStatistic){
          this.valuesA = valuesA.clone();
          this.valuesB = valuesB.clone();
-         this.binCounts = binCounts.clone();
          this.binBounds = binBounds.clone();
          this.chiSqStatistic = chiSqStatistic.clone();
       }
       
       @Override
       public void createSolver() {
-          solver = new Solver("ChiSquare");
+          solver = new Solver("ChiSquareReal");
       }
       
       @Override
@@ -199,12 +196,12 @@ public class ChiSquareIndependenceTest {
       }
       
       @Override
-      public void configureSearch() {         
-         solver.set(
-               new RealStrategy(seriesA, new Cyclic(), new RealDomainMiddle()),
-               new RealStrategy(seriesB, new Cyclic(), new RealDomainMiddle()),
-               new RealStrategy(new RealVar[]{chiSqstatisticVariable}, new Cyclic(), new RealDomainMiddle())
-               );
+      public void configureSearch() {    
+         /*solver.set(
+               RealStrategyFactory.cyclic_middle(seriesA),
+               RealStrategyFactory.cyclic_middle(seriesB)
+               //RealStrategyFactory.cyclic_middle(new RealVar[]{chiSqstatisticVariable})
+               );*/
       }
       
       @Override
@@ -215,8 +212,8 @@ public class ChiSquareIndependenceTest {
            st.append("---\n");
            if(solution) {
 
-              assertTrue(chiSqstatisticVariable.getLB() <= 10);
-              assertTrue(chiSqstatisticVariable.getUB() >= 9);
+              assertTrue(chiSqstatisticVariable.getLB() <= 10+precision);
+              assertTrue(chiSqstatisticVariable.getUB() >= 10-precision);
               
               st.append(chiSqstatisticVariable.getLB()+" "+chiSqstatisticVariable.getUB());
            }else{

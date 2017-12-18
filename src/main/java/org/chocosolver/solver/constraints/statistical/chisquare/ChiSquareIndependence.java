@@ -30,12 +30,14 @@ public class ChiSquareIndependence {
       
       int observations = seriesA.length;
 
-      IntVar[][] binVariables = new IntVar[binBounds[0].length - 1][binBounds[1].length - 1];
+      IntVar[][] binVariables = VariableFactory.boundedMatrix("BinMatrix", binBounds[0].length - 1, binBounds[1].length - 1, 0, observations, solver);
+      
+      /*      new IntVar[binBounds[0].length - 1][binBounds[1].length - 1];
       for(int i = 0; i < binVariables.length; i++){
          for(int j = 0; j < binVariables[0].length; j++){
             binVariables[i][j] = VariableFactory.bounded(name+"_Bin "+(i+1)+","+(j+1), 0, observations, solver);
          }
-      }
+      }*/
       
       IntVar[] marginalsH = VariableFactory.boundedArray(name+"_Marginals H", binVariables.length, 0, observations, solver);
       
@@ -84,17 +86,19 @@ public class ChiSquareIndependence {
                                     RealVar statistic,
                                     double precision,
                                     boolean allowOutOfBinObservations){
+      
       Solver solver = statistic.getSolver();
 
       int observations = seriesA.length;
 
-      IntVar[][] binVariables = new IntVar[binBounds[0].length - 1][binBounds[1].length - 1];
+      IntVar[][] binVariables = VariableFactory.boundedMatrix("BinMatrix", binBounds[0].length - 1, binBounds[1].length - 1, 0, observations, solver);
+            /*new IntVar[binBounds[0].length - 1][binBounds[1].length - 1];
       for(int i = 0; i < binVariables.length; i++){
          for(int j = 0; j < binVariables[0].length; j++){
             binVariables[i][j] = VariableFactory.bounded(name+"_Bin "+(i+1)+","+(j+1), 0, observations, solver);
          }
-      }
-
+      }*/
+      
       IntVar[] marginalsH = VariableFactory.boundedArray(name+"_Marginals H", binVariables.length, 0, observations, solver);
 
       IntVar[] marginalsV = VariableFactory.boundedArray(name+"_Marginals V", binVariables[0].length, 0, observations, solver);
@@ -126,10 +130,14 @@ public class ChiSquareIndependence {
          }
       }
 
+      RealVar[] flattenedBinsReal = VariableFactory.real(flattenedBins, precision);
+      RealVar[] marginalsHReal = VariableFactory.real(marginalsH, precision);
+      RealVar[] marginalsVReal = VariableFactory.real(marginalsV, precision);
+      
       RealVar[] allRealVariables = new RealVar[flattenedBins.length + binVariables.length + binVariables[0].length + 1];
-      System.arraycopy(VF.real(flattenedBins, precision), 0, allRealVariables, 0, flattenedBins.length);
-      System.arraycopy(VF.real(marginalsH, precision), 0, allRealVariables, flattenedBins.length, marginalsH.length);
-      System.arraycopy(VF.real(marginalsV, precision), 0, allRealVariables, flattenedBins.length + marginalsH.length, marginalsV.length);
+      System.arraycopy(flattenedBinsReal, 0, allRealVariables, 0, flattenedBins.length);
+      System.arraycopy(marginalsHReal, 0, allRealVariables, flattenedBins.length, marginalsH.length);
+      System.arraycopy(marginalsVReal, 0, allRealVariables, flattenedBins.length + marginalsH.length, marginalsV.length);
       allRealVariables[flattenedBins.length + binVariables.length + binVariables[0].length] = statistic;
 
       solver.post(new RealConstraint(name, chiSqExp, Ibex.HC4_NEWTON, allRealVariables));
