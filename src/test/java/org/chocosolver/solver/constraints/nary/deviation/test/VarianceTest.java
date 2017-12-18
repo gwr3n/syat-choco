@@ -25,6 +25,8 @@ public class VarianceTest {
 
    @After
    public void tearDown() throws Exception {
+      System.gc();
+      Thread.sleep(1000);
    }
 
    @Test

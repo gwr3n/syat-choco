@@ -109,40 +109,16 @@ public class ChiSquareIndependenceTest {
          for(int i = 0; i < this.valuesB.length; i++)
             seriesB[i] = VariableFactory.enumerated("Value B"+(i+1), valuesB[i], solver);
          
-         /*binVariables = new IntVar[this.binBounds[0].length - 1][this.binBounds[1].length - 1];
-         for(int i = 0; i < this.binVariables.length; i++){
-            for(int j = 0; j < this.binVariables[0].length; j++){
-               binVariables[i][j] = VariableFactory.bounded("Bin "+(i+1)+","+(j+1), this.binCounts[0], this.binCounts[1], solver);
-            }
-         }
-         
-         marginalsH = VariableFactory.boundedArray("Marginals H", binVariables.length, 0, seriesA.length, solver);
-         
-         marginalsV = VariableFactory.boundedArray("Marginals V", binVariables[0].length, 0, seriesA.length, solver);
-         
-         ContingencyDecompositions.decomposition(seriesA, seriesB, binVariables, binBounds, marginalsH, marginalsV);*/
-         
          chiSqstatisticVariable = VF.real("chiSqStatistics", chiSqStatistic[0], chiSqStatistic[1], precision, solver);
          
-         //ChiSquareIndependence.decomposition("chiSqConstraint", seriesA.length, binVariables, marginalsH, marginalsV, chiSqstatisticVariable, precision);
          ChiSquareIndependence.decomposition("chiSqConstraint", seriesA, seriesB, this.binBounds, chiSqstatisticVariable, precision, false);
       }
       
       @Override
-      public void configureSearch() {
-         /*IntVar[] flattenedBins = new IntVar[binVariables.length*binVariables[0].length];
-         for(int i = 0; i < binVariables.length; i++){
-            for(int j = 0; j < binVariables[0].length; j++){
-               flattenedBins[binVariables[0].length*i + j] = binVariables[i][j]; 
-            }
-         }*/
-         
+      public void configureSearch() {         
          solver.set(
                IntStrategyFactory.activity(seriesA,1234),
                IntStrategyFactory.activity(seriesB,1234),
-               //IntStrategyFactory.activity(flattenedBins,1234),
-               //IntStrategyFactory.activity(marginalsH,1234),
-               //IntStrategyFactory.activity(marginalsV,1234),
                new RealStrategy(new RealVar[]{chiSqstatisticVariable}, new Cyclic(), new RealDomainMiddle())
                );
       }
@@ -154,20 +130,6 @@ public class ChiSquareIndependenceTest {
         //do{
            st.append("---\n");
            if(solution) {
-              /*for(int i = 0; i < valueVariables.length; i++){
-                 st.append("("+valueVariables[i].getLB()+", "+valueVariables[i].getUB()+"), ");
-              }
-              st.append("\n");
-              for(int i = 0; i < binVariables.length; i++){
-                 st.append(binVariables[i].getValue()+", ");
-              }
-              st.append("\n");
-              st.append(meanVariable.getLB()+" "+meanVariable.getUB());
-              st.append("\n");
-              st.append(stdVariable.getLB()+" "+stdVariable.getUB());
-              st.append("\n");
-              st.append(chiSqstatisticVariable.getLB()+" "+chiSqstatisticVariable.getUB());
-              st.append("\n");*/
               
               assertTrue(chiSqstatisticVariable.getLB() <= 10);
               assertTrue(chiSqstatisticVariable.getUB() >= 9);
@@ -175,6 +137,7 @@ public class ChiSquareIndependenceTest {
               st.append(chiSqstatisticVariable.getLB()+" "+chiSqstatisticVariable.getUB());
            }else{
               st.append("No solution!");
+              assertTrue(false);
            }
         //}while(solution = solver.nextSolution());
         System.out.println(st.toString());
@@ -230,40 +193,16 @@ public class ChiSquareIndependenceTest {
          for(int i = 0; i < this.valuesB.length; i++)
             seriesB[i] = VariableFactory.real("Value B"+(i+1), valuesB[i][0], valuesB[i][1], precision, solver);
          
-         /*binVariables = new IntVar[this.binBounds[0].length - 1][this.binBounds[1].length - 1];
-         for(int i = 0; i < this.binVariables.length; i++){
-            for(int j = 0; j < this.binVariables[0].length; j++){
-               binVariables[i][j] = VariableFactory.bounded("Bin "+(i+1)+","+(j+1), this.binCounts[0], this.binCounts[1], solver);
-            }
-         }
-         
-         marginalsH = VariableFactory.boundedArray("Marginals H", binVariables.length, 0, seriesA.length, solver);
-         
-         marginalsV = VariableFactory.boundedArray("Marginals V", binVariables[0].length, 0, seriesA.length, solver);
-         
-         ContingencyDecompositions.decomposition(seriesA, seriesB, binVariables, binBounds, marginalsH, marginalsV);*/
-         
          chiSqstatisticVariable = VF.real("chiSqStatistics", chiSqStatistic[0], chiSqStatistic[1], precision, solver);
          
-         //ChiSquareIndependence.decomposition("chiSqConstraint", seriesA.length, binVariables, marginalsH, marginalsV, chiSqstatisticVariable, precision);
          ChiSquareIndependence.decomposition("chiSqConstraint", seriesA, seriesB, this.binBounds, chiSqstatisticVariable, precision, false);
       }
       
       @Override
-      public void configureSearch() {
-         /*IntVar[] flattenedBins = new IntVar[binVariables.length*binVariables[0].length];
-         for(int i = 0; i < binVariables.length; i++){
-            for(int j = 0; j < binVariables[0].length; j++){
-               flattenedBins[binVariables[0].length*i + j] = binVariables[i][j]; 
-            }
-         }*/
-         
+      public void configureSearch() {         
          solver.set(
                new RealStrategy(seriesA, new Cyclic(), new RealDomainMiddle()),
                new RealStrategy(seriesB, new Cyclic(), new RealDomainMiddle()),
-               //IntStrategyFactory.activity(flattenedBins,1234),
-               //IntStrategyFactory.activity(marginalsH,1234),
-               //IntStrategyFactory.activity(marginalsV,1234),
                new RealStrategy(new RealVar[]{chiSqstatisticVariable}, new Cyclic(), new RealDomainMiddle())
                );
       }
@@ -275,27 +214,14 @@ public class ChiSquareIndependenceTest {
         //do{
            st.append("---\n");
            if(solution) {
-              /*for(int i = 0; i < valueVariables.length; i++){
-                 st.append("("+valueVariables[i].getLB()+", "+valueVariables[i].getUB()+"), ");
-              }
-              st.append("\n");
-              for(int i = 0; i < binVariables.length; i++){
-                 st.append(binVariables[i].getValue()+", ");
-              }
-              st.append("\n");
-              st.append(meanVariable.getLB()+" "+meanVariable.getUB());
-              st.append("\n");
-              st.append(stdVariable.getLB()+" "+stdVariable.getUB());
-              st.append("\n");
-              st.append(chiSqstatisticVariable.getLB()+" "+chiSqstatisticVariable.getUB());
-              st.append("\n");*/
-              
+
               assertTrue(chiSqstatisticVariable.getLB() <= 10);
               assertTrue(chiSqstatisticVariable.getUB() >= 9);
               
               st.append(chiSqstatisticVariable.getLB()+" "+chiSqstatisticVariable.getUB());
            }else{
               st.append("No solution!");
+              assertTrue(false);
            }
         //}while(solution = solver.nextSolution());
         System.out.println(st.toString());

@@ -6,6 +6,7 @@ import org.chocosolver.samples.AbstractProblem;
 import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.constraints.nary.deviation.StandardDeviation;
 import org.chocosolver.solver.search.strategy.IntStrategyFactory;
+import org.chocosolver.solver.search.strategy.RealStrategyFactory;
 import org.chocosolver.solver.search.strategy.strategy.AbstractStrategy;
 import org.chocosolver.solver.variables.IntVar;
 import org.chocosolver.solver.variables.RealVar;
@@ -22,15 +23,27 @@ public class StandardDeviationTest {
 
    @After
    public void tearDown() throws Exception {
+      System.gc();
+      Thread.sleep(1000);
    }
 
    @Test
-   public void test() {
+   public void testInteger() {
       String[] str={"-log","SOLUTION"};
       
       int[][] values = {{1},{2},{3},{4},{5},{6},{7},{8},{9}}; 
       
       IntegerStandardDeviation standardDeviation = new IntegerStandardDeviation(values, new double[]{0,100});
+      standardDeviation.execute(str);
+   }
+   
+   @Test
+   public void testReal() {
+      String[] str={"-log","SOLUTION"};
+      
+      double[][] values = {{1},{2},{3},{4},{5},{6},{7},{8},{9}}; 
+      
+      RealStandardDeviation standardDeviation = new RealStandardDeviation(values, new double[]{0,100});
       standardDeviation.execute(str);
    }
 
@@ -50,7 +63,7 @@ public class StandardDeviationTest {
       
       @Override
       public void createSolver() {
-          solver = new Solver("StandardDeviation");
+          solver = new Solver("IntegerStandardDeviation");
       }
       
       @Override
@@ -78,6 +91,70 @@ public class StandardDeviationTest {
            if(solution) {
               for(int i = 0; i < valueVariables.length; i++){
                  st.append(valueVariables[i].getValue()+", ");
+              }
+              st.append("\n");
+              st.append(standardDeviationVariable.getLB()+" "+standardDeviationVariable.getUB());
+              st.append("\n");
+              
+              assertTrue(standardDeviationVariable.getLB() <= Math.sqrt(7.5));
+              assertTrue(standardDeviationVariable.getUB() >= Math.sqrt(7.5));
+           }else{
+              st.append("No solution!");
+           }
+        //}while(solution = solver.nextSolution());
+        System.out.println(st.toString());
+      }
+      
+      @Override
+      public void prettyOut() {
+          
+      }
+   }
+   
+   class RealStandardDeviation extends AbstractProblem {
+      public RealVar[] valueVariables;
+      public RealVar standardDeviationVariable;
+      
+      public double[][] values;
+      public double[] standardDeviation;
+      
+      double precision = 1.e-4;
+      
+      public RealStandardDeviation(double[][] values, double[] standardDeviation){
+         this.values = values;
+         this.standardDeviation = standardDeviation;
+      }
+      
+      @Override
+      public void createSolver() {
+          solver = new Solver("RealStandardDeviation");
+      }
+      
+      @Override
+      public void buildModel() {
+         valueVariables = new RealVar[this.values.length];
+         for(int i = 0; i < this.values.length; i++)
+            valueVariables[i] = VariableFactory.real("Value"+(i+1), values[i][0], values[i][0], precision, solver);
+         
+         standardDeviationVariable = VariableFactory.real("StandardDeviation", standardDeviation[0], standardDeviation[1], precision, solver);
+         
+         StandardDeviation.decompose("StandardDeviationConstraint", valueVariables, standardDeviationVariable, precision);
+      }
+      
+      public void configureSearch() {
+         AbstractStrategy<RealVar> strat = RealStrategyFactory.cyclic_middle(valueVariables);
+         solver.set(strat);
+      }
+    
+      @Override
+      public void solve() {
+        StringBuilder st = new StringBuilder();
+        boolean solution = solver.findSolution();
+        //do{
+           st.append("---\n");
+           if(solution) {
+              for(int i = 0; i < valueVariables.length; i++){
+                 st.append("("+valueVariables[i].getLB()+","+valueVariables[i].getUB()+"), ");
               }
               st.append("\n");
               st.append(standardDeviationVariable.getLB()+" "+standardDeviationVariable.getUB());
