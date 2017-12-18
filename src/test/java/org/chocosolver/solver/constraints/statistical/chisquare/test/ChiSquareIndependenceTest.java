@@ -115,7 +115,7 @@ public class ChiSquareIndependenceTest {
       }
       
       @Override
-      public void configureSearch() {         
+      public void configureSearch() {  
          /*solver.set(
                IntStrategyFactory.activity(seriesA,1234),
                IntStrategyFactory.activity(seriesB,1234),
@@ -134,7 +134,7 @@ public class ChiSquareIndependenceTest {
               assertTrue(chiSqstatisticVariable.getLB() <= 10+precision);
               assertTrue(chiSqstatisticVariable.getUB() >= 10-precision);
               
-              st.append(chiSqstatisticVariable.getLB()+" "+chiSqstatisticVariable.getUB());
+              st.append(chiSqstatisticVariable.getLB()+" "+chiSqstatisticVariable.getUB() +"Roberto");
            }else{
               st.append("No solution!");
               assertTrue(false);

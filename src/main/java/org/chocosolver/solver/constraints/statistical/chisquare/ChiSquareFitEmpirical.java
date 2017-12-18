@@ -17,6 +17,7 @@ public class ChiSquareFitEmpirical {
                                     IntVar[] targetFrequencies,
                                     RealVar statistic, 
                                     double precision){
+      
       Solver solver = statistic.getSolver();
 
       //RealVar[] realBinViews = VF.real(binCounts, precision);
@@ -47,6 +48,7 @@ public class ChiSquareFitEmpirical {
                                     IntVar[] targetFrequencies,
                                     RealVar statistic, 
                                     double precision){
+      
       Solver solver = statistic.getSolver();
 
       //solver.post(IntConstraintFactorySt.bincounts(observations, binCounts, binBounds, BincountsPropagatorType.EQFast));

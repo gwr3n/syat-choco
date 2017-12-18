@@ -26,6 +26,7 @@ public class ChiSquareIndependence {
                                     RealVar statistic,
                                     double precision,
                                     boolean allowOutOfBinObservations){
+      
       Solver solver = statistic.getSolver();
       
       int observations = seriesA.length;
