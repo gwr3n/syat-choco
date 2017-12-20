@@ -1,4 +1,4 @@
-package org.chocosolver.solver.constraints.statistical.unary;
+package org.chocosolver.solver.constraints.statistical.kolmogorovsmirnov;
 
 import org.chocosolver.solver.constraints.Propagator;
 import org.chocosolver.solver.constraints.PropagatorPriority;
@@ -6,13 +6,11 @@ import org.chocosolver.solver.exception.ContradictionException;
 import org.chocosolver.solver.exception.SolverException;
 import org.chocosolver.solver.variables.IntVar;
 import org.chocosolver.util.ESat;
+import org.syat.statistics.KolmogorovSmirnovTest;
 
 import umontreal.iro.lecuyer.probdist.ContinuousDistribution;
 import umontreal.iro.lecuyer.probdist.Distribution;
 import umontreal.iro.lecuyer.probdist.EmpiricalDist;
-
-import org.chocosolver.util.iterators.DisposableValueIterator;
-import org.syat.statistics.KolmogorovSmirnovTest;
 
 /**
  * X <= C
@@ -22,12 +20,12 @@ import org.syat.statistics.KolmogorovSmirnovTest;
  * @since 16/06/11
  */
 @SuppressWarnings("serial")
-public class PropNotEqualXCStDist extends Propagator<IntVar> {
+public class PropLessOrEqualXCStDist extends Propagator<IntVar> {
 
 	private final Distribution dist;
     private final double confidence;
 
-    public PropNotEqualXCStDist(IntVar[] var, Distribution dist, double confidence) {
+    public PropLessOrEqualXCStDist(IntVar[] var, Distribution dist, double confidence) {
         super(var, PropagatorPriority.UNARY, true);
         if(!(dist instanceof ContinuousDistribution)) 
 			throw new SolverException("Theoretical distribution should not be discrete");
@@ -42,39 +40,30 @@ public class PropNotEqualXCStDist extends Propagator<IntVar> {
             this.setPassive();
         }*/
         
+    	//int counter = 0;
         for(int i = 0; i < vars.length; i++){
-        	double[] samplesLB = new double[vars.length];
-        	int k = 1;
-        	for(int j = 0; j < vars.length; j++){
-        		if(j==i) 
-        			continue;
-        		else
-        			samplesLB[k++] = vars[j].getLB();
-        	}
-        	double[] samplesUB = new double[vars.length];
-        	k = 1;
-        	for(int j = 0; j < vars.length; j++){
-        		if(j==i) 
-        			continue;
-        		else
-        			samplesUB[k++] = vars[j].getUB();
-        	}
-        	
+        	double[] samples = new double[vars.length];
         	IntVar pivotVar = vars[i];
-        	DisposableValueIterator iterator = pivotVar.getValueIterator(true);
-        	while(iterator.hasNext()){
-        		int value = iterator.next();
-        		samplesLB[0] = samplesUB[0] = value;
-        		EmpiricalDist empLB = new EmpiricalDist(samplesLB);
-        		KolmogorovSmirnovTest ksTestLB = new KolmogorovSmirnovTest(empLB, this.dist, this.confidence);
-    			EmpiricalDist empUB = new EmpiricalDist(samplesUB);
-    			KolmogorovSmirnovTest ksTestUB = new KolmogorovSmirnovTest(empUB, this.dist, this.confidence);
-    			
-    			if(ksTestLB.testD1GeqE1() && ksTestUB.testE1GeqD1()){
-    				pivotVar.removeValue(value, this);
-    			}
+        	int k = 0;
+        	samples[k++] = pivotVar.getUB();
+        	for(int j = 0; j < vars.length; j++){
+        		if(j==i) 
+        			continue;
+        		else
+        			samples[k++] = vars[j].getLB();
         	}
+        	EmpiricalDist emp = new EmpiricalDist(samples);
+        	KolmogorovSmirnovTest ksTest = new KolmogorovSmirnovTest(emp, this.dist, this.confidence);
+			while(!ksTest.testD1GeqE1()){
+				pivotVar.updateUpperBound(pivotVar.getUB()-1, this);
+				//counter++;
+				samples[0] = pivotVar.getUB();
+				emp = new EmpiricalDist(samples);
+				ksTest = new KolmogorovSmirnovTest(emp, this.dist, this.confidence);
+			}
         }
+        //if(counter > 0)
+        	//LoggerFactory.getLogger("bench").info("Pruned (LE): "+counter);
     }
 
     @Override
@@ -93,11 +82,10 @@ public class PropNotEqualXCStDist extends Propagator<IntVar> {
         return ESat.UNDEFINED;*/
     	return ESat.UNDEFINED;
     }
-
+    
     @Override
     public String toString() {
-        return vars[0].getName() + " <= " + dist.toString();
+        return vars[0].getName() + " >= " + dist.toString();
     }
 }
-
 

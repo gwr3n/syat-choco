@@ -9,14 +9,14 @@ import org.chocosolver.solver.variables.statistical.distributions.DistributionVa
 
 import umontreal.iro.lecuyer.probdist.Distribution;
 
-import org.chocosolver.solver.constraints.statistical.binary.PropGreaterOrEqualX_DStDist;
-import org.chocosolver.solver.constraints.statistical.binary.PropGreaterOrEqualX_YStDist;
-import org.chocosolver.solver.constraints.statistical.binary.PropLessOrEqualX_DStDist;
-import org.chocosolver.solver.constraints.statistical.binary.PropNotEqualX_DStDist;
-import org.chocosolver.solver.constraints.statistical.binary.PropNotEqualX_YStDist;
-import org.chocosolver.solver.constraints.statistical.unary.PropGreaterOrEqualXCStDist;
-import org.chocosolver.solver.constraints.statistical.unary.PropLessOrEqualXCStDist;
-import org.chocosolver.solver.constraints.statistical.unary.PropNotEqualXCStDist;
+import org.chocosolver.solver.constraints.statistical.kolmogorovsmirnov.PropGreaterOrEqualXCStDist;
+import org.chocosolver.solver.constraints.statistical.kolmogorovsmirnov.PropGreaterOrEqualX_DStDist;
+import org.chocosolver.solver.constraints.statistical.kolmogorovsmirnov.PropGreaterOrEqualX_YStDist;
+import org.chocosolver.solver.constraints.statistical.kolmogorovsmirnov.PropLessOrEqualXCStDist;
+import org.chocosolver.solver.constraints.statistical.kolmogorovsmirnov.PropLessOrEqualX_DStDist;
+import org.chocosolver.solver.constraints.statistical.kolmogorovsmirnov.PropNotEqualXCStDist;
+import org.chocosolver.solver.constraints.statistical.kolmogorovsmirnov.PropNotEqualX_DStDist;
+import org.chocosolver.solver.constraints.statistical.kolmogorovsmirnov.PropNotEqualX_YStDist;
 
 /**
  * A constraint dedicated to arithmetic operations.

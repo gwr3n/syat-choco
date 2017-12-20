@@ -1,4 +1,4 @@
-package org.chocosolver.solver.constraints.statistical.binary;
+package org.chocosolver.solver.constraints.statistical.kolmogorovsmirnov;
 
 import org.chocosolver.solver.constraints.Propagator;
 import org.chocosolver.solver.constraints.PropagatorPriority;
@@ -21,7 +21,7 @@ import umontreal.iro.lecuyer.probdist.EmpiricalDist;
  * @since 16/06/11
  */
 @SuppressWarnings("serial")
-public class PropLessOrEqualX_DStDist extends Propagator<IntVar> {
+public class PropGreaterOrEqualX_DStDist extends Propagator<IntVar> {
 
     private final DistributionVar dist;
     private final double confidence;
@@ -33,7 +33,7 @@ public class PropLessOrEqualX_DStDist extends Propagator<IntVar> {
     	return var3;
     }
     
-    public PropLessOrEqualX_DStDist(IntVar[] var, DistributionVar dist, double confidence) {
+    public PropGreaterOrEqualX_DStDist(IntVar[] var, DistributionVar dist, double confidence) {
         super(mergeArrays(var,dist.getVarParatemers()), PropagatorPriority.BINARY, true);
         if(!(dist instanceof ContinuousDistribution)) 
 			throw new SolverException("Theoretical distribution should not be discrete");
@@ -45,7 +45,11 @@ public class PropLessOrEqualX_DStDist extends Propagator<IntVar> {
 
     @Override
     public int getPropagationConditions(int vIdx) {
-        return IntEventType.INSTANTIATE.getMask() + IntEventType.BOUND.getMask();
+    	if (vIdx == 0) {
+            return IntEventType.INSTANTIATE.getMask() + IntEventType.DECUPP.getMask();
+        } else {
+            return IntEventType.INSTANTIATE.getMask() + IntEventType.INCLOW.getMask();
+        }
     }
 
     @Override
@@ -59,35 +63,35 @@ public class PropLessOrEqualX_DStDist extends Propagator<IntVar> {
         	double[] samples = new double[vars.length];
         	IntVar pivotVar = vars[i];
         	int k = 0;
-        	samples[k++] = pivotVar.getUB();
+        	samples[k++] = pivotVar.getLB();
         	for(int j = 0; j < vars.length; j++){
         		if(j==i) 
         			continue;
         		else
-        			samples[k++] = vars[j].getLB();
+        			samples[k++] = vars[j].getUB();
         	}
         	EmpiricalDist emp = new EmpiricalDist(samples);
-        	this.dist.setParameters(new double[]{this.dist.getVarParatemers()[0].getUB()});
+        	this.dist.setParameters(new double[]{this.dist.getVarParatemers()[0].getLB()});
 			KolmogorovSmirnovTest ksTest = new KolmogorovSmirnovTest(emp, this.dist, this.confidence);
-			while(!ksTest.testD1GeqE1()){
-				pivotVar.updateUpperBound(pivotVar.getUB()-1, this);
-				samples[0] = pivotVar.getUB();
+			while(!ksTest.testE1GeqD1()){
+				pivotVar.updateLowerBound(pivotVar.getLB()+1, this);
+				samples[0] = pivotVar.getLB();
 				emp = new EmpiricalDist(samples);
 				ksTest = new KolmogorovSmirnovTest(emp, this.dist, this.confidence);
-			}
+			}			
         }
         
         double[] samples = new double[vars.length];
     	for(int j = 0; j < vars.length; j++){
-    		samples[j] = vars[j].getLB();
+    		samples[j] = vars[j].getUB();
     	}
     	EmpiricalDist emp = new EmpiricalDist(samples);
     	IntVar pivotVar = dist.getVarParatemers()[0];
-    	this.dist.setParameters(new double[]{this.dist.getVarParatemers()[0].getLB()});
+    	this.dist.setParameters(new double[]{this.dist.getVarParatemers()[0].getUB()});
     	KolmogorovSmirnovTest ksTest = new KolmogorovSmirnovTest(emp, this.dist, this.confidence);
-    	while(!ksTest.testD1GeqE1()){
-    		pivotVar.updateLowerBound(pivotVar.getLB()+1, this);
-    		this.dist.setParameters(new double[]{this.dist.getVarParatemers()[0].getLB()});
+    	while(!ksTest.testE1GeqD1()){
+    		pivotVar.updateUpperBound(pivotVar.getUB()-1, this);
+    		this.dist.setParameters(new double[]{this.dist.getVarParatemers()[0].getUB()});
     		ksTest = new KolmogorovSmirnovTest(emp, this.dist, this.confidence);
     	}
     }
