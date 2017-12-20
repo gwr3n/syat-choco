@@ -5,7 +5,6 @@ import static org.junit.Assert.*;
 import org.chocosolver.samples.AbstractProblem;
 import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.constraints.statistical.chisquare.ChiSquareIndependence;
-import org.chocosolver.solver.search.strategy.RealStrategyFactory;
 import org.chocosolver.solver.variables.IntVar;
 import org.chocosolver.solver.variables.RealVar;
 import org.chocosolver.solver.variables.VF;
