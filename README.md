@@ -1,5 +1,5 @@
 # syat-choco
-An extension of Choco for Declarative Statistics.
+An extension of [Choco](http://www.choco-solver.org/) for Declarative Statistics.
 
 Please note this is an [Eclipse](https://www.eclipse.org/) project folder.
 
