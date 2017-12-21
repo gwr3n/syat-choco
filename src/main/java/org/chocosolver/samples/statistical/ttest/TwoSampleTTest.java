@@ -27,6 +27,7 @@
 package org.chocosolver.samples.statistical.ttest;
 
 import java.util.ArrayList;
+import java.util.stream.IntStream;
 
 import org.apache.mahout.math.Arrays;
 import org.chocosolver.samples.AbstractProblem;
@@ -93,20 +94,21 @@ public class TwoSampleTTest extends AbstractProblem {
        /**
         * Define decision variables representing observed realisations
         */
-        int populationXSize = dataX.length;
-        populationX = new IntVar[populationXSize];
-        for(int i = 0; i < populationXSize; i++)
-        	populationX[i] = VariableFactory.bounded("sample "+i, dataX[i], dataX[i], solver);
-
-        int populationYSize = dataY.length;
-        populationY = new IntVar[populationYSize];
-        for(int i = 0; i < populationYSize; i++)
-        	populationY[i] = VariableFactory.bounded("sample "+i, dataY[i], dataY[i], solver);
+        
+        populationX = IntStream.iterate(0, i -> i + 1)
+                               .limit(dataX.length)
+                               .mapToObj(i -> VariableFactory.bounded("sample X "+i, dataX[i], dataX[i], solver))
+                               .toArray(IntVar[]::new);
+        
+        populationY = IntStream.iterate(0, i -> i + 1)
+                               .limit(dataY.length)
+                               .mapToObj(i -> VariableFactory.bounded("sample Y "+i, dataY[i], dataY[i], solver))
+                               .toArray(IntVar[]::new);
         
         /**
          * RealVar representing feasible values of Student's t statistics at prescribed confidence level
          */ 
-        StudentDist tDist = new StudentDist(populationXSize + populationYSize - 2);
+        StudentDist tDist = new StudentDist(dataX.length + dataY.length - 2);
         RealVar t = VariableFactory.real("tStatistic", tDist.inverseF(alpha/2), tDist.inverseF(1-alpha/2), precision, solver);
         
         /**

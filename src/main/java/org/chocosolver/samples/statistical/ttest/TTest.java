@@ -30,6 +30,7 @@ import umontreal.iro.lecuyer.probdist.StudentDist;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.stream.IntStream;
 
 import org.chocosolver.samples.AbstractProblem;
 import org.chocosolver.solver.Solver;
@@ -82,13 +83,13 @@ public class TTest extends AbstractProblem {
     @Override
     public void buildModel() {
        
-       /**
-        * Define decision variables representing observed realisations
-        */
-        int populationSize = data.length;
-        population = new IntVar[populationSize];
-        for(int i = 0; i < populationSize; i++)
-           population[i] = VariableFactory.bounded("sample "+i, data[i], data[i], solver);
+        /**
+         * Define decision variables representing observed realisations
+         */
+        population = IntStream.iterate(0, i -> i + 1)
+                              .limit(data.length)
+                              .mapToObj(i -> VariableFactory.bounded("sample "+i, data[i], data[i], solver))
+                              .toArray(IntVar[]::new);
         
         /**
          * Define decision variable representing mean values that are compatible (at prescribed confidence level) with realisations
@@ -98,7 +99,7 @@ public class TTest extends AbstractProblem {
         /**
          * RealVar representing feasible values of Student's t statistics at prescribed confidence level
          */ 
-        StudentDist tDist = new StudentDist(populationSize - 1);
+        StudentDist tDist = new StudentDist(data.length - 1);
         RealVar t = VariableFactory.real("tStatistic", tDist.inverseF(alpha/2), tDist.inverseF(1-alpha/2), precision, solver);
         
         /**
