@@ -42,8 +42,8 @@ import org.chocosolver.solver.variables.VariableFactory;
 
 /**
  * This class implements a simple example illustrating the use of 
- * Student's t statistical constraints the computation of confidence interval 
- * of the mean. Furthre details on the underpinning theory can be found at
+ * Student's t statistical constraints for the computation of confidence interval 
+ * of the mean. Further details on the underpinning theory can be found at
  * <a href="https://en.wikipedia.org/wiki/Confidence_interval#Theoretical_example">
  * Confidence interval</a>.
  * 
