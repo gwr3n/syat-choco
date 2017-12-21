@@ -14,7 +14,14 @@ import org.chocosolver.solver.variables.VariableFactory;
 public class tStatistic {
    
    /**
-    * One sample
+    * The one-sample t-test statistical constraint is used to determined 
+    * mean values are compatible with the observed realisations.
+    * 
+    * @param name
+    * @param observations
+    * @param mean
+    * @param t
+    * @param precision
     */
    
    public static void decompose(String name,
@@ -38,6 +45,17 @@ public class tStatistic {
       solver.post(new RealConstraint(name+"_t", exp, new RealVar[]{t,sampleMean,mean,standardError}));
    }
 
+   /**
+    * The one-sample t-test statistical constraint is used to determined 
+    * mean values are compatible with the observed realisations.
+    * 
+    * @param name
+    * @param observations
+    * @param mean
+    * @param t
+    * @param precision
+    */
+   
    public static void decompose(String name,
                                 RealVar[] observations,
                                 RealVar mean,
@@ -60,7 +78,18 @@ public class tStatistic {
    }
    
    /**
-    * Two samples
+    * Consider two independent and identically distributed samples obtained from two populations.
+    * 
+    * The independent samples t-test statistical constraint is used to determine if these two samples 
+    * originate from populations that are significantly different from each other.
+    * 
+    * This test is used only when it can be assumed that the two distributions have the same variance. 
+    * 
+    * @param name
+    * @param observationsA
+    * @param observationsB
+    * @param t
+    * @param precision
     */
    
    public static void decompose(String name,
@@ -91,6 +120,21 @@ public class tStatistic {
       solver.post(new RealConstraint(name+"_t", exp, new RealVar[]{t,sampleMeanA, sampleMeanB, pooledVariance}));
    }
 
+   /**
+    * Consider two independent and identically distributed samples obtained from two populations.
+    * 
+    * The independent samples t-test statistical constraint is used to determine if these two samples 
+    * originate from populations that are significantly different from each other.
+    * 
+    * This test is used only when it can be assumed that the two distributions have the same variance. 
+    * 
+    * @param name
+    * @param observationsA
+    * @param observationsB
+    * @param t
+    * @param precision
+    */
+   
    public static void decompose(String name,
                                 RealVar[] observationsA,
                                 RealVar[] observationsB,

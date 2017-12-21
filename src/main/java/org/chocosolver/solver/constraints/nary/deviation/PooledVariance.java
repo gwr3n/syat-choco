@@ -10,6 +10,7 @@ import org.chocosolver.solver.variables.RealVar;
 import org.chocosolver.solver.variables.VariableFactory;
 
 public class PooledVariance {
+
    public static void decompose(String name,
                                 IntVar[] observationsA,
                                 IntVar[] observationsB,
