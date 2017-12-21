@@ -1,5 +1,5 @@
 # syat-choco
-An extension of Choco for Stochastic Constraint Programming
+An extension of Choco for Declarative Statistics.
 
 Please note this is an Eclipse project folder.
 
