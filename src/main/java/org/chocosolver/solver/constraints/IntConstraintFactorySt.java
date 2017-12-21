@@ -5,9 +5,9 @@ import org.chocosolver.solver.constraints.nary.contingency.ContingencyDecomposit
 import org.chocosolver.solver.constraints.nary.bincounts.BincountsDecompositionType;
 import org.chocosolver.solver.constraints.nary.bincounts.BincountsDecompositions;
 import org.chocosolver.solver.constraints.statistical.ArithmeticSt;
+import org.chocosolver.solver.constraints.statistical.kolmogorovsmirnov.distributions.DistributionVar;
 import org.chocosolver.solver.variables.IntVar;
 import org.chocosolver.solver.variables.RealVar;
-import org.chocosolver.solver.variables.statistical.distributions.DistributionVar;
 
 import umontreal.iro.lecuyer.probdist.Distribution;
 

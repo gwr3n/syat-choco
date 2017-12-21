@@ -1,4 +1,4 @@
-package org.chocosolver.solver.variables.statistical.distributions;
+package org.chocosolver.solver.constraints.statistical.kolmogorovsmirnov.distributions;
 
 import org.chocosolver.solver.variables.IntVar;
 import umontreal.iro.lecuyer.probdist.Distribution;

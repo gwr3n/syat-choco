@@ -5,7 +5,6 @@ import org.chocosolver.solver.constraints.Operator;
 import org.chocosolver.solver.constraints.Propagator;
 import org.chocosolver.solver.exception.SolverException;
 import org.chocosolver.solver.variables.IntVar;
-import org.chocosolver.solver.variables.statistical.distributions.DistributionVar;
 
 import umontreal.iro.lecuyer.probdist.Distribution;
 
@@ -17,6 +16,7 @@ import org.chocosolver.solver.constraints.statistical.kolmogorovsmirnov.PropLess
 import org.chocosolver.solver.constraints.statistical.kolmogorovsmirnov.PropNotEqualXCStDist;
 import org.chocosolver.solver.constraints.statistical.kolmogorovsmirnov.PropNotEqualX_DStDist;
 import org.chocosolver.solver.constraints.statistical.kolmogorovsmirnov.PropNotEqualX_YStDist;
+import org.chocosolver.solver.constraints.statistical.kolmogorovsmirnov.distributions.DistributionVar;
 
 /**
  * A constraint dedicated to arithmetic operations.

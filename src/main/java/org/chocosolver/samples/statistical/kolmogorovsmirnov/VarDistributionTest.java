@@ -3,11 +3,11 @@ package org.chocosolver.samples.statistical.kolmogorovsmirnov;
 import org.chocosolver.samples.AbstractProblem;
 import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.constraints.IntConstraintFactorySt;
+import org.chocosolver.solver.constraints.statistical.kolmogorovsmirnov.distributions.ExponentialDistVar;
 import org.chocosolver.solver.search.strategy.IntStrategyFactory;
 import org.chocosolver.solver.search.strategy.strategy.AbstractStrategy;
 import org.chocosolver.solver.variables.IntVar;
 import org.chocosolver.solver.variables.VariableFactory;
-import org.chocosolver.solver.variables.statistical.distributions.ExponentialDistVar;
 
 public class VarDistributionTest extends AbstractProblem {
 
