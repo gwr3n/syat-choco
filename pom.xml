@@ -31,11 +31,6 @@
     	<version>2.5</version>
     </dependency>
     <dependency>
-    	<groupId>org.ojalgo</groupId>
-    	<artifactId>ojalgo</artifactId>
-    	<version>40.0.0</version>
-    </dependency>
-    <dependency>
     	<groupId>org.la4j</groupId>
     	<artifactId>la4j</artifactId>
     	<version>0.6.0</version>
