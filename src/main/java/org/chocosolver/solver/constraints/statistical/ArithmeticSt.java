@@ -87,7 +87,7 @@ public class ArithmeticSt extends Constraint {
 	        	throw new NullPointerException("Not implemented");
 	            //return new Propagator[]{new PropGreaterOrEqualXCStDist(new IntVar[]{var2, var1}, 1)};
 	        default:
-	            throw new SolverException("Incorrect formula; operator should be one of those:{=, !=, >=, >, <=, <}");
+	            throw new SolverException("Undefined operator: {=, !=, >=, >, <=, <}");
 	    }
     }
     
@@ -132,7 +132,7 @@ public class ArithmeticSt extends Constraint {
 	                throw new SolverException("Incorrect formula; operator should be one of those:{=, !=, >=, >, <=, <}");
 	        }
 	    default: 
-	    	throw new SolverException("Incorrect formula; operator two should be one of those:{MEAN}");
+	    	throw new SolverException("Undefined operator");
         }
     }
     
