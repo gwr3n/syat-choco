@@ -1,0 +1,1 @@
+This folder contains resources for the test cases
