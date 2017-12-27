@@ -1,4 +1,4 @@
-package org.chocosolver.solver.constraints.statistical.t.test;
+package org.chocosolver.solver.constraints.statistical.t;
 
 import static org.junit.Assert.*;
 

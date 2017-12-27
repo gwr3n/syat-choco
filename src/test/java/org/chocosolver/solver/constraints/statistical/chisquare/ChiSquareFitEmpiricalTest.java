@@ -1,4 +1,4 @@
-package org.chocosolver.solver.constraints.statistical.chisquare.test;
+package org.chocosolver.solver.constraints.statistical.chisquare;
 
 import static org.junit.Assert.*;
 

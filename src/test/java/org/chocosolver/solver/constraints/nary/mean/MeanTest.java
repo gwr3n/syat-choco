@@ -1,4 +1,4 @@
-package org.chocosolver.solver.constraints.nary.mean.test;
+package org.chocosolver.solver.constraints.nary.mean;
 
 import static org.junit.Assert.*;
 

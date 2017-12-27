@@ -1,4 +1,4 @@
-package org.chocosolver.solver.constraints.nary.deviation.test;
+package org.chocosolver.solver.constraints.nary.deviation;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;

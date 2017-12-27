@@ -1,4 +1,4 @@
-package org.chocosolver.solver.constraints.nary.matrix.test;
+package org.chocosolver.solver.constraints.nary.matrix;
 
 import org.chocosolver.samples.AbstractProblem;
 import org.chocosolver.solver.Solver;

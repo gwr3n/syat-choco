@@ -1,4 +1,4 @@
-package org.chocosolver.solver.constraints.statistical.fisherratio.test;
+package org.chocosolver.solver.constraints.statistical.fisherratio;
 
 import org.chocosolver.samples.AbstractProblem;
 import org.chocosolver.solver.Solver;

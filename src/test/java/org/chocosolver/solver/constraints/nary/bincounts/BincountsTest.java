@@ -76,13 +76,9 @@ public class BincountsTest {
          this.binBounds = binBounds.clone();
       }
       
-      /*public void setUp() {
-
-      }*/
-      
       @Override
       public void createSolver() {
-          solver = new Solver("Frequency");
+          solver = new Solver("Bincounts");
       }
       
       @Override
@@ -108,42 +104,18 @@ public class BincountsTest {
       
       @Override
       public void configureSearch() {
-        AbstractStrategy<IntVar> strat = IntStrategyFactory.domOverWDeg(mergeArrays(valueVariables,binVariables),1234);
-          // trick : top-down maximization
-          solver.set(strat);
+        AbstractStrategy<IntVar> strat = IntStrategyFactory.activity(mergeArrays(valueVariables,binVariables),1234);
+        solver.set(strat);
       }
       
       @Override
       public void solve() {
-        //LoggerFactory.getLogger("bench").info("---");
-        //this.prettyOut();
         try {
          solver.propagate();
         } catch (ContradictionException e) {
          // TODO Auto-generated catch block
          e.printStackTrace();
         }
-        //LoggerFactory.getLogger("bench").info("---");
-        //this.prettyOut();
-        
-        /*StringBuilder st = new StringBuilder();
-        boolean solution = solver.findSolution();
-        do{
-           st.append("\n---SOLUTION---\n");
-           if(solution) {
-              for(int i = 0; i < valueVariables.length; i++){
-                 st.append(valueVariables[i].getValue()+", ");
-              }
-              st.append("\n");
-              for(int i = 0; i < binVariables.length; i++){
-                 st.append(binVariables[i].getValue()+", ");
-              }
-              st.append("\n");
-           }else{
-              st.append("No solution!");
-           }
-        }while(solution = solver.nextSolution());
-        LoggerFactory.getLogger("bench").info(st.toString());*/
       }
       
       public boolean checkFilteredDomains(int[][] values, int[][] binCounts){

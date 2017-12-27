@@ -6,19 +6,19 @@ import umontreal.iro.lecuyer.probdist.BetaDist;
 import umontreal.iro.lecuyer.probdist.EmpiricalDist;
 import umontreal.iro.lecuyer.probdist.NormalDist;
 
-public class BinomialProportions {
+public class BinomialProportion {
 	
 	EmpiricalDist emp;
 	double frequency;
 	int N;
 	
-	public BinomialProportions(EmpiricalDist emp){
+	public BinomialProportion(EmpiricalDist emp){
 		this.emp = emp;
 		this.frequency = emp.getMean();
 		this.N = emp.getN();
 	}
 	
-	public BinomialProportions(double frequency, int N){
+	public BinomialProportion(double frequency, int N){
 		this.frequency = frequency;
 		this.N = N;
 	}
@@ -54,35 +54,5 @@ public class BinomialProportions {
 	  	interval[1] = ub != null ? ub.inverseF(1-(1-confidence)/2.0) : 1; 	/*UB*/
 	  	
 		return interval;
-	}
-	
-	public static void main(String args[]){
-		double confidence = 0.90;
-		double p = 0.5;
-		int replications = 10000;
-		int sampleSize = 500;
-		
-		double coverageProbabilityCP = 0;
-		double coverageProbabilityAC = 0;
-		MRG32k3a rng = new MRG32k3a();
-		BinomialGen binomial = new BinomialGen(rng, 1, p);
-		for(int i = 0; i < replications; i++){
-			double[] variates = new double[sampleSize];
-			binomial.nextArrayOfDouble(variates, 0, sampleSize);
-			EmpiricalDist empDist = new EmpiricalDist(variates);
-			BinomialProportions cp = new BinomialProportions(empDist);
-			
-			double[] intervalCP = cp.computeClopperPearsonCI(confidence);
-			if(intervalCP[0] <= p && p <= intervalCP[1]){
-				coverageProbabilityCP++;
-			}
-			
-			double[] intervalAC = cp.computeAgrestiCoullCI(confidence);
-			if(intervalAC[0] <= p && p <= intervalAC[1]){
-				coverageProbabilityAC++;
-			}
-		}
-		System.out.println("CP: "+coverageProbabilityCP/replications);
-		System.out.println("AC: "+coverageProbabilityAC/replications);
 	}
 }

@@ -5,13 +5,13 @@ import umontreal.iro.lecuyer.randvar.UniformGen;
 import umontreal.iro.lecuyer.randvarmulti.MultinomialGen;
 import umontreal.iro.lecuyer.rng.MRG32k3a;
 
-public class MultinomialProportions {
+public class MultinomialProportion {
 	
 	double[][] observations;
 	double[] frequencies;
 	int N;
 	
-	public MultinomialProportions(double[][] observations){
+	public MultinomialProportion(double[][] observations){
 		this.observations = observations;
 		N = observations.length;
 		frequencies = new double[observations[0].length];
@@ -26,7 +26,7 @@ public class MultinomialProportions {
 		}
 	}
 	
-	public MultinomialProportions(double[] frequencies, int N){
+	public MultinomialProportion(double[] frequencies, int N){
 		this.frequencies = frequencies;
 		this.N = N;
 	}
@@ -74,34 +74,5 @@ public class MultinomialProportions {
 			intervals[i][1] = (A + 2*n[i] + Math.sqrt(A*(A+4*n[i]*(N-n[i])/N)))/(2*(N+A));
 		}
 		return intervals;
-	}
-	
-	public static void main(String args[]){
-		double confidence = 0.90;
-		double[] p = {0.3,0.3,0.4}; 
-		int replications = 10000;
-		int sampleSize = 10;
-		
-		double coverageProbability = 0;
-		MRG32k3a rng = new MRG32k3a();
-		UniformGen gen1 = new UniformGen(rng);
-		MultinomialGen binomial = new MultinomialGen(gen1, p, 1);
-		for(int i = 0; i < replications; i++){
-			double[][] variates = new double[sampleSize][p.length];
-			binomial.nextArrayOfPoints(variates, 0, sampleSize);
-			
-			MultinomialProportions mp = new MultinomialProportions(variates);
-			
-			double[][] intervals = mp.computeGoodmanCI(confidence);
-			boolean covered = true;
-			for(int j = 0; j < p.length; j++){
-				if(intervals[j][0] >= p[j] || p[j] >= intervals[j][1]){
-					covered = false;
-				}
-			}
-			if(covered) coverageProbability++;
-		}
-		
-		System.out.println("CP: "+coverageProbability/replications);
 	}
 }

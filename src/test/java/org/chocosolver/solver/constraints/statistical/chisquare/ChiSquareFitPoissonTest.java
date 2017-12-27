@@ -1,10 +1,10 @@
-package org.chocosolver.solver.constraints.statistical.chisquare.test;
+package org.chocosolver.solver.constraints.statistical.chisquare;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 import org.chocosolver.samples.AbstractProblem;
 import org.chocosolver.solver.Solver;
-import org.chocosolver.solver.constraints.statistical.chisquare.ChiSquareFitNormal;
+import org.chocosolver.solver.constraints.statistical.chisquare.ChiSquareFitPoisson;
 import org.chocosolver.solver.search.strategy.IntStrategyFactory;
 import org.chocosolver.solver.search.strategy.selectors.values.RealDomainMiddle;
 import org.chocosolver.solver.search.strategy.selectors.variables.Cyclic;
@@ -17,8 +17,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class ChiSquareFitNormalTest {
-
+public class ChiSquareFitPoissonTest {
+   
    @Before
    public void setUp() throws Exception {
    }
@@ -28,84 +28,76 @@ public class ChiSquareFitNormalTest {
       Thread.sleep(1000);
       System.gc();
    }
-
+   
    @Test
-   public void test() {
+   public void testInteger() {
       String[] str={"-log","SOLUTION"};
       
-      double[][] values = {{2,2},{-1,-1},{0,0},{3,3},{1,1},{2,2}};
-      int[][] binCounts = {{0,6},{0,6},{0,6},{0,6},{0,6},{0,6},{0,6}};
-      double [] binBounds = {-3.5,-2.5,-1.5,-0.5,0.5,1.5,2.5,3.5};
-      double[] normalMean = {0,0};
-      double[] normalStd = {1,1};
+      int[][] values = {{2},{1},{4},{4},{1},{2}};
+      int[][] binCounts = {{0,6},{0,6},{0,6},{0,6},{0,6},{0,6},{0,6},{0,6},{0,6},{0,6}};
+      int[] binBounds = {0,1,2,3,4,5,6,7,8,9,10};
+      double[] poissonRate = {5,5};
       
       double[] chiSqStatistic = {0,50};
       
-      ChiSquareFitNormalReal cs = new ChiSquareFitNormalReal(values, binCounts, binBounds, normalMean, normalStd, chiSqStatistic);
+      ChiSquareFitPoissonInteger cs = new ChiSquareFitPoissonInteger(values, binCounts, binBounds, poissonRate, chiSqStatistic);
       cs.execute(str);
    }
    
-   public class ChiSquareFitNormalReal extends AbstractProblem {
-      
-      public RealVar[] valueVariables;
+   class ChiSquareFitPoissonInteger extends AbstractProblem {
+      public IntVar[] valueVariables;
       public IntVar[] binVariables;
-      public RealVar meanVariable;
-      public RealVar stdVariable;
+      public RealVar poissonRateVariable;
       public RealVar chiSqstatisticVariable;
       
       int[][] binCounts;
-      double[][] values;
-      double[] binBounds;
-      double[] normalMean;
-      double[] normalStd;
+      int[][] values;
+      int[] binBounds;
+      double[] poissonRate;
       double[] chiSqStatistic;
       
       double precision = 1.e-4;
       
-      public ChiSquareFitNormalReal(double[][] values,
-                                    int[][] binCounts, 
-                                    double[] binBounds,
-                                    double[] normalMean,
-                                    double[] normalStd,
-                                    double[] chiSqStatistic){
+      public ChiSquareFitPoissonInteger(int[][] values,
+                                        int[][] binCounts, 
+                                        int[] binBounds,
+                                        double[] poissonRate,
+                                        double[] chiSqStatistic){
          this.values = values.clone();
          this.binCounts = binCounts.clone();
          this.binBounds = binBounds.clone();
-         this.normalMean = normalMean.clone();
-         this.normalStd = normalStd.clone();
+         this.poissonRate = poissonRate.clone();
          this.chiSqStatistic = chiSqStatistic.clone();
       }
       
       @Override
       public void createSolver() {
-          solver = new Solver("ChiSquare");
+          solver = new Solver("ChiSquareInteger");
       }
       
       @Override
       public void buildModel() {
-         valueVariables = new RealVar[this.values.length];
+         valueVariables = new IntVar[this.values.length];
          for(int i = 0; i < this.values.length; i++)
-            valueVariables[i] = VariableFactory.real("Value "+(i+1), values[i][0], values[i][1], precision, solver);
+            valueVariables[i] = VariableFactory.enumerated("Value "+(i+1), values[i], solver);
          
          binVariables = new IntVar[this.binCounts.length];
          for(int i = 0; i < this.binCounts.length; i++)
             binVariables[i] = VariableFactory.bounded("Bin "+(i+1), this.binCounts[i][0], this.binCounts[i][1], solver);
          
-         meanVariable = VF.real("Normal mean", normalMean[0], normalMean[1], precision, solver);
-         
-         stdVariable = VF.real("Normal std", normalStd[0], normalStd[1], precision, solver);
+         poissonRateVariable = VF.real("Poisson rate", poissonRate[0], poissonRate[1], precision, solver);
          
          chiSqstatisticVariable = VF.real("chiSqStatistics", chiSqStatistic[0], chiSqStatistic[1], precision, solver);
          
-         ChiSquareFitNormal.decomposition("chiSqConstraint", valueVariables, binVariables, binBounds, meanVariable, stdVariable, chiSqstatisticVariable, precision, false);
+         ChiSquareFitPoisson.decomposition("chiSqConstraint", valueVariables, binVariables, binBounds, poissonRateVariable, chiSqstatisticVariable, precision, false);
       }
       
       @Override
       public void configureSearch() {
          solver.set(
-               new RealStrategy(valueVariables, new Cyclic(), new RealDomainMiddle()),
+               IntStrategyFactory.activity(valueVariables,1234),
                IntStrategyFactory.activity(binVariables,1234),
-               new RealStrategy(new RealVar[]{meanVariable, stdVariable}, new Cyclic(), new RealDomainMiddle()),
+               new RealStrategy(new RealVar[]{poissonRateVariable}, new Cyclic(), new RealDomainMiddle()),
                new RealStrategy(new RealVar[]{chiSqstatisticVariable}, new Cyclic(), new RealDomainMiddle())
                );
       }
@@ -125,15 +117,13 @@ public class ChiSquareFitNormalTest {
                  st.append(binVariables[i].getValue()+", ");
               }
               st.append("\n");
-              st.append(meanVariable.getLB()+" "+meanVariable.getUB());
-              st.append("\n");
-              st.append(stdVariable.getLB()+" "+stdVariable.getUB());
+              st.append(poissonRateVariable.getLB()+" "+poissonRateVariable.getUB());
               st.append("\n");
               st.append(chiSqstatisticVariable.getLB()+" "+chiSqstatisticVariable.getUB());
               st.append("\n");
               
-              assertTrue(chiSqstatisticVariable.getLB() <= 35);
-              assertTrue(chiSqstatisticVariable.getUB() >= 34);
+              assertTrue(chiSqstatisticVariable.getLB() <= 24);
+              assertTrue(chiSqstatisticVariable.getUB() >= 23);
            }else{
               st.append("No solution!");
            }
@@ -146,5 +136,4 @@ public class ChiSquareFitNormalTest {
           
       }
    }
-
 }

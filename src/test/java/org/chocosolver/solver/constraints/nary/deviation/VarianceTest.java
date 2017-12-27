@@ -1,4 +1,4 @@
-package org.chocosolver.solver.constraints.nary.deviation.test;
+package org.chocosolver.solver.constraints.nary.deviation;
 
 import static org.junit.Assert.*;
 

@@ -1,10 +1,10 @@
-package org.chocosolver.solver.constraints.nary.deviation.test;
+package org.chocosolver.solver.constraints.nary.deviation;
 
 import static org.junit.Assert.*;
 
 import org.chocosolver.samples.AbstractProblem;
 import org.chocosolver.solver.Solver;
-import org.chocosolver.solver.constraints.nary.deviation.StandardError;
+import org.chocosolver.solver.constraints.nary.deviation.StandardDeviation;
 import org.chocosolver.solver.search.strategy.IntStrategyFactory;
 import org.chocosolver.solver.search.strategy.RealStrategyFactory;
 import org.chocosolver.solver.search.strategy.strategy.AbstractStrategy;
@@ -15,7 +15,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class StandardErrorTest {
+public class StandardDeviationTest {
 
    @Before
    public void setUp() throws Exception {
@@ -33,8 +33,8 @@ public class StandardErrorTest {
       
       int[][] values = {{1},{2},{3},{4},{5},{6},{7},{8},{9}}; 
       
-      IntegerStandardError standardError = new IntegerStandardError(values, new double[]{0,100});
-      standardError.execute(str);
+      IntegerStandardDeviation standardDeviation = new IntegerStandardDeviation(values, new double[]{0,100});
+      standardDeviation.execute(str);
    }
    
    @Test
@@ -43,27 +43,27 @@ public class StandardErrorTest {
       
       double[][] values = {{1},{2},{3},{4},{5},{6},{7},{8},{9}}; 
       
-      RealStandardError standardError = new RealStandardError(values, new double[]{0,100});
-      standardError.execute(str);
+      RealStandardDeviation standardDeviation = new RealStandardDeviation(values, new double[]{0,100});
+      standardDeviation.execute(str);
    }
 
-   class IntegerStandardError extends AbstractProblem {
+   class IntegerStandardDeviation extends AbstractProblem {
       public IntVar[] valueVariables;
-      public RealVar standardErrorVariable;
+      public RealVar standardDeviationVariable;
       
       public int[][] values;
-      public double[] standardError;
+      public double[] standardDeviation;
       
       double precision = 1.e-4;
       
-      public IntegerStandardError(int[][] values, double[] standardError){
+      public IntegerStandardDeviation(int[][] values, double[] standardDeviation){
          this.values = values;
-         this.standardError = standardError;
+         this.standardDeviation = standardDeviation;
       }
       
       @Override
       public void createSolver() {
-          solver = new Solver("IntegerStandardError");
+          solver = new Solver("IntegerStandardDeviation");
       }
       
       @Override
@@ -72,9 +72,9 @@ public class StandardErrorTest {
          for(int i = 0; i < this.values.length; i++)
             valueVariables[i] = VariableFactory.enumerated("Value"+(i+1), values[i], solver);
          
-         standardErrorVariable = VariableFactory.real("StandardError", standardError[0], standardError[1], precision, solver);
+         standardDeviationVariable = VariableFactory.real("StandardDeviation", standardDeviation[0], standardDeviation[1], precision, solver);
          
-         StandardError.decompose("StandardDeviationConstraint", valueVariables, standardErrorVariable, precision);
+         StandardDeviation.decompose("StandardDeviationConstraint", valueVariables, standardDeviationVariable, precision);
       }
       
       public void configureSearch() {
@@ -93,11 +93,11 @@ public class StandardErrorTest {
                  st.append(valueVariables[i].getValue()+", ");
               }
               st.append("\n");
-              st.append(standardErrorVariable.getLB()+" "+standardErrorVariable.getUB());
+              st.append(standardDeviationVariable.getLB()+" "+standardDeviationVariable.getUB());
               st.append("\n");
               
-              assertTrue(standardErrorVariable.getLB() <= Math.sqrt(7.5)/Math.sqrt(9));
-              assertTrue(standardErrorVariable.getUB() >= Math.sqrt(7.5)/Math.sqrt(9));
+              assertTrue(standardDeviationVariable.getLB() <= Math.sqrt(7.5));
+              assertTrue(standardDeviationVariable.getUB() >= Math.sqrt(7.5));
            }else{
               st.append("No solution!");
            }
@@ -111,23 +111,23 @@ public class StandardErrorTest {
       }
    }
    
-   class RealStandardError extends AbstractProblem {
+   class RealStandardDeviation extends AbstractProblem {
       public RealVar[] valueVariables;
-      public RealVar standardErrorVariable;
+      public RealVar standardDeviationVariable;
       
       public double[][] values;
-      public double[] standardError;
+      public double[] standardDeviation;
       
       double precision = 1.e-4;
       
-      public RealStandardError(double[][] values, double[] standardError){
+      public RealStandardDeviation(double[][] values, double[] standardDeviation){
          this.values = values;
-         this.standardError = standardError;
+         this.standardDeviation = standardDeviation;
       }
       
       @Override
       public void createSolver() {
-          solver = new Solver("RealStandardError");
+          solver = new Solver("RealStandardDeviation");
       }
       
       @Override
@@ -136,9 +136,9 @@ public class StandardErrorTest {
          for(int i = 0; i < this.values.length; i++)
             valueVariables[i] = VariableFactory.real("Value"+(i+1), values[i][0], values[i][0], precision, solver);
          
-         standardErrorVariable = VariableFactory.real("StandardError", standardError[0], standardError[1], precision, solver);
+         standardDeviationVariable = VariableFactory.real("StandardDeviation", standardDeviation[0], standardDeviation[1], precision, solver);
          
-         StandardError.decompose("StandardDeviationConstraint", valueVariables, standardErrorVariable, precision);
+         StandardDeviation.decompose("StandardDeviationConstraint", valueVariables, standardDeviationVariable, precision);
       }
       
       public void configureSearch() {
@@ -157,11 +157,11 @@ public class StandardErrorTest {
                  st.append("("+valueVariables[i].getLB()+","+valueVariables[i].getUB()+"), ");
               }
               st.append("\n");
-              st.append(standardErrorVariable.getLB()+" "+standardErrorVariable.getUB());
+              st.append(standardDeviationVariable.getLB()+" "+standardDeviationVariable.getUB());
               st.append("\n");
               
-              assertTrue(standardErrorVariable.getLB() <= Math.sqrt(7.5)/Math.sqrt(9));
-              assertTrue(standardErrorVariable.getUB() >= Math.sqrt(7.5)/Math.sqrt(9));
+              assertTrue(standardDeviationVariable.getLB() <= Math.sqrt(7.5));
+              assertTrue(standardDeviationVariable.getUB() >= Math.sqrt(7.5));
            }else{
               st.append("No solution!");
            }

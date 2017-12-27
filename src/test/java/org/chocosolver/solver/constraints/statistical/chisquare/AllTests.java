@@ -1,4 +1,4 @@
-package org.chocosolver.solver.constraints.statistical.chisquare.test;
+package org.chocosolver.solver.constraints.statistical.chisquare;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;

@@ -1,4 +1,4 @@
-package org.chocosolver.solver.constraints.statistical.hotelling.test;
+package org.chocosolver.solver.constraints.statistical.hotelling;
 
 import static org.junit.Assert.*;
 
