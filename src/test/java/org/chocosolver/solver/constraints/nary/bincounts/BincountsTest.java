@@ -1,4 +1,4 @@
-package org.syad.statistics.test;
+package org.chocosolver.solver.constraints.nary.bincounts;
 
 import static org.junit.Assert.*;
 
