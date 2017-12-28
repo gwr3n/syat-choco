@@ -108,7 +108,7 @@ public class InspectionSchedulingSatisfaction extends AbstractProblem {
 				solver.post(IntConstraintFactory.scalar(new IntVar[]{starts[i*(NUM_OF_INSPECTIONS/UNITS_TO_INSPECT)+j-1],starts[i*(NUM_OF_INSPECTIONS/UNITS_TO_INSPECT)+j],VariableFactory.fixed(-1, solver)}, new int[]{-1,1,1}, intervals[i][j-1]));
 			}
 			Distribution dist = new ExponentialDist(1.0/EXP_INTERVAL_BETWEEN_INSPECTION);
-			solver.post(IntConstraintFactorySt.arithmSt(intervals[i], dist, "=", 0.9));
+			solver.post(IntConstraintFactorySt.kolmogorov_smirnov(intervals[i], dist, "=", 0.9));
 		}
 	}
 

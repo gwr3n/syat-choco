@@ -33,7 +33,7 @@ import org.chocosolver.solver.constraints.statistical.kolmogorovsmirnov.distribu
  * @since 21/06/12
  */
 @SuppressWarnings("serial")
-public class ArithmeticSt extends Constraint {
+public class KolmogorovSmirnov extends Constraint {
 
     protected final Operator op1, op2; // operators.
     protected final int cste;
@@ -60,8 +60,8 @@ public class ArithmeticSt extends Constraint {
     	}
     }
     
-    public ArithmeticSt(IntVar[] var1, DistributionVar dist, Operator op1, double confidence) {
-    	super("ArithmeticSt_DistVar", createProp(var1, dist, op1, confidence));
+    public KolmogorovSmirnov(IntVar[] var1, DistributionVar dist, Operator op1, double confidence) {
+    	super("KolmogorovSmirnov_DistVar", createProp(var1, dist, op1, confidence));
     	this.op1 = op1;
     	this.op2 = Operator.DISTRIBUTION;
     	this.isBinary = false;
@@ -91,8 +91,8 @@ public class ArithmeticSt extends Constraint {
 	    }
     }
     
-    public ArithmeticSt(IntVar[] var1, Distribution dist, Operator op1, double confidence) {
-    	super("ArithmeticSt_Dist", createProp(var1, dist, op1, confidence));
+    public KolmogorovSmirnov(IntVar[] var1, Distribution dist, Operator op1, double confidence) {
+    	super("KolmogorovSmirnov_Dist", createProp(var1, dist, op1, confidence));
     	this.op1 = op1;
     	this.op2 = Operator.DISTRIBUTION;
     	this.isBinary = false;
@@ -136,8 +136,8 @@ public class ArithmeticSt extends Constraint {
         }
     }
     
-    public ArithmeticSt(IntVar[] var1, IntVar[] var2, Operator op1, Operator op2, double confidence) {
-        super("ArithmeticSt_TwoSample", createProp(var1, var2, op1, op2, confidence));
+    public KolmogorovSmirnov(IntVar[] var1, IntVar[] var2, Operator op1, Operator op2, double confidence) {
+        super("KolmogorovSmirnov_TwoSample", createProp(var1, var2, op1, op2, confidence));
         this.op1 = op1;
         this.op2 = op2;
         this.cste = 0;

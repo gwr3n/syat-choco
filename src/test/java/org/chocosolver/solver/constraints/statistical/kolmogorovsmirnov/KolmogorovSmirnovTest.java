@@ -84,7 +84,7 @@ public class KolmogorovSmirnovTest {
           
           Distribution dist = new NormalDist(10,Math.sqrt(10));
           
-          solver.post(IntConstraintFactorySt.arithmSt(populationX, dist, "!=", 0.95));
+          solver.post(IntConstraintFactorySt.kolmogorov_smirnov(populationX, dist, "!=", 0.95));
       }
 
       @Override
@@ -151,7 +151,7 @@ public class KolmogorovSmirnovTest {
           for(int i = 0; i < populationYSize; i++)
            populationY[i] = VariableFactory.bounded("sample "+i, dataY[i], dataY[i], solver);
           
-          solver.post(IntConstraintFactorySt.arithmSt(populationX, populationY, "=", "DISTRIBUTION", 0.95));
+          solver.post(IntConstraintFactorySt.kolmogorov_smirnov(populationX, populationY, "=", "DISTRIBUTION", 0.95));
       }
 
       @Override
