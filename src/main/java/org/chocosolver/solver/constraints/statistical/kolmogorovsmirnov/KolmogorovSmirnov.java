@@ -35,7 +35,7 @@ import org.chocosolver.solver.constraints.statistical.kolmogorovsmirnov.propagat
 @SuppressWarnings("serial")
 public class KolmogorovSmirnov extends Constraint {
 
-    protected final Operator op1, op2; // operators.
+    protected final Operator op1; // operators.
     protected final int cste;
     protected final boolean isBinary; // to distinct unary and binary formula
     
@@ -63,7 +63,6 @@ public class KolmogorovSmirnov extends Constraint {
     public KolmogorovSmirnov(IntVar[] var1, DistributionVar dist, Operator op1, double confidence) {
     	super("KolmogorovSmirnov_DistVar", createProp(var1, dist, op1, confidence));
     	this.op1 = op1;
-    	this.op2 = Operator.DISTRIBUTION;
     	this.isBinary = false;
     	this.cste = 0;
     	
@@ -94,7 +93,6 @@ public class KolmogorovSmirnov extends Constraint {
     public KolmogorovSmirnov(IntVar[] var1, Distribution dist, Operator op1, double confidence) {
     	super("KolmogorovSmirnov_Dist", createProp(var1, dist, op1, confidence));
     	this.op1 = op1;
-    	this.op2 = Operator.DISTRIBUTION;
     	this.isBinary = false;
     	this.cste = 0;
     }
@@ -108,38 +106,32 @@ public class KolmogorovSmirnov extends Constraint {
     }
     
     @SuppressWarnings("unchecked")
-   private static Propagator<IntVar>[] createProp(IntVar[] var1, IntVar[] var2, Operator op1, Operator op2, double confidence) {
-    	switch (op2) {
-        case DISTRIBUTION:
-	        switch (op1) {
-	            case EQ: // X = Y
-	            	return new Propagator[]{new PropGreaterOrEqualX_YStDist(var1, var2, 1-(1-confidence)/2.0),new PropGreaterOrEqualX_YStDist(var2, var1, 1-(1-confidence)/2.0)};
-	            case NQ: // X =/= Y
-	            	return new Propagator[]{new PropNotEqualX_YStDist(var1, var2, 1-(1-confidence)/2.0)};
-	            case GE: //  X >= Y
-	            	return new Propagator[]{new PropGreaterOrEqualX_YStDist(var1, var2, confidence)};
-	            case GT: //  X > Y --> X >= Y + 1
-	            	throw new NullPointerException("Not implemented");
-	                //setPropagators(new PropGreaterOrEqualX_YC(vars, 1));
-	                //break;
-	            case LE: //  X <= Y --> Y >= X
-	            	return new Propagator[]{new PropGreaterOrEqualX_YStDist(var2, var1, confidence)};
-	            case LT: //  X < Y --> Y >= X + 1
-	            	throw new NullPointerException("Not implemented");
-	                //setPropagators(new PropGreaterOrEqualX_YC(new IntVar[]{var2, var1}, 1));
-	                //break;
-	            default:
-	                throw new SolverException("Incorrect formula; operator should be one of those:{=, !=, >=, >, <=, <}");
-	        }
-	    default: 
-	    	throw new SolverException("Undefined operator");
-        }
+    private static Propagator<IntVar>[] createProp(IntVar[] var1, IntVar[] var2, Operator op1, double confidence) {
+       switch (op1) {
+       case EQ: // X = Y
+          return new Propagator[]{new PropGreaterOrEqualX_YStDist(var1, var2, 1-(1-confidence)/2.0),new PropGreaterOrEqualX_YStDist(var2, var1, 1-(1-confidence)/2.0)};
+       case NQ: // X =/= Y
+          return new Propagator[]{new PropNotEqualX_YStDist(var1, var2, 1-(1-confidence)/2.0)};
+       case GE: //  X >= Y
+          return new Propagator[]{new PropGreaterOrEqualX_YStDist(var1, var2, confidence)};
+       case GT: //  X > Y --> X >= Y + 1
+          throw new NullPointerException("Not implemented");
+          //setPropagators(new PropGreaterOrEqualX_YC(vars, 1));
+          //break;
+       case LE: //  X <= Y --> Y >= X
+          return new Propagator[]{new PropGreaterOrEqualX_YStDist(var2, var1, confidence)};
+       case LT: //  X < Y --> Y >= X + 1
+          throw new NullPointerException("Not implemented");
+          //setPropagators(new PropGreaterOrEqualX_YC(new IntVar[]{var2, var1}, 1));
+          //break;
+       default:
+          throw new SolverException("Incorrect formula; operator should be one of those:{=, !=, >=, >, <=, <}");
+       }
     }
     
-    public KolmogorovSmirnov(IntVar[] var1, IntVar[] var2, Operator op1, Operator op2, double confidence) {
-        super("KolmogorovSmirnov_TwoSample", createProp(var1, var2, op1, op2, confidence));
+    public KolmogorovSmirnov(IntVar[] var1, IntVar[] var2, Operator op1, double confidence) {
+        super("KolmogorovSmirnov_TwoSample", createProp(var1, var2, op1, confidence));
         this.op1 = op1;
-        this.op2 = op2;
         this.cste = 0;
         this.isBinary = true;
         

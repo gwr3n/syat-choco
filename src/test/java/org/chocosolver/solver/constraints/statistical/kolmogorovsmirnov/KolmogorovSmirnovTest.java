@@ -151,7 +151,7 @@ public class KolmogorovSmirnovTest {
           for(int i = 0; i < populationYSize; i++)
            populationY[i] = VariableFactory.bounded("sample "+i, dataY[i], dataY[i], solver);
           
-          solver.post(SyatConstraintFactory.kolmogorov_smirnov(populationX, populationY, "=", "DISTRIBUTION", 0.95));
+          solver.post(SyatConstraintFactory.kolmogorov_smirnov(populationX, populationY, "=", 0.95));
       }
 
       @Override

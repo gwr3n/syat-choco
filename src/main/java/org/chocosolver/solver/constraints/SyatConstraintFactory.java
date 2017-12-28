@@ -13,10 +13,9 @@ import umontreal.iro.lecuyer.probdist.Distribution;
 
 public class SyatConstraintFactory extends IntConstraintFactory {
 
-   public static KolmogorovSmirnov kolmogorov_smirnov(IntVar[] VAR1, IntVar[] VAR2, String OP1, String OP2, double confidence) {
+   public static KolmogorovSmirnov kolmogorov_smirnov(IntVar[] VAR1, IntVar[] VAR2, String OP1, double confidence) {
       Operator op1 = Operator.get(OP1);
-      Operator op2 = Operator.get(OP2);
-      return new KolmogorovSmirnov(VAR1, VAR2, op1, op2, confidence);
+      return new KolmogorovSmirnov(VAR1, VAR2, op1, confidence);
    }
 
    public static KolmogorovSmirnov kolmogorov_smirnov(IntVar[] VAR1, Distribution DIST, String OP1, double confidence) {
