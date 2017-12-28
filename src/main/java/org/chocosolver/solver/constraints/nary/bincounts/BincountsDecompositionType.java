@@ -26,6 +26,13 @@
 
 package org.chocosolver.solver.constraints.nary.bincounts;
 
+/**
+ * Available {@code BINCOUNTS} decompositions
+ * 
+ * @author Roberto Rossi
+ *
+ */
+
 public enum BincountsDecompositionType {
    Rossi2016,
    Agkun2016_1,

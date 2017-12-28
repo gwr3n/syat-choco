@@ -36,28 +36,49 @@ import org.chocosolver.solver.variables.IntVar;
 import org.chocosolver.solver.variables.RealVar;
 import org.chocosolver.solver.variables.VariableFactory;
 
+/**
+ * Decompositions of the {@code CONTINGENCY} constraint
+ * 
+ * @author Roberto Rossi
+ * @see <a href="https://en.wikipedia.org/wiki/Contingency_table">Contingency table</a>
+ */
+
 public class ContingencyDecompositions {
-   public static void decompose(IntVar[] seriesA,
-                                IntVar[] seriesB,
+   
+   /**
+    * {@code CONTINGENCY} constraint decomposition for integer valued observations
+    * 
+    * @param observationsA population A observations
+    * @param observationsB population B observations
+    * @param binVariables contingency table cell counts
+    * @param binBounds contingency table bin bounds; provide two arrays of 
+    * breakpoints, for populations A and B, respectively
+    * @param marginalsH contingency table row counts sums
+    * @param marginalsV contingency table column counts sums
+    */
+   
+   public static void decompose(IntVar[] observationsA,
+                                IntVar[] observationsB,
                                 IntVar[][] binVariables,
                                 int[][] binBounds,
                                 IntVar[] marginalsH,
                                 IntVar[] marginalsV){
-      Solver solver = seriesA[0].getSolver();
+      
+      Solver solver = observationsA[0].getSolver();
       
       for(int i = 0; i < binVariables.length; i++){
          for(int j = 0; j < binVariables[i].length; j++){        
-            BoolVar[] valueBinVariables = new BoolVar[seriesA.length];
-            for(int s = 0; s < seriesA.length; s++){
+            BoolVar[] valueBinVariables = new BoolVar[observationsA.length];
+            for(int s = 0; s < observationsA.length; s++){
                valueBinVariables[s] = VariableFactory.bool("Value-Bin "+s+" ("+i+","+j+")", solver);
                
                solver.post(LogicalConstraintFactory.reification_reifiable(
                      valueBinVariables[s], 
                      LogicalConstraintFactory.and(
-                           SyatConstraintFactory.arithm(seriesA[s], ">=", binBounds[0][i]),
-                           SyatConstraintFactory.arithm(seriesA[s], "<", binBounds[0][i+1]),
-                           SyatConstraintFactory.arithm(seriesB[s], ">=", binBounds[1][j]),
-                           SyatConstraintFactory.arithm(seriesB[s], "<", binBounds[1][j+1])
+                           SyatConstraintFactory.arithm(observationsA[s], ">=", binBounds[0][i]),
+                           SyatConstraintFactory.arithm(observationsA[s], "<", binBounds[0][i+1]),
+                           SyatConstraintFactory.arithm(observationsB[s], ">=", binBounds[1][j]),
+                           SyatConstraintFactory.arithm(observationsB[s], "<", binBounds[1][j+1])
                            )));
             }
             solver.post(SyatConstraintFactory.sum(valueBinVariables, binVariables[i][j]));
@@ -77,12 +98,25 @@ public class ContingencyDecompositions {
       }
    }
    
+   /**
+    * {@code CONTINGENCY} constraint decomposition for real valued observations
+    * 
+    * @param seriesA population A observations
+    * @param seriesB population B observations
+    * @param binVariables contingency table cell counts
+    * @param binBounds contingency table bin bounds; provide two arrays of 
+    * breakpoints, for populations A and B, respectively
+    * @param marginalsH contingency table row counts sums
+    * @param marginalsV contingency table column counts sums
+    */
+   
    public static void decompose(RealVar[] seriesA,
                                 RealVar[] seriesB,
                                 IntVar[][] binVariables,
                                 double[][] binBounds,
                                 IntVar[] marginalsH,
                                 IntVar[] marginalsV){
+      
       Solver solver = seriesA[0].getSolver();
 
       for(int i = 0; i < binVariables.length; i++){

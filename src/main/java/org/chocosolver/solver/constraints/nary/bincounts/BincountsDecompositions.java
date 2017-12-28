@@ -36,64 +36,67 @@ import org.chocosolver.solver.variables.IntVar;
 import org.chocosolver.solver.variables.RealVar;
 import org.chocosolver.solver.variables.VariableFactory;
 
+/**
+ * Decompositions of the {@code BINCOUNTS} constraint
+ * 
+ * @author Roberto Rossi
+ * @see <a href="https://arxiv.org/abs/1611.08942">Bincounts constraint</a>
+ */
+
 public class BincountsDecompositions {
    /**
-    * Bincounts decomposition (Rossi, 2016)
+    * {@code BINCOUNTS} decomposition (Rossi, 2016)
     * 
-    * BEWARE : it is automatically posted (it cannot be reified)
-    * 
-    * @param valueVariables
-    * @param binVariables
-    * @param binBounds
+    * @param observations observations
+    * @param binCounts bin counts
+    * @param binBounds bin bounds expressed as a list of breakpoints
     */
-   public static void bincountsDecomposition1(IntVar[] valueVariables, IntVar[] binVariables, int[] binBounds){
-      Solver solver = valueVariables[0].getSolver();
+   public static void bincountsDecomposition1(IntVar[] observations, IntVar[] binCounts, int[] binBounds){
+      Solver solver = observations[0].getSolver();
       
       IntVar[] valueOccurrenceVariables = new IntVar[binBounds[binBounds.length-1]-binBounds[0]];
       int[] valuesArray = new int[valueOccurrenceVariables.length];
       for(int i = 0; i < valueOccurrenceVariables.length; i++){
-         valueOccurrenceVariables[i] = VariableFactory.bounded("Value Occurrence "+i, 0, valueVariables.length, solver);
+         valueOccurrenceVariables[i] = VariableFactory.bounded("Value Occurrence "+i, 0, observations.length, solver);
          valuesArray[i] = i + binBounds[0];
       }
       
       for(int i = 0; i < binBounds.length - 1; i++){
          IntVar[] binOccurrences = new IntVar[binBounds[i+1]-binBounds[i]];
          System.arraycopy(valueOccurrenceVariables, binBounds[i]-binBounds[0], binOccurrences, 0, binBounds[i+1]-binBounds[i]);
-         solver.post(SyatConstraintFactory.sum(binOccurrences, binVariables[i]));
+         solver.post(SyatConstraintFactory.sum(binOccurrences, binCounts[i]));
       }
       
-      solver.post(SyatConstraintFactory.sum(binVariables, VariableFactory.fixed(valueVariables.length, solver)));
+      solver.post(SyatConstraintFactory.sum(binCounts, VariableFactory.fixed(observations.length, solver)));
       
-      solver.post(SyatConstraintFactory.global_cardinality(valueVariables, valuesArray, valueOccurrenceVariables, true));
+      solver.post(SyatConstraintFactory.global_cardinality(observations, valuesArray, valueOccurrenceVariables, true));
    }
    
    /**
-    * Bincounts decomposition (Agkun, 2016) first decomposition 
+    * {@code BINCOUNTS} decomposition (Agkun, 2016a) integer valued
     * 
-    * BEWARE : it is automatically posted (it cannot be reified)
-    * 
-    * @param valueVariables
-    * @param binVariables
-    * @param binBounds
+    * @param observations observations
+    * @param binCounts bin counts
+    * @param binBounds bin bounds expressed as a list of breakpoints
     */
-   public static void bincountsDecomposition2(IntVar[] valueVariables, IntVar[] binVariables, int[] binBounds){
-      Solver solver = valueVariables[0].getSolver();
+   public static void bincountsDecomposition2(IntVar[] observations, IntVar[] binCounts, int[] binBounds){
+      Solver solver = observations[0].getSolver();
       
-      IntVar[] valueBinVariables = new IntVar[valueVariables.length];
+      IntVar[] valueBinVariables = new IntVar[observations.length];
       for(int i = 0; i < valueBinVariables.length; i++){
          valueBinVariables[i] = VariableFactory.bounded("Value-Bin "+i, 0, binBounds.length - 2, solver);
          for(int j = 0; j < binBounds.length - 1; j++){
             solver.post(LogicalConstraintFactory.ifThen_reifiable(
                   SyatConstraintFactory.arithm(valueBinVariables[i], "=", j), 
                   LogicalConstraintFactory.and(
-                        SyatConstraintFactory.arithm(valueVariables[i], ">=", binBounds[j]),
-                        SyatConstraintFactory.arithm(valueVariables[i], "<", binBounds[j+1])
+                        SyatConstraintFactory.arithm(observations[i], ">=", binBounds[j]),
+                        SyatConstraintFactory.arithm(observations[i], "<", binBounds[j+1])
                         )));
             
             solver.post(LogicalConstraintFactory.ifThen_reifiable( 
                   LogicalConstraintFactory.and(
-                        SyatConstraintFactory.arithm(valueVariables[i], ">=", binBounds[j]),
-                        SyatConstraintFactory.arithm(valueVariables[i], "<", binBounds[j+1])
+                        SyatConstraintFactory.arithm(observations[i], ">=", binBounds[j]),
+                        SyatConstraintFactory.arithm(observations[i], "<", binBounds[j+1])
                         ),
                         SyatConstraintFactory.arithm(valueBinVariables[i], "=", j)
                   ));
@@ -103,30 +106,28 @@ public class BincountsDecompositions {
       int[] bins = new int[binBounds.length-1];
       for(int k = 0; k < binBounds.length - 1; k++) bins[k] = k;
       
-      solver.post(SyatConstraintFactory.global_cardinality(valueBinVariables, bins, binVariables, true));
+      solver.post(SyatConstraintFactory.global_cardinality(valueBinVariables, bins, binCounts, true));
    }
    
    /**
-    * Bincounts decomposition (Agkun, 2016) first decomposition (real)
+    * {@code BINCOUNTS} decomposition (Agkun, 2016a) real valued
     * 
-    * BEWARE : it is automatically posted (it cannot be reified)
-    * 
-    * @param valueVariables
-    * @param binVariables
-    * @param binBounds
+    * @param observations observations
+    * @param binCounts bin counts
+    * @param binBounds bin bounds expressed as a list of breakpoints
     */
-   public static void bincountsDecomposition2(RealVar[] valueVariables, IntVar[] binVariables, double[] binBounds, double precision){
-      Solver solver = valueVariables[0].getSolver();
+   public static void bincountsDecomposition2(RealVar[] observations, IntVar[] binCounts, double[] binBounds, double precision){
+      Solver solver = observations[0].getSolver();
       
-      IntVar[] valueBinVariables = new IntVar[valueVariables.length];
+      IntVar[] valueBinVariables = new IntVar[observations.length];
       for(int i = 0; i < valueBinVariables.length; i++){
          valueBinVariables[i] = VariableFactory.bounded("Value-Bin "+i, 0, binBounds.length - 2, solver);
          for(int j = 0; j < binBounds.length - 1; j++){
             String constraintGEStr = "{0}>="+binBounds[j];
             String constraintLEStr = "{0}<"+binBounds[j+1];
             
-            RealConstraint constraintGE = new RealConstraint("constraintGE_"+i+"_"+j,constraintGEStr,Ibex.HC4_NEWTON, new RealVar[]{valueVariables[i]});
-            RealConstraint constraintLE = new RealConstraint("constraintLE_"+i+"_"+j,constraintLEStr,Ibex.HC4_NEWTON, new RealVar[]{valueVariables[i]});
+            RealConstraint constraintGE = new RealConstraint("constraintGE_"+i+"_"+j,constraintGEStr,Ibex.HC4_NEWTON, new RealVar[]{observations[i]});
+            RealConstraint constraintLE = new RealConstraint("constraintLE_"+i+"_"+j,constraintLEStr,Ibex.HC4_NEWTON, new RealVar[]{observations[i]});
            
             solver.post(LogicalConstraintFactory.ifThen_reifiable(
                   SyatConstraintFactory.arithm(valueBinVariables[i], "=", j), 
@@ -144,63 +145,61 @@ public class BincountsDecompositions {
       for(int k = 0; k < binBounds.length - 1; k++) 
          bins[k] = k;
       
-      solver.post(SyatConstraintFactory.global_cardinality(valueBinVariables, bins, binVariables, true));
+      solver.post(SyatConstraintFactory.global_cardinality(valueBinVariables, bins, binCounts, true));
    }
    
    /**
-    * Bincounts decomposition (Agkun, 2016) second decomposition ***
+    * {@code BINCOUNTS} decomposition (Agkun, 2016b) integer valued
     * 
-    * BEWARE : it is automatically posted (it cannot be reified)
-    * 
-    * @param valueVariables
-    * @param binVariables
-    * @param binBounds
+    * @param observations observations
+    * @param binCounts bin counts
+    * @param binBounds bin bounds expressed as a list of breakpoints
+    * @param forceEquality if true, all observations must fall within the given bins
     */
-   public static void bincountsDecomposition3(IntVar[] valueVariables, IntVar[] binVariables, int[] binBounds, boolean forceEquality){
-      Solver solver = valueVariables[0].getSolver();
+   public static void bincountsDecomposition3(IntVar[] observations, IntVar[] binCounts, int[] binBounds, boolean forceEquality){
+      Solver solver = observations[0].getSolver();
       
       for(int j = 0; j < binBounds.length - 1; j++){
-         BoolVar[] valueBinVariables = new BoolVar[valueVariables.length];
+         BoolVar[] valueBinVariables = new BoolVar[observations.length];
          for(int i = 0; i < valueBinVariables.length; i++){
             valueBinVariables[i] = VariableFactory.bool("Value-Bin "+i+" "+j, solver);
             
             solver.post(LogicalConstraintFactory.reification_reifiable(
                   valueBinVariables[i], 
                   LogicalConstraintFactory.and(
-                        SyatConstraintFactory.arithm(valueVariables[i], ">=", binBounds[j]),
-                        SyatConstraintFactory.arithm(valueVariables[i], "<", binBounds[j+1])
+                        SyatConstraintFactory.arithm(observations[i], ">=", binBounds[j]),
+                        SyatConstraintFactory.arithm(observations[i], "<", binBounds[j+1])
                         )));
             
          }
-         solver.post(SyatConstraintFactory.sum(valueBinVariables, binVariables[j]));
+         solver.post(SyatConstraintFactory.sum(valueBinVariables, binCounts[j]));
       }
       
       if(forceEquality) 
-         solver.post(SyatConstraintFactory.sum(binVariables, VariableFactory.fixed(valueVariables.length, solver)));
+         solver.post(SyatConstraintFactory.sum(binCounts, VariableFactory.fixed(observations.length, solver)));
    }
    
    /**
-    * Bincounts decomposition (Agkun, 2016) second decomposition (real) ***
+    * {@code BINCOUNTS} decomposition (Agkun, 2016b) real valued
     * 
-    * BEWARE : it is automatically posted (it cannot be reified)
-    * 
-    * @param valueVariables
-    * @param binVariables
-    * @param binBounds
+    * @param observations observations
+    * @param binCounts bin counts
+    * @param binBounds bin bounds expressed as a list of breakpoints
+    * @param forceEquality if true, all observations must fall within the given bins
     */
-   public static void bincountsDecomposition3(RealVar[] valueVariables, IntVar[] binVariables, double[] binBounds, double precision, boolean forceEquality){
-      Solver solver = valueVariables[0].getSolver();
+   public static void bincountsDecomposition3(RealVar[] observations, IntVar[] binCounts, double[] binBounds, double precision, boolean forceEquality){
+      Solver solver = observations[0].getSolver();
       
       for(int j = 0; j < binBounds.length - 1; j++){
-         BoolVar[] valueBinVariables = new BoolVar[valueVariables.length];
+         BoolVar[] valueBinVariables = new BoolVar[observations.length];
          for(int i = 0; i < valueBinVariables.length; i++){
             valueBinVariables[i] = VariableFactory.bool("Value-Bin "+i+" "+j, solver);
             
             String constraintGEStr = "{0}>="+binBounds[j];
             String constraintLEStr = "{0}<"+binBounds[j+1];
             
-            RealConstraint constraintGE = new RealConstraint("constraintGE_"+i+"_"+j,constraintGEStr,Ibex.HC4_NEWTON, new RealVar[]{valueVariables[i]});
-            RealConstraint constraintLE = new RealConstraint("constraintLE_"+i+"_"+j,constraintLEStr,Ibex.HC4_NEWTON, new RealVar[]{valueVariables[i]});
+            RealConstraint constraintGE = new RealConstraint("constraintGE_"+i+"_"+j,constraintGEStr,Ibex.HC4_NEWTON, new RealVar[]{observations[i]});
+            RealConstraint constraintLE = new RealConstraint("constraintLE_"+i+"_"+j,constraintLEStr,Ibex.HC4_NEWTON, new RealVar[]{observations[i]});
             
             solver.post(LogicalConstraintFactory.reification_reifiable(
                   valueBinVariables[i], 
@@ -208,10 +207,10 @@ public class BincountsDecompositions {
                   ));
             
          }
-         solver.post(SyatConstraintFactory.sum(valueBinVariables, binVariables[j]));
+         solver.post(SyatConstraintFactory.sum(valueBinVariables, binCounts[j]));
       }
       
       if(forceEquality) 
-         solver.post(SyatConstraintFactory.sum(binVariables, VariableFactory.fixed(valueVariables.length, solver)));
+         solver.post(SyatConstraintFactory.sum(binCounts, VariableFactory.fixed(observations.length, solver)));
    }
 }
