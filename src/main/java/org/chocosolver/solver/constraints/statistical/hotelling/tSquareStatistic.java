@@ -45,6 +45,101 @@ import org.la4j.matrix.dense.Basic2DMatrix;
 
 public class tSquareStatistic {
    
+   /***************************/
+   /* Observations are scalar */
+   /***************************/
+   
+   public static void decompose(String name,
+                                RealVar[] mu, 
+                                double[][] sigma, 
+                                double[][] observations,
+                                RealVar statistic, 
+                                double precision){
+      Solver solver = statistic.getSolver();
+      
+      double[] means = getMeans(observations);
+      
+      Matrix a = new Basic2DMatrix(sigma);
+      Matrix b = new GaussJordanInverter(a).inverse(); 
+      
+      int M = observations.length;
+      
+      String statisticString = M+"*(";
+      for(int i = 0; i < mu.length; i++){
+         statisticString += "("+means[i]+"-{"+i+"})*(";
+         for(int j = 0; j < mu.length; j++){
+            statisticString += "("+means[j]+"-{"+j+"})*"+b.get(j, i)+(j == mu.length - 1 ? "" : "+");
+         }
+         statisticString += i == mu.length - 1 ? "))={"+mu.length+"}" : ")+";
+      }
+      
+      RealVar[] allVars = new RealVar[mu.length + 1];
+      System.arraycopy(mu, 0, allVars, 0, mu.length);
+      allVars[allVars.length - 1] = statistic;
+      
+      solver.post(new RealConstraint(name, statisticString, Ibex.HC4_NEWTON, allVars));
+   }
+   
+   public static void decompose(String name,
+                                RealVar[] mu, 
+                                double[][] observations,
+                                RealVar statistic, 
+                                double precision){
+      Solver solver = statistic.getSolver();
+      
+      double[][] sigma = computeCovarianceMatrix(observations);
+      
+      double[] totals = getMeans(observations);
+      
+      Matrix a = new Basic2DMatrix(sigma);
+      Matrix b = new GaussJordanInverter(a).inverse(); 
+      
+      int M = observations.length;
+      
+      String statisticString = M+"*(";
+      for(int i = 0; i < mu.length; i++){
+         statisticString += "("+totals[i]+"-{"+i+"})*(";
+         for(int j = 0; j < mu.length; j++){
+            statisticString += "("+totals[j]+"-{"+j+"})*"+b.get(j, i)+(j == mu.length - 1 ? "" : "+");
+         }
+         statisticString += i == mu.length - 1 ? "))={"+mu.length+"}" : ")+";
+      }
+      
+      RealVar[] allVars = new RealVar[mu.length + 1];
+      System.arraycopy(mu, 0, allVars, 0, mu.length);
+      allVars[allVars.length - 1] = statistic;
+      
+      solver.post(new RealConstraint(name, statisticString, Ibex.HC4_NEWTON, allVars));
+   }
+   
+   private static double[] getMeans(double[][] observations){
+      double[] totals = new double[observations[0].length];
+      for(int i = 0; i < observations.length; i++){
+         for(int j = 0; j < observations[i].length; j++){
+            totals[j] += observations[i][j]/observations.length;
+         }
+      }
+      return totals;
+   }
+   
+   private static double[][] computeCovarianceMatrix(double[][] observations){
+      double[][] matrix = new double[observations[0].length][observations[0].length];
+      for(int i = 0; i < matrix.length; i++){
+         for(int j = 0; j < matrix.length; j++){
+            matrix[i][j] = (new org.apache.commons.math3.stat.correlation.Covariance()).covariance(getArray(i, observations), getArray(j, observations));
+         }
+      }
+      return matrix;
+   }
+   
+   private static double[] getArray(int j, double[][] observations){
+      double[] result = new double[observations.length];
+      for(int i = 0; i < observations.length; i++){
+         result[i] = observations[i][j];
+      }
+      return result;
+   }
+   
    /***************************************/
    /* Observations are decision variables */
    /***************************************/

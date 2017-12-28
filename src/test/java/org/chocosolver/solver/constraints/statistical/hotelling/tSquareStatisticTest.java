@@ -103,6 +103,52 @@ public class tSquareStatisticTest {
       scoreReal.execute(str);
    }
    
+   @Test
+   public void testKnownSigmaVariableObservations() {
+      String[] str={"-log","SOLUTION"};
+      double[] mu = {1, 1, 1};
+      double[][] sigma = new double[][]{
+         { 1.0, 0.1, 0.2 },
+         { 0.1, 1.0, 0.1 },
+         { 0.2, 0.1, 1.0 }
+      };
+      
+      int M = 50;
+      
+      MRG32k3a rng = new MRG32k3a();
+      rng.setSeed(new long[]{1,2,3,4,5,6});
+      double[][] observations = generateObservations(rng, mu, sigma, M);
+      
+      double[][] muDomains = {{1,1},{1,1},{1,1}};
+      double[] statistic = {-1000,1000};
+      
+      ScoreRealKnownSigmaVariableObservations scoreReal = new ScoreRealKnownSigmaVariableObservations(sigma, muDomains, observations, statistic);
+      scoreReal.execute(str);
+   }
+   
+   @Test
+   public void testUnknownSigmaVariableObservations() {
+      String[] str={"-log","SOLUTION"};
+      double[] mu = {1, 1, 1};
+      double[][] sigma = new double[][]{
+         { 1.0, 0.1, 0.2 },
+         { 0.1, 1.0, 0.1 },
+         { 0.2, 0.1, 1.0 }
+      };
+      
+      int M = 50;
+      
+      MRG32k3a rng = new MRG32k3a();
+      rng.setSeed(new long[]{1,2,3,4,5,6});
+      double[][] observations = generateObservations(rng, mu, sigma, M);
+      
+      double[][] muDomains = {{1,1},{1,1},{1,1}};
+      double[] statistic = {-1000,1000};
+      
+      ScoreRealUnknownSigmaVariableObservations scoreReal = new ScoreRealUnknownSigmaVariableObservations(muDomains, observations, statistic);
+      scoreReal.execute(str);
+   }
+   
    private static double[][] generateObservations(MRG32k3a rng, double[] mu, double[][] sigma, int nbObservations){
       NormalGen gen = new NormalGen(rng);
       MultinormalCholeskyGen dist = new MultinormalCholeskyGen(gen, mu, sigma);
@@ -112,6 +158,151 @@ public class tSquareStatisticTest {
    }
    
    class ScoreRealKnownSigma extends AbstractProblem {
+      public RealVar[] muVariable;
+      public RealVar statisticVariable;
+      
+      double[][] sigma;
+      
+      double[][] muDomains;
+      double[][] observations;
+      double[] statistic;
+      
+      double precision = 1.e-4;
+      
+      public ScoreRealKnownSigma(double[][] sigma,
+                       double[][] muDomains,
+                       double[][] observations,
+                       double[] statistic){
+         this.sigma = sigma;
+         
+         this.muDomains = muDomains;
+         this.observations = observations;
+         this.statistic = statistic;
+      }
+      
+      @Override
+      public void createSolver() {
+          solver = new Solver("ChiSquare");
+      }
+      
+      @Override
+      public void buildModel() {
+         muVariable = new RealVar[this.muDomains.length];
+         for(int i = 0; i < this.muVariable.length; i++)
+            muVariable[i] = VariableFactory.real("Mu "+(i+1), muDomains[i][0], muDomains[i][1], precision, solver);
+         
+         statisticVariable = VF.real("score", statistic[0], statistic[1], precision, solver);
+         
+         tSquareStatistic.decompose("scoreConstraint", muVariable, sigma, observations, statisticVariable, precision);
+      }
+      
+      @Override
+      public void configureSearch() {
+         RealStrategy strat = new RealStrategy(muVariable, new Cyclic(), new RealDomainMiddle());
+         solver.set(strat);
+      }
+      
+      @Override
+      public void solve() {
+        StringBuilder st = new StringBuilder();
+        boolean solution = solver.findSolution();
+        //do{
+           st.append("---\n");
+           if(solution) {
+              for(int i = 0; i < muVariable.length; i++){
+                 st.append("("+muVariable[i].getLB()+","+muVariable[i].getUB()+"), ");
+              }
+              st.append("\n");
+              st.append(statisticVariable.getLB()+" "+statisticVariable.getUB());
+              st.append("\n");
+              
+              assertTrue(statisticVariable.getLB() <= 2.64 && statisticVariable.getLB() >= 2.63);
+              assertTrue(statisticVariable.getUB() <= 2.64 && statisticVariable.getUB() >= 2.63);
+           }else{
+              st.append("No solution!");
+           }
+        //}while(solution = solver.nextSolution());
+        System.out.println(st.toString());
+      }
+      
+      @Override
+      public void prettyOut() {
+          
+      }
+   }
+   
+   class ScoreRealUnknownSigma extends AbstractProblem {
+      public RealVar[] muVariable;
+      public RealVar statisticVariable;
+      
+      double[][] muDomains;
+      double[][] observations;
+      double[] statistic;
+      
+      double precision = 1.e-4;
+      
+      public ScoreRealUnknownSigma(
+                       double[][] muDomains,
+                       double[][] observations,
+                       double[] statistic){
+         
+         this.muDomains = muDomains;
+         this.observations = observations;
+         this.statistic = statistic;
+      }
+      
+      @Override
+      public void createSolver() {
+          solver = new Solver("ChiSquare");
+      }
+      
+      @Override
+      public void buildModel() {
+         muVariable = new RealVar[this.muDomains.length];
+         for(int i = 0; i < this.muVariable.length; i++)
+            muVariable[i] = VariableFactory.real("Mu "+(i+1), muDomains[i][0], muDomains[i][1], precision, solver);
+         
+         statisticVariable = VF.real("score", statistic[0], statistic[1], precision, solver);
+         
+         tSquareStatistic.decompose("scoreConstraint", muVariable, observations, statisticVariable, precision);
+      }
+      
+      @Override
+      public void configureSearch() {
+         RealStrategy strat = new RealStrategy(muVariable, new Cyclic(), new RealDomainMiddle());
+         solver.set(strat);
+      }
+      
+      @Override
+      public void solve() {
+        StringBuilder st = new StringBuilder();
+        boolean solution = solver.findSolution();
+        //do{
+           st.append("---\n");
+           if(solution) {
+              for(int i = 0; i < muVariable.length; i++){
+                 st.append("("+muVariable[i].getLB()+","+muVariable[i].getUB()+"), ");
+              }
+              st.append("\n");
+              st.append(statisticVariable.getLB()+" "+statisticVariable.getUB());
+              st.append("\n");
+              
+              assertTrue(statisticVariable.getLB() <= 2.71 && statisticVariable.getLB() >= 2.70);
+              assertTrue(statisticVariable.getUB() <= 2.71 && statisticVariable.getUB() >= 2.70);
+           }else{
+              st.append("No solution!");
+           }
+        //}while(solution = solver.nextSolution());
+           System.out.println(st.toString());
+      }
+      
+      @Override
+      public void prettyOut() {
+          
+      }
+   }
+   
+   class ScoreRealKnownSigmaVariableObservations extends AbstractProblem {
       public RealVar[][] sigmaVariable;
       public RealVar[] muVariable;
       public RealVar[][] observationVariable;
@@ -124,7 +315,7 @@ public class tSquareStatisticTest {
       
       double precision = 1.e-4;
       
-      public ScoreRealKnownSigma(double[][] sigma,
+      public ScoreRealKnownSigmaVariableObservations(double[][] sigma,
                                                      double[][] muDomains,
                                                      double[][] observations,
                                                      double[] statistic){
@@ -210,7 +401,7 @@ public class tSquareStatisticTest {
       }
    }
    
-   class ScoreRealUnknownSigma extends AbstractProblem {
+   class ScoreRealUnknownSigmaVariableObservations extends AbstractProblem {
       public RealVar[] muVariable;
       public RealVar[][] observationVariable;
       public RealVar statisticVariable;
@@ -221,7 +412,7 @@ public class tSquareStatisticTest {
       
       double precision = 1.e-4;
       
-      public ScoreRealUnknownSigma(
+      public ScoreRealUnknownSigmaVariableObservations(
                        double[][] muDomains,
                        double[][] observations,
                        double[] statistic){
