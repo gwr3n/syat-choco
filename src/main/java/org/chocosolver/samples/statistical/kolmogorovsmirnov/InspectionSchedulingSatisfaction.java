@@ -1,4 +1,4 @@
-package org.chocosolver.samples.statistical.inspectionscheduling;
+package org.chocosolver.samples.statistical.kolmogorovsmirnov;
 
 /**
  *  Copyright (c) 1999-2011, Ecole des Mines de Nantes
