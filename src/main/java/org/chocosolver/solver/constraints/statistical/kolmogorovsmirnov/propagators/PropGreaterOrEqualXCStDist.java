@@ -1,4 +1,5 @@
-package org.chocosolver.solver.constraints.statistical.kolmogorovsmirnov;
+package org.chocosolver.solver.constraints.statistical.kolmogorovsmirnov.propagators;
+
 
 import org.chocosolver.solver.constraints.Propagator;
 import org.chocosolver.solver.constraints.PropagatorPriority;
@@ -20,12 +21,12 @@ import umontreal.iro.lecuyer.probdist.EmpiricalDist;
  * @since 16/06/11
  */
 @SuppressWarnings("serial")
-public class PropLessOrEqualXCStDist extends Propagator<IntVar> {
+public class PropGreaterOrEqualXCStDist extends Propagator<IntVar> {
 
-	private final Distribution dist;
+    private final Distribution dist;
     private final double confidence;
 
-    public PropLessOrEqualXCStDist(IntVar[] var, Distribution dist, double confidence) {
+    public PropGreaterOrEqualXCStDist(IntVar[] var, Distribution dist, double confidence) {
         super(var, PropagatorPriority.UNARY, true);
         if(!(dist instanceof ContinuousDistribution)) 
 			throw new SolverException("Theoretical distribution should not be discrete");
@@ -45,25 +46,25 @@ public class PropLessOrEqualXCStDist extends Propagator<IntVar> {
         	double[] samples = new double[vars.length];
         	IntVar pivotVar = vars[i];
         	int k = 0;
-        	samples[k++] = pivotVar.getUB();
+        	samples[k++] = pivotVar.getLB();
         	for(int j = 0; j < vars.length; j++){
         		if(j==i) 
         			continue;
         		else
-        			samples[k++] = vars[j].getLB();
+        			samples[k++] = vars[j].getUB();
         	}
         	EmpiricalDist emp = new EmpiricalDist(samples);
-        	KolmogorovSmirnovTest ksTest = new KolmogorovSmirnovTest(emp, this.dist, this.confidence);
-			while(!ksTest.testD1GeqE1()){
-				pivotVar.updateUpperBound(pivotVar.getUB()-1, this);
+			KolmogorovSmirnovTest ksTest = new KolmogorovSmirnovTest(emp, this.dist, this.confidence);
+			while(!ksTest.testE1GeqD1()){
+				pivotVar.updateLowerBound(pivotVar.getLB()+1, this);
 				//counter++;
-				samples[0] = pivotVar.getUB();
+				samples[0] = pivotVar.getLB();
 				emp = new EmpiricalDist(samples);
 				ksTest = new KolmogorovSmirnovTest(emp, this.dist, this.confidence);
 			}
         }
         //if(counter > 0)
-        	//LoggerFactory.getLogger("bench").info("Pruned (LE): "+counter);
+        	//LoggerFactory.getLogger("bench").info("Pruned (GE): "+counter);
     }
 
     @Override
@@ -82,10 +83,10 @@ public class PropLessOrEqualXCStDist extends Propagator<IntVar> {
         return ESat.UNDEFINED;*/
     	return ESat.UNDEFINED;
     }
-    
+
     @Override
     public String toString() {
-        return vars[0].getName() + " >= " + dist.toString();
+        return vars[0].getName() + " <= " + dist.toString();
     }
 }
 

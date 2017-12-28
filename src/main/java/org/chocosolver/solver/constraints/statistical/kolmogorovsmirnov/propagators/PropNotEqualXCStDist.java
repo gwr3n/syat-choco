@@ -1,4 +1,4 @@
-package org.chocosolver.solver.constraints.statistical.kolmogorovsmirnov;
+package org.chocosolver.solver.constraints.statistical.kolmogorovsmirnov.propagators;
 
 import org.chocosolver.solver.constraints.Propagator;
 import org.chocosolver.solver.constraints.PropagatorPriority;

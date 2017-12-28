@@ -9,6 +9,14 @@ import org.chocosolver.solver.variables.IntVar;
 import umontreal.iro.lecuyer.probdist.Distribution;
 
 import org.chocosolver.solver.constraints.statistical.kolmogorovsmirnov.distributions.DistributionVar;
+import org.chocosolver.solver.constraints.statistical.kolmogorovsmirnov.propagators.PropGreaterOrEqualXCStDist;
+import org.chocosolver.solver.constraints.statistical.kolmogorovsmirnov.propagators.PropGreaterOrEqualX_DStDist;
+import org.chocosolver.solver.constraints.statistical.kolmogorovsmirnov.propagators.PropGreaterOrEqualX_YStDist;
+import org.chocosolver.solver.constraints.statistical.kolmogorovsmirnov.propagators.PropLessOrEqualXCStDist;
+import org.chocosolver.solver.constraints.statistical.kolmogorovsmirnov.propagators.PropLessOrEqualX_DStDist;
+import org.chocosolver.solver.constraints.statistical.kolmogorovsmirnov.propagators.PropNotEqualXCStDist;
+import org.chocosolver.solver.constraints.statistical.kolmogorovsmirnov.propagators.PropNotEqualX_DStDist;
+import org.chocosolver.solver.constraints.statistical.kolmogorovsmirnov.propagators.PropNotEqualX_YStDist;
 
 /**
  * A constraint dedicated to arithmetic operations.
