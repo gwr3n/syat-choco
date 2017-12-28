@@ -3,7 +3,7 @@ package org.chocosolver.solver.constraints.statistical.chisquare;
 import java.math.BigDecimal;
 
 import org.chocosolver.solver.Solver;
-import org.chocosolver.solver.constraints.IntConstraintFactorySt;
+import org.chocosolver.solver.constraints.SyatConstraintFactory;
 import org.chocosolver.solver.constraints.nary.bincounts.BincountsDecompositionType;
 import org.chocosolver.solver.constraints.real.Ibex;
 import org.chocosolver.solver.constraints.real.RealConstraint;
@@ -37,7 +37,7 @@ public class ChiSquareFitPoisson {
 
       //RealVar[] realBinViews = VF.real(binCounts, precision);
       //solver.post(IntConstraintFactorySt.bincounts(observations, realBinViews, binBounds, BincountsPropagatorType.EQFast));
-      IntConstraintFactorySt.bincountsDecomposition(observations, 
+      SyatConstraintFactory.bincountsDecomposition(observations, 
                                                     binCounts, 
                                                     binBounds, 
                                                     precision, 
@@ -96,7 +96,7 @@ public class ChiSquareFitPoisson {
       Solver solver = statistic.getSolver();
       
       //solver.post(IntConstraintFactorySt.bincounts(observations, binCounts, binBounds, BincountsPropagatorType.EQFast));
-      IntConstraintFactorySt.bincountsDecomposition(observations, 
+      SyatConstraintFactory.bincountsDecomposition(observations, 
                                                     binCounts, 
                                                     binBounds, 
                                                     allowOutOfBinObservations ? BincountsDecompositionType.Agkun2016_2_LE :

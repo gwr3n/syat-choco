@@ -4,7 +4,7 @@ import static org.junit.Assert.*;
 
 import org.chocosolver.samples.AbstractProblem;
 import org.chocosolver.solver.Solver;
-import org.chocosolver.solver.constraints.IntConstraintFactorySt;
+import org.chocosolver.solver.constraints.SyatConstraintFactory;
 import org.chocosolver.solver.constraints.statistical.kolmogorovsmirnov.distributions.ExponentialDistVar;
 import org.chocosolver.solver.search.strategy.IntStrategyFactory;
 import org.chocosolver.solver.search.strategy.strategy.AbstractStrategy;
@@ -84,7 +84,7 @@ public class KolmogorovSmirnovTest {
           
           Distribution dist = new NormalDist(10,Math.sqrt(10));
           
-          solver.post(IntConstraintFactorySt.kolmogorov_smirnov(populationX, dist, "!=", 0.95));
+          solver.post(SyatConstraintFactory.kolmogorov_smirnov(populationX, dist, "!=", 0.95));
       }
 
       @Override
@@ -151,7 +151,7 @@ public class KolmogorovSmirnovTest {
           for(int i = 0; i < populationYSize; i++)
            populationY[i] = VariableFactory.bounded("sample "+i, dataY[i], dataY[i], solver);
           
-          solver.post(IntConstraintFactorySt.kolmogorov_smirnov(populationX, populationY, "=", "DISTRIBUTION", 0.95));
+          solver.post(SyatConstraintFactory.kolmogorov_smirnov(populationX, populationY, "=", "DISTRIBUTION", 0.95));
       }
 
       @Override
@@ -232,7 +232,7 @@ public class KolmogorovSmirnovTest {
 
           lambda = VariableFactory.bounded("lambda", 1, 40, solver);
           
-          solver.post(IntConstraintFactorySt.kolmogorov_smirnov(populationX, new ExponentialDistVar(lambda), "=", 0.95));
+          solver.post(SyatConstraintFactory.kolmogorov_smirnov(populationX, new ExponentialDistVar(lambda), "=", 0.95));
       }
 
       @Override

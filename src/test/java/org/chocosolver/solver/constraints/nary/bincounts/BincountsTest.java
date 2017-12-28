@@ -6,7 +6,7 @@ import java.util.Arrays;
 
 import org.chocosolver.samples.AbstractProblem;
 import org.chocosolver.solver.Solver;
-import org.chocosolver.solver.constraints.IntConstraintFactorySt;
+import org.chocosolver.solver.constraints.SyatConstraintFactory;
 import org.chocosolver.solver.constraints.nary.bincounts.BincountsDecompositionType;
 import org.chocosolver.solver.exception.ContradictionException;
 import org.chocosolver.solver.search.strategy.IntStrategyFactory;
@@ -92,7 +92,7 @@ public class BincountsTest {
          for(int i = 0; i < this.binCounts.length; i++)
             binVariables[i] = VariableFactory.bounded("Bin "+(i+1), this.binCounts[i][0], this.binCounts[i][1], solver);
          
-         IntConstraintFactorySt.bincountsDecomposition(valueVariables, binVariables, binBounds, BincountsDecompositionType.Agkun2016_2_EQ);      
+         SyatConstraintFactory.bincountsDecomposition(valueVariables, binVariables, binBounds, BincountsDecompositionType.Agkun2016_2_EQ);      
       }
       
       private IntVar[] mergeArrays(IntVar[] var1, IntVar[] var2){

@@ -1,7 +1,7 @@
 package org.chocosolver.solver.constraints.nary.bincounts;
 
 import org.chocosolver.solver.Solver;
-import org.chocosolver.solver.constraints.IntConstraintFactorySt;
+import org.chocosolver.solver.constraints.SyatConstraintFactory;
 import org.chocosolver.solver.constraints.LogicalConstraintFactory;
 import org.chocosolver.solver.constraints.real.Ibex;
 import org.chocosolver.solver.constraints.real.RealConstraint;
@@ -33,12 +33,12 @@ public class BincountsDecompositions {
       for(int i = 0; i < binBounds.length - 1; i++){
          IntVar[] binOccurrences = new IntVar[binBounds[i+1]-binBounds[i]];
          System.arraycopy(valueOccurrenceVariables, binBounds[i]-binBounds[0], binOccurrences, 0, binBounds[i+1]-binBounds[i]);
-         solver.post(IntConstraintFactorySt.sum(binOccurrences, binVariables[i]));
+         solver.post(SyatConstraintFactory.sum(binOccurrences, binVariables[i]));
       }
       
-      solver.post(IntConstraintFactorySt.sum(binVariables, VariableFactory.fixed(valueVariables.length, solver)));
+      solver.post(SyatConstraintFactory.sum(binVariables, VariableFactory.fixed(valueVariables.length, solver)));
       
-      solver.post(IntConstraintFactorySt.global_cardinality(valueVariables, valuesArray, valueOccurrenceVariables, true));
+      solver.post(SyatConstraintFactory.global_cardinality(valueVariables, valuesArray, valueOccurrenceVariables, true));
    }
    
    /**
@@ -58,18 +58,18 @@ public class BincountsDecompositions {
          valueBinVariables[i] = VariableFactory.bounded("Value-Bin "+i, 0, binBounds.length - 2, solver);
          for(int j = 0; j < binBounds.length - 1; j++){
             solver.post(LogicalConstraintFactory.ifThen_reifiable(
-                  IntConstraintFactorySt.arithm(valueBinVariables[i], "=", j), 
+                  SyatConstraintFactory.arithm(valueBinVariables[i], "=", j), 
                   LogicalConstraintFactory.and(
-                        IntConstraintFactorySt.arithm(valueVariables[i], ">=", binBounds[j]),
-                        IntConstraintFactorySt.arithm(valueVariables[i], "<", binBounds[j+1])
+                        SyatConstraintFactory.arithm(valueVariables[i], ">=", binBounds[j]),
+                        SyatConstraintFactory.arithm(valueVariables[i], "<", binBounds[j+1])
                         )));
             
             solver.post(LogicalConstraintFactory.ifThen_reifiable( 
                   LogicalConstraintFactory.and(
-                        IntConstraintFactorySt.arithm(valueVariables[i], ">=", binBounds[j]),
-                        IntConstraintFactorySt.arithm(valueVariables[i], "<", binBounds[j+1])
+                        SyatConstraintFactory.arithm(valueVariables[i], ">=", binBounds[j]),
+                        SyatConstraintFactory.arithm(valueVariables[i], "<", binBounds[j+1])
                         ),
-                        IntConstraintFactorySt.arithm(valueBinVariables[i], "=", j)
+                        SyatConstraintFactory.arithm(valueBinVariables[i], "=", j)
                   ));
          }
       }
@@ -77,7 +77,7 @@ public class BincountsDecompositions {
       int[] bins = new int[binBounds.length-1];
       for(int k = 0; k < binBounds.length - 1; k++) bins[k] = k;
       
-      solver.post(IntConstraintFactorySt.global_cardinality(valueBinVariables, bins, binVariables, true));
+      solver.post(SyatConstraintFactory.global_cardinality(valueBinVariables, bins, binVariables, true));
    }
    
    /**
@@ -103,13 +103,13 @@ public class BincountsDecompositions {
             RealConstraint constraintLE = new RealConstraint("constraintLE_"+i+"_"+j,constraintLEStr,Ibex.HC4_NEWTON, new RealVar[]{valueVariables[i]});
            
             solver.post(LogicalConstraintFactory.ifThen_reifiable(
-                  IntConstraintFactorySt.arithm(valueBinVariables[i], "=", j), 
+                  SyatConstraintFactory.arithm(valueBinVariables[i], "=", j), 
                   LogicalConstraintFactory.and(constraintGE,constraintLE))
                   );
             
             solver.post(LogicalConstraintFactory.ifThen_reifiable(
                   LogicalConstraintFactory.and(constraintGE,constraintLE),
-                  IntConstraintFactorySt.arithm(valueBinVariables[i], "=", j))
+                  SyatConstraintFactory.arithm(valueBinVariables[i], "=", j))
                   );
          }
       }
@@ -118,7 +118,7 @@ public class BincountsDecompositions {
       for(int k = 0; k < binBounds.length - 1; k++) 
          bins[k] = k;
       
-      solver.post(IntConstraintFactorySt.global_cardinality(valueBinVariables, bins, binVariables, true));
+      solver.post(SyatConstraintFactory.global_cardinality(valueBinVariables, bins, binVariables, true));
    }
    
    /**
@@ -141,16 +141,16 @@ public class BincountsDecompositions {
             solver.post(LogicalConstraintFactory.reification_reifiable(
                   valueBinVariables[i], 
                   LogicalConstraintFactory.and(
-                        IntConstraintFactorySt.arithm(valueVariables[i], ">=", binBounds[j]),
-                        IntConstraintFactorySt.arithm(valueVariables[i], "<", binBounds[j+1])
+                        SyatConstraintFactory.arithm(valueVariables[i], ">=", binBounds[j]),
+                        SyatConstraintFactory.arithm(valueVariables[i], "<", binBounds[j+1])
                         )));
             
          }
-         solver.post(IntConstraintFactorySt.sum(valueBinVariables, binVariables[j]));
+         solver.post(SyatConstraintFactory.sum(valueBinVariables, binVariables[j]));
       }
       
       if(forceEquality) 
-         solver.post(IntConstraintFactorySt.sum(binVariables, VariableFactory.fixed(valueVariables.length, solver)));
+         solver.post(SyatConstraintFactory.sum(binVariables, VariableFactory.fixed(valueVariables.length, solver)));
    }
    
    /**
@@ -182,10 +182,10 @@ public class BincountsDecompositions {
                   ));
             
          }
-         solver.post(IntConstraintFactorySt.sum(valueBinVariables, binVariables[j]));
+         solver.post(SyatConstraintFactory.sum(valueBinVariables, binVariables[j]));
       }
       
       if(forceEquality) 
-         solver.post(IntConstraintFactorySt.sum(binVariables, VariableFactory.fixed(valueVariables.length, solver)));
+         solver.post(SyatConstraintFactory.sum(binVariables, VariableFactory.fixed(valueVariables.length, solver)));
    }
 }

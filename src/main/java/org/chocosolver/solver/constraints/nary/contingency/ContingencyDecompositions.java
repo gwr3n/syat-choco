@@ -1,7 +1,7 @@
 package org.chocosolver.solver.constraints.nary.contingency;
 
 import org.chocosolver.solver.Solver;
-import org.chocosolver.solver.constraints.IntConstraintFactorySt;
+import org.chocosolver.solver.constraints.SyatConstraintFactory;
 import org.chocosolver.solver.constraints.LogicalConstraintFactory;
 import org.chocosolver.solver.constraints.real.Ibex;
 import org.chocosolver.solver.constraints.real.RealConstraint;
@@ -28,18 +28,18 @@ public class ContingencyDecompositions {
                solver.post(LogicalConstraintFactory.reification_reifiable(
                      valueBinVariables[s], 
                      LogicalConstraintFactory.and(
-                           IntConstraintFactorySt.arithm(seriesA[s], ">=", binBounds[0][i]),
-                           IntConstraintFactorySt.arithm(seriesA[s], "<", binBounds[0][i+1]),
-                           IntConstraintFactorySt.arithm(seriesB[s], ">=", binBounds[1][j]),
-                           IntConstraintFactorySt.arithm(seriesB[s], "<", binBounds[1][j+1])
+                           SyatConstraintFactory.arithm(seriesA[s], ">=", binBounds[0][i]),
+                           SyatConstraintFactory.arithm(seriesA[s], "<", binBounds[0][i+1]),
+                           SyatConstraintFactory.arithm(seriesB[s], ">=", binBounds[1][j]),
+                           SyatConstraintFactory.arithm(seriesB[s], "<", binBounds[1][j+1])
                            )));
             }
-            solver.post(IntConstraintFactorySt.sum(valueBinVariables, binVariables[i][j]));
+            solver.post(SyatConstraintFactory.sum(valueBinVariables, binVariables[i][j]));
          }
       }
       
       for(int i = 0; i < marginalsH.length; i++){
-         solver.post(IntConstraintFactorySt.sum(binVariables[i], marginalsH[i]));
+         solver.post(SyatConstraintFactory.sum(binVariables[i], marginalsH[i]));
       }
       
       for(int j = 0; j < marginalsV.length; j++){
@@ -47,7 +47,7 @@ public class ContingencyDecompositions {
          for(int i = 0; i < marginalsH.length; i++){
             tempVArray[i] = binVariables[i][j];
          }
-         solver.post(IntConstraintFactorySt.sum(tempVArray, marginalsV[j]));
+         solver.post(SyatConstraintFactory.sum(tempVArray, marginalsV[j]));
       }
    }
    
@@ -85,12 +85,12 @@ public class ContingencyDecompositions {
                            constraintBL
                            )));
             }
-            solver.post(IntConstraintFactorySt.sum(valueBinVariables, binVariables[i][j]));
+            solver.post(SyatConstraintFactory.sum(valueBinVariables, binVariables[i][j]));
          }
       }
 
       for(int i = 0; i < marginalsH.length; i++){
-         solver.post(IntConstraintFactorySt.sum(binVariables[i], marginalsH[i]));
+         solver.post(SyatConstraintFactory.sum(binVariables[i], marginalsH[i]));
       }
 
       for(int j = 0; j < marginalsV.length; j++){
@@ -98,7 +98,7 @@ public class ContingencyDecompositions {
          for(int i = 0; i < marginalsH.length; i++){
             tempVArray[i] = binVariables[i][j];
          }
-         solver.post(IntConstraintFactorySt.sum(tempVArray, marginalsV[j]));
+         solver.post(SyatConstraintFactory.sum(tempVArray, marginalsV[j]));
       }
    }
 }

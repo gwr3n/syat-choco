@@ -11,7 +11,7 @@ import org.chocosolver.solver.variables.RealVar;
 
 import umontreal.iro.lecuyer.probdist.Distribution;
 
-public class IntConstraintFactorySt extends IntConstraintFactory {
+public class SyatConstraintFactory extends IntConstraintFactory {
 
    public static KolmogorovSmirnov kolmogorov_smirnov(IntVar[] VAR1, IntVar[] VAR2, String OP1, String OP2, double confidence) {
       Operator op1 = Operator.get(OP1);

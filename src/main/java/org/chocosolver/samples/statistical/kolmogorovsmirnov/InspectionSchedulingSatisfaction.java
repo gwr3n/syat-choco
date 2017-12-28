@@ -29,7 +29,7 @@ package org.chocosolver.samples.statistical.kolmogorovsmirnov;
 
 import org.chocosolver.samples.AbstractProblem;
 import org.chocosolver.solver.Solver;
-import org.chocosolver.solver.constraints.IntConstraintFactorySt;
+import org.chocosolver.solver.constraints.SyatConstraintFactory;
 import org.chocosolver.solver.constraints.IntConstraintFactory;
 import org.chocosolver.solver.exception.SolverException;
 import org.chocosolver.solver.search.strategy.IntStrategyFactory;
@@ -108,7 +108,7 @@ public class InspectionSchedulingSatisfaction extends AbstractProblem {
 				solver.post(IntConstraintFactory.scalar(new IntVar[]{starts[i*(NUM_OF_INSPECTIONS/UNITS_TO_INSPECT)+j-1],starts[i*(NUM_OF_INSPECTIONS/UNITS_TO_INSPECT)+j],VariableFactory.fixed(-1, solver)}, new int[]{-1,1,1}, intervals[i][j-1]));
 			}
 			Distribution dist = new ExponentialDist(1.0/EXP_INTERVAL_BETWEEN_INSPECTION);
-			solver.post(IntConstraintFactorySt.kolmogorov_smirnov(intervals[i], dist, "=", 0.9));
+			solver.post(SyatConstraintFactory.kolmogorov_smirnov(intervals[i], dist, "=", 0.9));
 		}
 	}
 

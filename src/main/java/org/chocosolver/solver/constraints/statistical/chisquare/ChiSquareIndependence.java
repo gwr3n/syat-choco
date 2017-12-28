@@ -1,7 +1,7 @@
 package org.chocosolver.solver.constraints.statistical.chisquare;
 
 import org.chocosolver.solver.Solver;
-import org.chocosolver.solver.constraints.IntConstraintFactorySt;
+import org.chocosolver.solver.constraints.SyatConstraintFactory;
 import org.chocosolver.solver.constraints.nary.contingency.ContingencyDecompositions;
 import org.chocosolver.solver.constraints.real.Ibex;
 import org.chocosolver.solver.constraints.real.RealConstraint;
@@ -55,7 +55,7 @@ public class ChiSquareIndependence {
       
       if(!allowOutOfBinObservations){
          IntVar totalCount = VariableFactory.fixed(name+"_total count", observations, solver);
-         solver.post(IntConstraintFactorySt.sum(flattenedBins, totalCount));
+         solver.post(SyatConstraintFactory.sum(flattenedBins, totalCount));
       }
 
       String chiSqExp = "";
@@ -115,7 +115,7 @@ public class ChiSquareIndependence {
 
       if(!allowOutOfBinObservations){
          IntVar totalCount = VariableFactory.fixed(name+"_total count", observations, solver);
-         solver.post(IntConstraintFactorySt.sum(flattenedBins, totalCount));
+         solver.post(SyatConstraintFactory.sum(flattenedBins, totalCount));
       }
 
       String chiSqExp = "";

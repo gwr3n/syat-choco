@@ -1,7 +1,7 @@
 package org.chocosolver.solver.constraints.statistical.chisquare;
 
 import org.chocosolver.solver.Solver;
-import org.chocosolver.solver.constraints.IntConstraintFactorySt;
+import org.chocosolver.solver.constraints.SyatConstraintFactory;
 import org.chocosolver.solver.constraints.nary.bincounts.BincountsDecompositionType;
 import org.chocosolver.solver.constraints.real.Ibex;
 import org.chocosolver.solver.constraints.real.RealConstraint;
@@ -22,7 +22,7 @@ public class ChiSquareFitEmpirical {
 
       //RealVar[] realBinViews = VF.real(binCounts, precision);
       //solver.post(IntConstraintFactorySt.bincounts(observations, realBinViews, binBounds, BincountsPropagatorType.EQFast));
-      IntConstraintFactorySt.bincountsDecomposition(observations, binCounts, binBounds, precision, BincountsDecompositionType.Agkun2016_1);
+      SyatConstraintFactory.bincountsDecomposition(observations, binCounts, binBounds, precision, BincountsDecompositionType.Agkun2016_1);
 
       RealVar[] realBinCounts = VF.real(binCounts, precision);
       RealVar[] realTargetFrequencies = VF.real(targetFrequencies, precision);
@@ -52,7 +52,7 @@ public class ChiSquareFitEmpirical {
       Solver solver = statistic.getSolver();
 
       //solver.post(IntConstraintFactorySt.bincounts(observations, binCounts, binBounds, BincountsPropagatorType.EQFast));
-      IntConstraintFactorySt.bincountsDecomposition(observations, binCounts, binBounds, BincountsDecompositionType.Agkun2016_1);
+      SyatConstraintFactory.bincountsDecomposition(observations, binCounts, binBounds, BincountsDecompositionType.Agkun2016_1);
 
       RealVar[] realBinCounts = VF.real(binCounts, precision);
       RealVar[] realTargetFrequencies = VF.real(targetFrequencies, precision);

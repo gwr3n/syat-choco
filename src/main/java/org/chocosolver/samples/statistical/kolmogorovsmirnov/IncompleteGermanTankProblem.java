@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 import org.chocosolver.samples.AbstractProblem;
 import org.chocosolver.solver.Solver;
-import org.chocosolver.solver.constraints.IntConstraintFactorySt;
+import org.chocosolver.solver.constraints.SyatConstraintFactory;
 import org.chocosolver.solver.constraints.statistical.kolmogorovsmirnov.distributions.UniformDistVar;
 import org.chocosolver.solver.exception.ContradictionException;
 import org.chocosolver.solver.search.strategy.IntStrategyFactory;
@@ -45,7 +45,7 @@ public class IncompleteGermanTankProblem extends AbstractProblem {
 
         uniformUB = VariableFactory.bounded("UB", 1, 150, solver);
         
-        solver.post(IntConstraintFactorySt.kolmogorov_smirnov(populationX, new UniformDistVar(uniformUB), "=", 0.9));
+        solver.post(SyatConstraintFactory.kolmogorov_smirnov(populationX, new UniformDistVar(uniformUB), "=", 0.9));
     }
     
     @SuppressWarnings("unused")
