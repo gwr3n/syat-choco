@@ -1,4 +1,4 @@
-package org.chocosolver.solver.constraints.statistical.kolmogorovsmirnov;
+package org.chocosolver.samples.statistical.kolmogorovsmirnov;
 
 import static org.junit.Assert.*;
 
