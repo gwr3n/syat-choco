@@ -4,7 +4,7 @@ import org.chocosolver.solver.constraints.Operator;
 import org.chocosolver.solver.constraints.nary.contingency.ContingencyDecompositions;
 import org.chocosolver.solver.constraints.nary.bincounts.BincountsDecompositionType;
 import org.chocosolver.solver.constraints.nary.bincounts.BincountsDecompositions;
-import org.chocosolver.solver.constraints.statistical.KolmogorovSmirnov;
+import org.chocosolver.solver.constraints.statistical.kolmogorovsmirnov.KolmogorovSmirnov;
 import org.chocosolver.solver.constraints.statistical.kolmogorovsmirnov.distributions.DistributionVar;
 import org.chocosolver.solver.variables.IntVar;
 import org.chocosolver.solver.variables.RealVar;

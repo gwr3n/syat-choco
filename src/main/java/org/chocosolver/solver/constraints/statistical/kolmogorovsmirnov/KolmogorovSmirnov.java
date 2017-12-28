@@ -1,4 +1,4 @@
-package org.chocosolver.solver.constraints.statistical;
+package org.chocosolver.solver.constraints.statistical.kolmogorovsmirnov;
 
 import org.chocosolver.solver.constraints.Constraint;
 import org.chocosolver.solver.constraints.Operator;
@@ -8,14 +8,6 @@ import org.chocosolver.solver.variables.IntVar;
 
 import umontreal.iro.lecuyer.probdist.Distribution;
 
-import org.chocosolver.solver.constraints.statistical.kolmogorovsmirnov.PropGreaterOrEqualXCStDist;
-import org.chocosolver.solver.constraints.statistical.kolmogorovsmirnov.PropGreaterOrEqualX_DStDist;
-import org.chocosolver.solver.constraints.statistical.kolmogorovsmirnov.PropGreaterOrEqualX_YStDist;
-import org.chocosolver.solver.constraints.statistical.kolmogorovsmirnov.PropLessOrEqualXCStDist;
-import org.chocosolver.solver.constraints.statistical.kolmogorovsmirnov.PropLessOrEqualX_DStDist;
-import org.chocosolver.solver.constraints.statistical.kolmogorovsmirnov.PropNotEqualXCStDist;
-import org.chocosolver.solver.constraints.statistical.kolmogorovsmirnov.PropNotEqualX_DStDist;
-import org.chocosolver.solver.constraints.statistical.kolmogorovsmirnov.PropNotEqualX_YStDist;
 import org.chocosolver.solver.constraints.statistical.kolmogorovsmirnov.distributions.DistributionVar;
 
 /**
