@@ -35,14 +35,32 @@ import org.chocosolver.solver.variables.IntVar;
 import org.chocosolver.solver.variables.RealVar;
 import org.chocosolver.solver.variables.VariableFactory;
 
+/**
+ * Decompositions of the {@code POOLED_STANDARD_DEVIATION} constraint
+ * 
+ * @author Roberto Rossi
+ * @see <a href="https://en.wikipedia.org/wiki/Pooled_variance#Pooled_standard_deviation">Pooled standard deviation</a>
+ */
+
 public class PooledStandardDeviation {
+   
+   /**
+    * {@code POOLED_STANDARD_DEVIATION} constraint decomposition for integer valued observations
+    * 
+    * @param name constraint name
+    * @param observationsA population A observations
+    * @param observationsB population B observations
+    * @param pooledStandardDeviation pooled standard deviation
+    * @param precision Ibex precision
+    */
+   
    public static void decompose(String name,
                                 IntVar[] observationsA,
                                 IntVar[] observationsB,
-                                RealVar standardDeviation,
+                                RealVar pooledStandardDeviation,
                                 double precision){
       
-      Solver solver = standardDeviation.getSolver();
+      Solver solver = pooledStandardDeviation.getSolver();
 
       int minA = Arrays.stream(observationsA).mapToInt(o -> o.getLB()).min().getAsInt();
       int maxA = Arrays.stream(observationsA).mapToInt(o -> o.getUB()).max().getAsInt();
@@ -71,20 +89,30 @@ public class PooledStandardDeviation {
       RealVar[] realObservationsB = VariableFactory.real(observationsB, precision);
       System.arraycopy(realObservationsA, 0, allRealVariables, 0, observationsA.length);
       System.arraycopy(realObservationsB, 0, allRealVariables, observationsA.length, observationsB.length);
-      allRealVariables[observationsA.length + observationsB.length] = standardDeviation;
+      allRealVariables[observationsA.length + observationsB.length] = pooledStandardDeviation;
       allRealVariables[observationsA.length + observationsB.length + 1] = meanA;
       allRealVariables[observationsA.length + observationsB.length + 2] = meanB;
 
       solver.post(new RealConstraint(exp, allRealVariables));
    }
 
+   /**
+    * {@code POOLED_STANDARD_DEVIATION} constraint decomposition for real valued observations
+    * 
+    * @param name constraint name
+    * @param observationsA population A observations
+    * @param observationsB population B observations
+    * @param pooledStandardDeviation pooled standard deviation
+    * @param precision Ibex precision
+    */
+   
    public static void decompose(String name,
                                 RealVar[] observationsA,
                                 RealVar[] observationsB,
-                                RealVar standardDeviation,
+                                RealVar pooledStandardDeviation,
                                 double precision){
       
-      Solver solver = standardDeviation.getSolver();
+      Solver solver = pooledStandardDeviation.getSolver();
       
       double minA = Arrays.stream(observationsA).mapToDouble(o -> o.getLB()).min().getAsDouble();
       double maxA = Arrays.stream(observationsA).mapToDouble(o -> o.getUB()).max().getAsDouble();
@@ -111,7 +139,7 @@ public class PooledStandardDeviation {
       RealVar[] allRealVariables = new RealVar[observationsA.length + observationsB.length + 3];
       System.arraycopy(observationsA, 0, allRealVariables, 0, observationsA.length);
       System.arraycopy(observationsB, 0, allRealVariables, observationsA.length, observationsB.length);
-      allRealVariables[observationsA.length + observationsB.length] = standardDeviation;
+      allRealVariables[observationsA.length + observationsB.length] = pooledStandardDeviation;
       allRealVariables[observationsA.length + observationsB.length + 1] = meanA;
       allRealVariables[observationsA.length + observationsB.length + 2] = meanB;
 

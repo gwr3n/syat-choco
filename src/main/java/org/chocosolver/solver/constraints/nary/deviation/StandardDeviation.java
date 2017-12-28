@@ -37,7 +37,24 @@ import org.chocosolver.solver.variables.RealVar;
 import org.chocosolver.solver.variables.VF;
 import org.chocosolver.solver.variables.VariableFactory;
 
+/**
+ * Decompositions of the {@code STANDARD_DEVIATION} constraint
+ * 
+ * @author Roberto Rossi
+ * @see <a href="https://en.wikipedia.org/wiki/Standard_deviation">Standard deviation</a>
+ */
+
 public class StandardDeviation {
+   
+   /**
+    * {@code STANDARD_DEVIATION} constraint decomposition for integer valued observations
+    * 
+    * @param name constraint name
+    * @param observations observations
+    * @param standardDeviation standard deviation
+    * @param precision Ibex precision
+    */
+   
    public static void decompose(String name,
                                 IntVar[] observations,
                                 RealVar standardDeviation,
@@ -67,6 +84,15 @@ public class StandardDeviation {
       solver.post(new RealConstraint(name, exp, Ibex.HC4_NEWTON, allRealVariables));
    }
 
+   /**
+    * {@code STANDARD_DEVIATION} constraint decomposition for real valued observations
+    * 
+    * @param name constraint name
+    * @param observations observations
+    * @param standardDeviation standard deviation
+    * @param precision Ibex precision
+    */
+   
    public static void decompose(String name,
                                 RealVar[] observations,
                                 RealVar standardDeviation,

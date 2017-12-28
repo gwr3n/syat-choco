@@ -1,5 +1,5 @@
 /*
- * syat-choco: a Choco extension for Declarative Statistics.
+ * syat-choco: a Choco extension for Declarative Statistics
  * 
  * MIT License
  * 
@@ -31,8 +31,24 @@ import org.chocosolver.solver.constraints.real.Ibex;
 import org.chocosolver.solver.constraints.real.RealConstraint;
 import org.chocosolver.solver.variables.RealVar;
 
+/**
+ * Decomposition of the {@code MATRIX} constraint
+ * 
+ * @author Roberto Rossi
+ * @see <a href="https://en.wikipedia.org/wiki/Gaussian_elimination">Gaussian elimination</a>
+ */
+
 public class GaussJordan {
    
+   /**
+    * MATRIX constraint decomposition; {@code inverse} is the  
+    * <a href="https://en.wikipedia.org/wiki/Invertible_matrix">
+    * inverse matrix</a> of {@code matrix}  
+    * 
+    * @param name constraint name
+    * @param matrix matrix
+    * @param inverse inverse matrix
+    */
    public static void decompose(String name, RealVar[][] matrix, RealVar[][] inverse){
       Solver solver = matrix[0][0].getSolver();
       int n = matrix.length;
@@ -132,8 +148,4 @@ public class GaussJordan {
    private static int convertIndexMatrix(int i, int j, int n){
       return n*i + j;
    }
-   
-   /*private static int convertIndexInverseMatrix(int i, int j, int n){
-      return (int) Math.pow(n, 2) + n*i + j;
-   }*/
 }

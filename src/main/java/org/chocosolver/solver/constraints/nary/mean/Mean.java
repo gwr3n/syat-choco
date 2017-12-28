@@ -1,5 +1,5 @@
 /*
- * syat-choco: a Choco extension for Declarative Statistics.
+ * syat-choco: a Choco extension for Declarative Statistics
  * 
  * MIT License
  * 
@@ -33,11 +33,29 @@ import org.chocosolver.solver.variables.IntVar;
 import org.chocosolver.solver.variables.RealVar;
 import org.chocosolver.solver.variables.VF;
 
+/**
+ * Decompositions of the {@code MEAN} constraint
+ * 
+ * @author Roberto Rossi
+ * @see <a href="https://en.wikipedia.org/wiki/Mean">Mean</a>
+ */
+
 public class Mean {
+   
+   /**
+    * {@code MEAN} constraint decomposition for integer valued observations
+    * 
+    * @param name constraint name
+    * @param observations observations
+    * @param mean mean value
+    * @param precision Ibex precision
+    */
+   
    public static void decompose(String name,
                                 IntVar[] observations,
                                 RealVar mean,
                                 double precision){
+      
       Solver solver = mean.getSolver();
       
       String exp = "(";
@@ -56,10 +74,20 @@ public class Mean {
       solver.post(new RealConstraint(name, exp, Ibex.HC4_NEWTON, allRealVariables));
    }
    
+   /**
+    * {@code MEAN} constraint decomposition for real valued observations
+    * 
+    * @param name constraint name
+    * @param observations observations
+    * @param mean mean value
+    * @param precision Ibex precision
+    */
+   
    public static void decompose(String name,
                                 RealVar[] observations,
                                 RealVar mean,
                                 double precision){
+      
       Solver solver = mean.getSolver();
       
       String exp = "(";

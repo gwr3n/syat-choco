@@ -1,5 +1,5 @@
 /*
- * syat-choco: a Choco extension for Declarative Statistics.
+ * syat-choco: a Choco extension for Declarative Statistics
  * 
  * MIT License
  * 
@@ -37,13 +37,30 @@ import org.chocosolver.solver.variables.RealVar;
 import org.chocosolver.solver.variables.VF;
 import org.chocosolver.solver.variables.VariableFactory;
 
+/**
+ * Decompositions of the {@code COVARIANCE} constraint
+ * 
+ * @author Roberto Rossi
+ * @see <a href="https://en.wikipedia.org/wiki/Covariance">Covariance</a>
+ */
+
 public class Covariance {
+   
+   /**
+    * {@code COVARIANCE} constraint decomposition for integer valued observations
+    * 
+    * @param name constraint name
+    * @param observationsA population A observations
+    * @param observationsB population B observations
+    * @param covariance covariance
+    * @param precision Ibex precision
+    */
    public static void decompose(String name,
                                 IntVar[] observationsA,
                                 IntVar[] observationsB,
-                                RealVar variance,
+                                RealVar covariance,
                                 double precision){
-      Solver solver = variance.getSolver();
+      Solver solver = covariance.getSolver();
 
       int minA = Arrays.stream(observationsA).mapToInt(o -> o.getLB()).min().getAsInt();
       int maxA = Arrays.stream(observationsA).mapToInt(o -> o.getUB()).max().getAsInt();
@@ -70,19 +87,29 @@ public class Covariance {
       RealVar[] realObservationsB = VF.real(observationsB, precision);
       System.arraycopy(realObservationsA, 0, allRealVariables, 0, observationsA.length);
       System.arraycopy(realObservationsB, 0, allRealVariables, observationsA.length, observationsB.length);
-      allRealVariables[observationsA.length + observationsB.length] = variance;
+      allRealVariables[observationsA.length + observationsB.length] = covariance;
       allRealVariables[observationsA.length + observationsB.length + 1] = meanA;
       allRealVariables[observationsA.length + observationsB.length + 2] = meanB;
 
       solver.post(new RealConstraint(name, exp, Ibex.HC4_NEWTON, allRealVariables));
    }
 
+   /**
+    * {@code COVARIANCE} constraint decomposition for integer valued observations
+    * 
+    * @param name constraint name
+    * @param observationsA population A observations
+    * @param observationsB population B observations
+    * @param covariance covariance
+    * @param precision Ibex precision
+    */
+   
    public static void decompose(String name,
                                 RealVar[] observationsA,
                                 RealVar[] observationsB,
-                                RealVar variance,
+                                RealVar covariance,
                                 double precision){
-      Solver solver = variance.getSolver();
+      Solver solver = covariance.getSolver();
 
       double minA = Arrays.stream(observationsA).mapToDouble(o -> o.getLB()).min().getAsDouble();
       double maxA = Arrays.stream(observationsA).mapToDouble(o -> o.getUB()).max().getAsDouble();
@@ -107,7 +134,7 @@ public class Covariance {
       RealVar[] allRealVariables = new RealVar[observationsA.length + observationsB.length + 3];
       System.arraycopy(observationsA, 0, allRealVariables, 0, observationsA.length);
       System.arraycopy(observationsB, 0, allRealVariables, observationsA.length, observationsB.length);
-      allRealVariables[observationsA.length + observationsB.length] = variance;
+      allRealVariables[observationsA.length + observationsB.length] = covariance;
       allRealVariables[observationsA.length + observationsB.length + 1] = meanA;
       allRealVariables[observationsA.length + observationsB.length + 2] = meanB;
 

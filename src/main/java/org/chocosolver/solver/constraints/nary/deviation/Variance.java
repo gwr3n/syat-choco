@@ -37,11 +37,29 @@ import org.chocosolver.solver.variables.RealVar;
 import org.chocosolver.solver.variables.VF;
 import org.chocosolver.solver.variables.VariableFactory;
 
+/**
+ * Decompositions of the {@code VARIANCE} constraint
+ * 
+ * @author Roberto Rossi
+ * @see <a href="https://en.wikipedia.org/wiki/Variance">Variance</a>
+ */
+
 public class Variance {
+   
+   /**
+    * {@code VARIANCE} constraint decomposition for integer valued observations
+    * 
+    * @param name constraint name
+    * @param observations observations
+    * @param variance variance
+    * @param precision Ibex precision
+    */
+   
    public static void decompose(String name,
                                 IntVar[] observations,
                                 RealVar variance,
                                 double precision){
+      
       Solver solver = variance.getSolver();
 
       int min = Arrays.stream(observations).mapToInt(o -> o.getLB()).min().getAsInt();
@@ -67,10 +85,20 @@ public class Variance {
       solver.post(new RealConstraint(name, exp, Ibex.HC4_NEWTON, allRealVariables));
    }
 
+   /**
+    * {@code VARIANCE} constraint decomposition for real valued observations
+    * 
+    * @param name constraint name
+    * @param observations observations
+    * @param variance variance
+    * @param precision Ibex precision
+    */
+   
    public static void decompose(String name,
                                 RealVar[] observations,
                                 RealVar variance,
                                 double precision){
+      
       Solver solver = variance.getSolver();
 
       double min = Arrays.stream(observations).mapToDouble(o -> o.getLB()).min().getAsDouble();
