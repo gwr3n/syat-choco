@@ -1,7 +1,5 @@
 package org.syat.statistics;
 
-import umontreal.iro.lecuyer.rng.MRG32k3a;
-import umontreal.iro.lecuyer.randvar.BinomialGen;
 import umontreal.iro.lecuyer.probdist.BetaDist;
 import umontreal.iro.lecuyer.probdist.EmpiricalDist;
 import umontreal.iro.lecuyer.probdist.NormalDist;

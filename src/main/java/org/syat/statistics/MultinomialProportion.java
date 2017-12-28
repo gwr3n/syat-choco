@@ -1,9 +1,6 @@
 package org.syat.statistics;
 
 import umontreal.iro.lecuyer.probdist.ChiSquareDist;
-import umontreal.iro.lecuyer.randvar.UniformGen;
-import umontreal.iro.lecuyer.randvarmulti.MultinomialGen;
-import umontreal.iro.lecuyer.rng.MRG32k3a;
 
 public class MultinomialProportion {
 	
