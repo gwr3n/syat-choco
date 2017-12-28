@@ -24,7 +24,7 @@ public class IntConstraintFactorySt extends IntConstraintFactory {
       return new KolmogorovSmirnov(VAR1, DIST, op1, confidence);
    }
 
-   public static KolmogorovSmirnov arithmSt(IntVar[] VAR1, DistributionVar DIST, String OP1, double confidence) {
+   public static KolmogorovSmirnov kolmogorov_smirnov(IntVar[] VAR1, DistributionVar DIST, String OP1, double confidence) {
       Operator op1 = Operator.get(OP1);
       return new KolmogorovSmirnov(VAR1, DIST, op1, confidence);
    }

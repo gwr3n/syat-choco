@@ -45,7 +45,7 @@ public class IncompleteGermanTankProblem extends AbstractProblem {
 
         uniformUB = VariableFactory.bounded("UB", 1, 150, solver);
         
-        solver.post(IntConstraintFactorySt.arithmSt(populationX, new UniformDistVar(uniformUB), "=", 0.9));
+        solver.post(IntConstraintFactorySt.kolmogorov_smirnov(populationX, new UniformDistVar(uniformUB), "=", 0.9));
     }
     
     @SuppressWarnings("unused")

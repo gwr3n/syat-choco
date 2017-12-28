@@ -232,7 +232,7 @@ public class KolmogorovSmirnovTest {
 
           lambda = VariableFactory.bounded("lambda", 1, 40, solver);
           
-          solver.post(IntConstraintFactorySt.arithmSt(populationX, new ExponentialDistVar(lambda), "=", 0.95));
+          solver.post(IntConstraintFactorySt.kolmogorov_smirnov(populationX, new ExponentialDistVar(lambda), "=", 0.95));
       }
 
       @Override
