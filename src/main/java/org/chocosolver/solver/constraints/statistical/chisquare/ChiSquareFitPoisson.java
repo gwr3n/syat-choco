@@ -13,6 +13,18 @@ import org.chocosolver.solver.variables.VF;
 
 public class ChiSquareFitPoisson {
    
+   /**
+    * This decomposition exploits Stirling's approximation to the factorial
+    * 
+    * @param name
+    * @param observations
+    * @param binCounts
+    * @param binBounds
+    * @param lambda
+    * @param statistic
+    * @param precision
+    * @param allowOutOfBinObservations
+    */
    public static void decomposition(String name,
                                     RealVar[] observations, 
                                     IntVar[] binCounts, 
@@ -61,6 +73,18 @@ public class ChiSquareFitPoisson {
       solver.post(new RealConstraint(name, chiSqExp, Ibex.HC4_NEWTON, allRealVariables));
    }
    
+   /**
+    * This decomposition exploits Stirling's approximation to the factorial
+    * 
+    * @param name
+    * @param observations
+    * @param binCounts
+    * @param binBounds
+    * @param lambda
+    * @param statistic
+    * @param precision
+    * @param allowOutOfBinObservations
+    */
    public static void decomposition(String name,
                                     IntVar[] observations, 
                                     IntVar[] binCounts, 

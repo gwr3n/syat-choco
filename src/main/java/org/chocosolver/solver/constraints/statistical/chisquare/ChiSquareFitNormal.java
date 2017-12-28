@@ -15,6 +15,7 @@ public class ChiSquareFitNormal {
 
    /**
     * Normal approximation {@link https://www.hindawi.com/journals/mpe/2012/124029/} Eq. 4.5.
+    * 
     * @param name
     * @param observations
     * @param binCounts
