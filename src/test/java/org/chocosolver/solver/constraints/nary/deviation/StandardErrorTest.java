@@ -50,7 +50,7 @@ public class StandardErrorTest {
    @After
    public void tearDown() throws Exception {
       System.gc();
-      Thread.sleep(1000);
+      Thread.sleep(3000);
    }
 
    @Test
@@ -61,6 +61,7 @@ public class StandardErrorTest {
       
       IntegerStandardError standardError = new IntegerStandardError(values, new double[]{0,100});
       standardError.execute(str);
+      standardError.getSolver().getIbex().release();
    }
    
    @Test
@@ -71,6 +72,7 @@ public class StandardErrorTest {
       
       RealStandardError standardError = new RealStandardError(values, new double[]{0,100});
       standardError.execute(str);
+      standardError.getSolver().getIbex().release();
    }
 
    class IntegerStandardError extends AbstractProblem {

@@ -51,7 +51,8 @@ public class KolmogorovSmirnovTest {
 
    @After
    public void tearDown() throws Exception {
-
+      System.gc();
+      Thread.sleep(3000);
    }
    
    private static IntVar[] mergeArrays(IntVar[] var1, IntVar[] var2){
@@ -283,7 +284,7 @@ public class KolmogorovSmirnovTest {
               assertTrue("VarDistributionTest", false);
            }
         }while(solution = solver.nextSolution());
-        assertTrue("VarDistributionTest", st.toString().equals("17, 18, 19, 20, 21, 22, 23, 24, "));
+        assertTrue("VarDistributionTest "+ st.toString(), st.toString().equals("17, 18, 19, 20, 21, 22, 23, 24, "));
         System.out.println(st.toString());
       }
 

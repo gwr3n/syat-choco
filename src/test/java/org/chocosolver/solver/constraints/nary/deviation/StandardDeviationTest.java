@@ -50,7 +50,7 @@ public class StandardDeviationTest {
    @After
    public void tearDown() throws Exception {
       System.gc();
-      Thread.sleep(1000);
+      Thread.sleep(3000);
    }
 
    @Test
@@ -61,6 +61,7 @@ public class StandardDeviationTest {
       
       IntegerStandardDeviation standardDeviation = new IntegerStandardDeviation(values, new double[]{0,100});
       standardDeviation.execute(str);
+      standardDeviation.getSolver().getIbex().release();
    }
    
    @Test
@@ -71,6 +72,7 @@ public class StandardDeviationTest {
       
       RealStandardDeviation standardDeviation = new RealStandardDeviation(values, new double[]{0,100});
       standardDeviation.execute(str);
+      standardDeviation.getSolver().getIbex().release();
    }
 
    class IntegerStandardDeviation extends AbstractProblem {

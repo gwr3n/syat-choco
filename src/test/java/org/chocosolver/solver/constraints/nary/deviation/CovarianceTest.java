@@ -52,7 +52,7 @@ public class CovarianceTest {
    @After
    public void tearDown() throws Exception {
       System.gc();
-      Thread.sleep(1000);
+      Thread.sleep(3000);
    }
 
    @Test
@@ -62,8 +62,9 @@ public class CovarianceTest {
       int[][] valuesA = {{1},{2},{3},{4},{5},{6},{7},{8},{9}};
       int[][] valuesB = {{9},{8},{7},{6},{5},{4},{3},{2},{1}};
       
-      IntegerCovariance variance = new IntegerCovariance(valuesA, valuesB, new double[]{-100,100});
-      variance.execute(str);
+      IntegerCovariance covariance = new IntegerCovariance(valuesA, valuesB, new double[]{-100,100});
+      covariance.execute(str);
+      covariance.getSolver().getIbex().release();
    }
    
    @Test
@@ -73,8 +74,9 @@ public class CovarianceTest {
       double[][] valuesA = {{1,1},{2,2},{3,3},{4,4},{5,5},{6,6},{7,7},{8,8},{9,9}};
       double[][] valuesB = {{9,9},{8,8},{7,7},{6,6},{5,5},{4,4},{3,3},{2,2},{1,1}};
       
-      RealCovariance variance = new RealCovariance(valuesA, valuesB, new double[]{-100,100});
-      variance.execute(str);
+      RealCovariance covariance = new RealCovariance(valuesA, valuesB, new double[]{-100,100});
+      covariance.execute(str);
+      covariance.getSolver().getIbex().release();
    }
    
    class IntegerCovariance extends AbstractProblem {

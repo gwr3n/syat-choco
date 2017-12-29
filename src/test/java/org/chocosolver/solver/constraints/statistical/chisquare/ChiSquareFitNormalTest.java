@@ -51,8 +51,8 @@ public class ChiSquareFitNormalTest {
 
    @After
    public void tearDown() throws Exception {
-      Thread.sleep(1000);
       System.gc();
+      Thread.sleep(3000);
    }
 
    @Test
@@ -69,6 +69,7 @@ public class ChiSquareFitNormalTest {
       
       ChiSquareFitNormalReal cs = new ChiSquareFitNormalReal(values, binCounts, binBounds, normalMean, normalStd, chiSqStatistic);
       cs.execute(str);
+      cs.getSolver().getIbex().release();
    }
    
    public class ChiSquareFitNormalReal extends AbstractProblem {

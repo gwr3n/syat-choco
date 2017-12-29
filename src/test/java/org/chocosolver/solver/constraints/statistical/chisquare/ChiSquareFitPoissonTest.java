@@ -51,8 +51,8 @@ public class ChiSquareFitPoissonTest {
 
    @After
    public void tearDown() throws Exception {
-      Thread.sleep(1000);
       System.gc();
+      Thread.sleep(3000);
    }
    
    @Test
@@ -68,6 +68,7 @@ public class ChiSquareFitPoissonTest {
       
       ChiSquareFitPoissonInteger cs = new ChiSquareFitPoissonInteger(values, binCounts, binBounds, poissonRate, chiSqStatistic);
       cs.execute(str);
+      cs.getSolver().getIbex().release();
    }
    
    class ChiSquareFitPoissonInteger extends AbstractProblem {

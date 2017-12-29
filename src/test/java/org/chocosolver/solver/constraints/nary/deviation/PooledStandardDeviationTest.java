@@ -52,7 +52,7 @@ public class PooledStandardDeviationTest {
    @After
    public void tearDown() throws Exception {
       System.gc();
-      Thread.sleep(1000);
+      Thread.sleep(3000);
    }
 
    @Test
@@ -64,6 +64,7 @@ public class PooledStandardDeviationTest {
       
       IntegerPooledStandardDeviation standardDeviation = new IntegerPooledStandardDeviation(valuesA, valuesB, new double[]{0,100});
       standardDeviation.execute(str);
+      standardDeviation.getSolver().getIbex().release();
    }
    
    @Test
@@ -75,6 +76,7 @@ public class PooledStandardDeviationTest {
       
       RealPooledStandardDeviation standardDeviation = new RealPooledStandardDeviation(valuesA, valuesB, new double[]{0,100});
       standardDeviation.execute(str);
+      standardDeviation.getSolver().getIbex().release();
    }
 
    class IntegerPooledStandardDeviation extends AbstractProblem {

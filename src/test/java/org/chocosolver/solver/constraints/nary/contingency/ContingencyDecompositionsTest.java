@@ -28,6 +28,8 @@ package org.chocosolver.solver.constraints.nary.contingency;
 
 import static org.junit.Assert.*;
 
+import java.util.Arrays;
+
 import org.chocosolver.samples.AbstractProblem;
 import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.search.strategy.IntStrategyFactory;
@@ -35,6 +37,7 @@ import org.chocosolver.solver.search.strategy.RealStrategyFactory;
 import org.chocosolver.solver.variables.IntVar;
 import org.chocosolver.solver.variables.RealVar;
 import org.chocosolver.solver.variables.VariableFactory;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -48,7 +51,7 @@ public class ContingencyDecompositionsTest {
    @After
    public void tearDown() throws Exception {
       System.gc();
-      Thread.sleep(1000);
+      Thread.sleep(3000);
    }
 
    @Test
@@ -62,6 +65,7 @@ public class ContingencyDecompositionsTest {
       
       ContingencyDecompositionsInteger cd = new ContingencyDecompositionsInteger(valuesA, valuesB, binCounts, binBounds);
       cd.execute(str);
+      cd.getSolver().getIbex().release();
    }
    
    @Test
@@ -75,6 +79,7 @@ public class ContingencyDecompositionsTest {
       
       ContingencyDecompositionsReal cd = new ContingencyDecompositionsReal(valuesA, valuesB, binCounts, binBounds);
       cd.execute(str);
+      cd.getSolver().getIbex().release();
    }
 
    class ContingencyDecompositionsInteger extends AbstractProblem {
@@ -270,7 +275,7 @@ public class ContingencyDecompositionsTest {
       
       @Override
       public void prettyOut() {
-          
+         System.out.println(Arrays.deepToString(binVariables));
       }
    }
 }

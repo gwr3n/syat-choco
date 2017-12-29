@@ -46,6 +46,8 @@ public class GaussJordanTest {
 
    @After
    public void tearDown() throws Exception {
+      System.gc();
+      Thread.sleep(3000);
    }
 
    @Test

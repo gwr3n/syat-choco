@@ -11,6 +11,8 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
   </properties>
 
   <dependencies>
@@ -47,6 +49,73 @@
   			<groupId>org.apache.maven.plugins</groupId>
   			<artifactId>maven-shade-plugin</artifactId>
   			<version>2.3</version>
+  			<executions>
+		        <execution>
+		            <phase>package</phase>
+		            <goals>
+		                <goal>shade</goal>
+		            </goals>
+		            <configuration>
+		                <filters>
+		                    <filter>
+		                        <artifact>org.bouncycastle:*</artifact>
+		                        <excludes>
+		                            <exclude>META-INF/*.SF</exclude>
+		                            <exclude>META-INF/*.DSA</exclude>
+		                            <exclude>META-INF/*.RSA</exclude>
+		                        </excludes>
+		                    </filter>
+		                </filters>
+		                <transformers>
+		                    <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+		                        <mainClass>your.class.here</mainClass>
+		                    </transformer>
+		                </transformers>
+		                <shadedArtifactAttached>true</shadedArtifactAttached>
+		            </configuration>
+		        </execution>
+		    </executions>
+  		</plugin>
+  		<plugin>
+		    <groupId>org.apache.maven.plugins</groupId>
+		    <artifactId>maven-jarsigner-plugin</artifactId>
+		    <version>1.4</version>
+		    <executions>
+		        <execution>
+		            <id>sign</id>
+		            <goals>
+		                <goal>sign</goal>
+		            </goals>
+		        </execution>
+		        <execution>
+		            <id>verify</id>
+		            <goals>
+		                <goal>verify</goal>
+		            </goals>
+		        </execution>
+		    </executions>
+		    <configuration>
+		        <keystore>${java-jar-signer}/KeyStore.jks</keystore>
+		        <alias>gwr3n.github.io</alias>
+		        <storepass>${java-key-store-password}</storepass>
+		        <keypass>${java-key-password}</keypass>
+		    </configuration>
+		</plugin>
+  		<plugin>
+  			<groupId>org.apache.maven.plugins</groupId>
+  			<artifactId>maven-surefire-plugin</artifactId>
+  			<version>2.12.4</version>
+  			<configuration>
+  			    <forkCount>1</forkCount>
+                <reuseForks>false</reuseForks>
+      			<argLine>-Djava.library.path=${ibex-native-lib}</argLine>
+      			<enableAssertions>false</enableAssertions>
+    			</configuration>
+  		</plugin>
+  		<plugin>
+  			<groupId>org.apache.maven.plugins</groupId>
+  			<artifactId>maven-jarsigner-plugin</artifactId>
+  			<version>1.4</version>
   		</plugin>
   	</plugins>
   </build>

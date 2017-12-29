@@ -53,8 +53,8 @@ public class tSquareStatisticTest {
 
    @After
    public void tearDown() throws Exception {
-      Thread.sleep(1000);
       System.gc();
+      Thread.sleep(3000);
    }
    
    @Test
@@ -78,6 +78,7 @@ public class tSquareStatisticTest {
       
       ScoreRealKnownSigma scoreReal = new ScoreRealKnownSigma(sigma, muDomains, observations, statistic);
       scoreReal.execute(str);
+      scoreReal.getSolver().getIbex().release();
    }
    
    @Test
@@ -101,6 +102,7 @@ public class tSquareStatisticTest {
       
       ScoreRealUnknownSigma scoreReal = new ScoreRealUnknownSigma(muDomains, observations, statistic);
       scoreReal.execute(str);
+      scoreReal.getSolver().getIbex().release();
    }
    
    @Test
@@ -124,6 +126,7 @@ public class tSquareStatisticTest {
       
       ScoreRealKnownSigmaVariableObservations scoreReal = new ScoreRealKnownSigmaVariableObservations(sigma, muDomains, observations, statistic);
       scoreReal.execute(str);
+      scoreReal.getSolver().getIbex().release();
    }
    
    @Test
@@ -147,6 +150,7 @@ public class tSquareStatisticTest {
       
       ScoreRealUnknownSigmaVariableObservations scoreReal = new ScoreRealUnknownSigmaVariableObservations(muDomains, observations, statistic);
       scoreReal.execute(str);
+      scoreReal.getSolver().getIbex().release();
    }
    
    private static double[][] generateObservations(MRG32k3a rng, double[] mu, double[][] sigma, int nbObservations){

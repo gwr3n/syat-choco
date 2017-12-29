@@ -48,6 +48,8 @@ public class MeanTest {
 
    @After
    public void tearDown() throws Exception {
+      System.gc();
+      Thread.sleep(3000);
    }
 
    @Test
@@ -58,6 +60,7 @@ public class MeanTest {
       
       IntegerMean mean = new IntegerMean(values, new double[]{0,10});
       mean.execute(str);
+      mean.getSolver().getIbex().release();
    }
 
    class IntegerMean extends AbstractProblem {

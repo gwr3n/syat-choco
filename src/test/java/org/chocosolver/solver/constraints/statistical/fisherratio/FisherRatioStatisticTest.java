@@ -26,6 +26,8 @@
 
 package org.chocosolver.solver.constraints.statistical.fisherratio;
 
+import static org.junit.Assert.*;
+
 import org.chocosolver.samples.AbstractProblem;
 import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.constraints.statistical.fisherratio.FisherRatioStatistic;
@@ -37,6 +39,7 @@ import org.chocosolver.solver.variables.IntVar;
 import org.chocosolver.solver.variables.RealVar;
 import org.chocosolver.solver.variables.VF;
 import org.chocosolver.solver.variables.VariableFactory;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -49,8 +52,8 @@ public class FisherRatioStatisticTest {
 
    @After
    public void tearDown() throws Exception {
-      Thread.sleep(2000);
       System.gc();
+      Thread.sleep(3000);
    }
 
    @Test
@@ -64,6 +67,7 @@ public class FisherRatioStatisticTest {
       
       FisherRationStatisticInteger fr = new FisherRationStatisticInteger(valuesA, valuesB, fStatistic);
       fr.execute(str);
+      fr.getSolver().getIbex().release();
    }
    
    @Test
@@ -77,6 +81,7 @@ public class FisherRatioStatisticTest {
       
       FisherRationStatisticReal fr = new FisherRationStatisticReal(valuesA, valuesB, fStatistic);
       fr.execute(str);
+      fr.getSolver().getIbex().release();
    }
    
    class FisherRationStatisticInteger extends AbstractProblem {
@@ -150,8 +155,8 @@ public class FisherRatioStatisticTest {
               st.append(chiSqstatisticVariable.getLB()+" "+chiSqstatisticVariable.getUB());
               st.append("\n");*/
               
-              //assertTrue(fStatisticVariable.getLB() <= 10);
-              //assertTrue(fStatisticVariable.getUB() >= 9);
+              assertTrue("F statistic LB: "+fStatisticVariable.getLB(), fStatisticVariable.getLB() <= 1.43);
+              assertTrue("F statistic UB: "+fStatisticVariable.getUB(), fStatisticVariable.getUB() >= 1.42);
               
               st.append(fStatisticVariable.getLB()+" "+fStatisticVariable.getUB());
            }else{
@@ -238,8 +243,8 @@ public class FisherRatioStatisticTest {
               st.append(chiSqstatisticVariable.getLB()+" "+chiSqstatisticVariable.getUB());
               st.append("\n");*/
               
-              //assertTrue(fStatisticVariable.getLB() <= 10);
-              //assertTrue(fStatisticVariable.getUB() >= 9);
+              assertTrue("F statistic LB: "+fStatisticVariable.getLB(), fStatisticVariable.getLB() <= 0.49);
+              assertTrue("F statistic UB: "+fStatisticVariable.getUB(), fStatisticVariable.getUB() >= 0.48);
               
               st.append(fStatisticVariable.getLB()+" "+fStatisticVariable.getUB());
            }else{

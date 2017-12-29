@@ -49,8 +49,8 @@ public class ChiSquareIndependenceTest {
 
    @After
    public void tearDown() throws Exception {
-      Thread.sleep(2000);
       System.gc();
+      Thread.sleep(3000);
    }
 
    @Test
@@ -68,6 +68,7 @@ public class ChiSquareIndependenceTest {
       
       ChiSquareIndependenceInteger cs = new ChiSquareIndependenceInteger(valuesA, valuesB, binCounts, binBounds, chiSqStatistic);
       cs.execute(str);
+      cs.getSolver().getIbex().release();
    }
    
    @Test
@@ -84,6 +85,7 @@ public class ChiSquareIndependenceTest {
       
       ChiSquareIndependenceReal cs = new ChiSquareIndependenceReal(valuesA, valuesB, binBounds, chiSqStatistic);
       cs.execute(str);
+      cs.getSolver().getIbex().release();
    }
 
    class ChiSquareIndependenceInteger extends AbstractProblem {

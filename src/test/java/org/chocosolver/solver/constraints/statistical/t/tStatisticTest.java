@@ -52,7 +52,7 @@ public class tStatisticTest {
    @After
    public void tearDown() throws Exception {
       System.gc();
-      Thread.sleep(1000);
+      Thread.sleep(3000);
    }
 
    @Test
@@ -61,8 +61,9 @@ public class tStatisticTest {
       
       int[][] values = {{1},{2},{3},{4},{5},{6},{7},{8},{9}}; 
       
-      tStatisticInteger standardError = new tStatisticInteger(values, new double[]{5.5,5.5}, new double[]{-10,10});
-      standardError.execute(str);
+      tStatisticInteger t = new tStatisticInteger(values, new double[]{5.5,5.5}, new double[]{-10,10});
+      t.execute(str);
+      t.getSolver().getIbex().release();
    }
    
    @Test
@@ -73,6 +74,7 @@ public class tStatisticTest {
       
       tStatisticReal t = new tStatisticReal(values, new double[]{5.5,5.5}, new double[]{-10,10});
       t.execute(str);
+      t.getSolver().getIbex().release();
    }
    
    @Test
@@ -84,6 +86,7 @@ public class tStatisticTest {
       
       tStatisticIntegerTwoSamples t = new tStatisticIntegerTwoSamples(valuesA, valuesB, new double[]{-10,10});
       t.execute(str);
+      t.getSolver().getIbex().release();
    }
    
    @Test

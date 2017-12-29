@@ -52,8 +52,8 @@ public class ChiSquareFitEmpiricalTest {
 
    @After
    public void tearDown() throws Exception {
-      Thread.sleep(1000);
       System.gc();
+      Thread.sleep(3000);
    }
    
    /**
@@ -73,6 +73,7 @@ public class ChiSquareFitEmpiricalTest {
       
       ChiSquareFitEmpiricalInteger cs = new ChiSquareFitEmpiricalInteger(values, binCounts, binBounds, targetFrequencies, chiSqStatistic);
       cs.execute(str);
+      cs.getSolver().getIbex().release();
    }
    
    @Test
@@ -88,6 +89,7 @@ public class ChiSquareFitEmpiricalTest {
       
       ChiSquareFitEmpiricalReal cs = new ChiSquareFitEmpiricalReal(values, binCounts, binBounds, targetFrequencies, chiSqStatistic);
       cs.execute(str);
+      cs.getSolver().getIbex().release();
    }
 
    class ChiSquareFitEmpiricalInteger extends AbstractProblem {

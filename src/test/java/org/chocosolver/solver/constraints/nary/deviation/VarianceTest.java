@@ -52,7 +52,7 @@ public class VarianceTest {
    @After
    public void tearDown() throws Exception {
       System.gc();
-      Thread.sleep(1000);
+      Thread.sleep(3000);
    }
 
    @Test
@@ -63,6 +63,7 @@ public class VarianceTest {
       
       IntegerVariance variance = new IntegerVariance(values, new double[]{0,100});
       variance.execute(str);
+      variance.getSolver().getIbex().release();
    }
    
    @Test
@@ -73,6 +74,7 @@ public class VarianceTest {
       
       RealVariance variance = new RealVariance(values, new double[]{0,100});
       variance.execute(str);
+      variance.getSolver().getIbex().release();
    }
 
    class IntegerVariance extends AbstractProblem {
