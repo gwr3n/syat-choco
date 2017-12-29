@@ -69,7 +69,7 @@ public class BinomialProportionTest {
          }
       }
       coverageProbabilityCP/=replications;
-      assertEquals("ClopperPearsonCI: "+coverageProbabilityCP,0.9, coverageProbabilityCP,0.001);
+      assertEquals("ClopperPearsonCI: "+coverageProbabilityCP,0.9, coverageProbabilityCP,0.01);
    }
 
    @Test
@@ -94,6 +94,6 @@ public class BinomialProportionTest {
          }
       }
       coverageProbabilityAC/=replications;
-      assertEquals("AgrestiCoullCI: "+coverageProbabilityAC,0.9, coverageProbabilityAC,0.001);
+      assertEquals("AgrestiCoullCI: "+coverageProbabilityAC,0.9, coverageProbabilityAC,0.01);
    }
 }

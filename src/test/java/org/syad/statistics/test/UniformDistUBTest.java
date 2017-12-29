@@ -70,7 +70,7 @@ public class UniformDistUBTest {
 			}
 		}
 		//System.out.println("Frequency: "+coverageProbability/replications);
-		assertEquals("Frequency: "+(coverageProbability/replications),0.95, (coverageProbability/replications),0.01);
+		assertEquals("Frequency: "+(coverageProbability/replications),0.95, (coverageProbability/replications),0.02);
 	}
 
 }

@@ -156,9 +156,9 @@ public class ContingencyDecompositionsTest {
            st.append("---\n");
            if(solution) {
               
-              assertTrue(binVariables[2][0].getValue()==2);
-              assertTrue(binVariables[0][1].getValue()==2);
-              assertTrue(binVariables[1][2].getValue()==1);
+              assertTrue("Value: "+binVariables[2][0].getValue(), binVariables[2][0].getValue()==2);
+              assertTrue("Value: "+binVariables[0][1].getValue(), binVariables[0][1].getValue()==2);
+              assertTrue("Value: "+binVariables[1][2].getValue(), binVariables[1][2].getValue()==1);
               
            }else{
               st.append("No solution!");
@@ -251,13 +251,14 @@ public class ContingencyDecompositionsTest {
       public void solve() {
         StringBuilder st = new StringBuilder();
         boolean solution = solver.findSolution();
+        
         //do{
            st.append("---\n");
            if(solution) {
               
-              assertTrue(binVariables[2][0].getValue()==2);
-              assertTrue(binVariables[0][1].getValue()==2);
-              assertTrue(binVariables[1][2].getValue()==1);
+              assertTrue("Value: "+binVariables[2][0].getValue(), binVariables[2][0].getValue()==2);
+              assertTrue("Value: "+binVariables[0][1].getValue(), binVariables[0][1].getValue()==2);
+              assertTrue("Value: "+binVariables[1][2].getValue(), binVariables[1][2].getValue()==1);
               
            }else{
               st.append("No solution!");
