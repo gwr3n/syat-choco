@@ -46,61 +46,132 @@ import umontreal.iro.lecuyer.probdist.Distribution;
 
 public class SyatConstraintFactory extends IntConstraintFactory {
 
-   public static KolmogorovSmirnov kolmogorov_smirnov(IntVar[] VAR1, IntVar[] VAR2, String OP1, double confidence) {
-      Operator op1 = Operator.get(OP1);
-      return new KolmogorovSmirnov(VAR1, VAR2, op1, confidence);
+   /**
+    * Two-sample Kolmogorov-Smirnov statistical constraint.
+    * 
+    * @param observationsA first list of observations
+    * @param observationsB second list of observations
+    * @param op operator that defines the comparison to be performed between the two distributions {@link org.chocosolver.solver.constraints.Operator
+}
+    * @param confidence test confidence level
+    * @return the Kolmogorov-Smirnov statistical constraint instance
+    */
+   public static KolmogorovSmirnov kolmogorov_smirnov(IntVar[] observationsA, IntVar[] observationsB, String op, double confidence) {
+      Operator op1 = Operator.get(op);
+      return new KolmogorovSmirnov(observationsA, observationsB, op1, confidence);
    }
 
-   public static KolmogorovSmirnov kolmogorov_smirnov(IntVar[] VAR1, Distribution DIST, String OP1, double confidence) {
-      Operator op1 = Operator.get(OP1);
-      return new KolmogorovSmirnov(VAR1, DIST, op1, confidence);
+   /**
+    * One sample Kolmogorov-Smirnov statistical constraint.
+    * 
+    * @param observations list of observations
+    * @param distribution target distribution
+    * @param op operator that defines the comparison to be performed between the two distributions {@link org.chocosolver.solver.constraints.Operator
+}
+    * @param confidence test confidence level
+    * @return the Kolmogorov-Smirnov statistical constraint instance
+    */
+   public static KolmogorovSmirnov kolmogorov_smirnov(IntVar[] observations, Distribution distribution, String op, double confidence) {
+      Operator op1 = Operator.get(op);
+      return new KolmogorovSmirnov(observations, distribution, op1, confidence);
    }
 
-   public static KolmogorovSmirnov kolmogorov_smirnov(IntVar[] VAR1, DistributionVar DIST, String OP1, double confidence) {
-      Operator op1 = Operator.get(OP1);
-      return new KolmogorovSmirnov(VAR1, DIST, op1, confidence);
+   /**
+    * One sample Kolmogorov-Smirnov statistical constraint with parameterised target distribution.
+    * 
+    * @param observations list of observations
+    * @param distribution parameterised target distribution (one parameter)
+    * @param op operator that defines the comparison to be performed between the two distributions {@link org.chocosolver.solver.constraints.Operator
+}
+    * @param confidence test confidence level
+    * @return the Kolmogorov-Smirnov statistical constraint instance
+    */
+   public static KolmogorovSmirnov kolmogorov_smirnov(IntVar[] observations, DistributionVar distribution, String op, double confidence) {
+      Operator op1 = Operator.get(op);
+      return new KolmogorovSmirnov(observations, distribution, op1, confidence);
    }
    
-   public static void bincountsDecomposition(IntVar[] valueVariables, IntVar[] binVariables, int[] binBounds, BincountsDecompositionType decompositionType){
+   /**
+    * Decomposition of the {@code BINCOUNTS} global constraint with integer valued observations.
+    * 
+    * @param observations observations
+    * @param binCounts bin counts
+    * @param binBounds bin bounds expressed as a list of breakpoints
+    * @param decompositionType decomposition type {@link org.chocosolver.solver.constraints.nary.bincounts.BincountsDecompositionType
+}
+    */
+   public static void bincountsDecomposition(IntVar[] observations, IntVar[] binCounts, int[] binBounds, BincountsDecompositionType decompositionType){
       switch(decompositionType){
       case Rossi2016:
-         BincountsDecompositions.bincountsDecomposition1(valueVariables, binVariables, binBounds);
+         BincountsDecompositions.bincountsDecomposition1(observations, binCounts, binBounds);
          break;
       case Agkun2016_1:
-         BincountsDecompositions.bincountsDecomposition2(valueVariables, binVariables, binBounds);
+         BincountsDecompositions.bincountsDecomposition2(observations, binCounts, binBounds);
          break;
       case Agkun2016_2_EQ:
-         BincountsDecompositions.bincountsDecomposition3(valueVariables, binVariables, binBounds, true);
+         BincountsDecompositions.bincountsDecomposition3(observations, binCounts, binBounds, true);
          break;
       case Agkun2016_2_LE:
-         BincountsDecompositions.bincountsDecomposition3(valueVariables, binVariables, binBounds, false);
+         BincountsDecompositions.bincountsDecomposition3(observations, binCounts, binBounds, false);
          break;
       default:
          throw new NullPointerException();
       }
    }
    
-   public static void bincountsDecomposition(RealVar[] valueVariables, IntVar[] binVariables, double[] binBounds, double precision, BincountsDecompositionType decompositionType){
+   /**
+    * Decomposition of the {@code BINCOUNTS} global constraint with real valued observations
+    * 
+    * @param observations observations
+    * @param binCounts bin counts
+    * @param binBounds bin bounds expressed as a list of breakpoints
+    * @param precision Ibex precision 
+    * @param decompositionType decomposition type {@link org.chocosolver.solver.constraints.nary.bincounts.BincountsDecompositionType
+}
+    */
+   public static void bincountsDecomposition(RealVar[] observations, IntVar[] binCounts, double[] binBounds, double precision, BincountsDecompositionType decompositionType){
       switch(decompositionType){
       case Agkun2016_1:
-         BincountsDecompositions.bincountsDecomposition2(valueVariables, binVariables, binBounds, precision);
+         BincountsDecompositions.bincountsDecomposition2(observations, binCounts, binBounds, precision);
          break;
       case Agkun2016_2_EQ:
-         BincountsDecompositions.bincountsDecomposition3(valueVariables, binVariables, binBounds, precision, true);
+         BincountsDecompositions.bincountsDecomposition3(observations, binCounts, binBounds, precision, true);
          break;
       case Agkun2016_2_LE:
-         BincountsDecompositions.bincountsDecomposition3(valueVariables, binVariables, binBounds, precision, false);
+         BincountsDecompositions.bincountsDecomposition3(observations, binCounts, binBounds, precision, false);
          break;
       default:
          throw new NullPointerException();
       }
    }
    
-   public static void contingencyDecomposition(IntVar[] seriesA, IntVar[] seriesB, IntVar[][] binVariables, int[][] binBounds, IntVar[] marginalsH, IntVar[] marginalsV){
-      ContingencyDecompositions.decompose(seriesA, seriesB, binVariables, binBounds, marginalsH, marginalsV);
+   /**
+    * {@code CONTINGENCY} constraint decomposition for integer valued observations.
+    * 
+    * @param observationsA population A observations
+    * @param observationsB population B observations
+    * @param binVariables contingency table cell counts
+    * @param binBounds contingency table bin bounds; provide two arrays of 
+    * breakpoints, for populations A and B, respectively
+    * @param marginalsH contingency table row counts sums
+    * @param marginalsV contingency table column counts sums
+    */
+   public static void contingencyDecomposition(IntVar[] observationsA, IntVar[] observationsB, IntVar[][] binVariables, int[][] binBounds, IntVar[] marginalsH, IntVar[] marginalsV){
+      ContingencyDecompositions.decompose(observationsA, observationsB, binVariables, binBounds, marginalsH, marginalsV);
    }
    
-   public static void contingencyDecomposition(RealVar[] seriesA, RealVar[] seriesB, IntVar[][] binVariables, double[][] binBounds, IntVar[] marginalsH, IntVar[] marginalsV){
-      ContingencyDecompositions.decompose(seriesA, seriesB, binVariables, binBounds, marginalsH, marginalsV);
+   /**
+    * {@code CONTINGENCY} constraint decomposition for real valued observations.
+    * 
+    * @param observationsA population A observations
+    * @param observationsB population B observations
+    * @param binVariables contingency table cell counts
+    * @param binBounds contingency table bin bounds; provide two arrays of 
+    * breakpoints, for populations A and B, respectively
+    * @param marginalsH contingency table row counts sums
+    * @param marginalsV contingency table column counts sums
+    */
+   public static void contingencyDecomposition(RealVar[] observationsA, RealVar[] observationsB, IntVar[][] binVariables, double[][] binBounds, IntVar[] marginalsH, IntVar[] marginalsV){
+      ContingencyDecompositions.decompose(observationsA, observationsB, binVariables, binBounds, marginalsH, marginalsV);
    }
 }
