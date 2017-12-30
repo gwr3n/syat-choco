@@ -38,6 +38,12 @@ import org.chocosolver.solver.search.strategy.strategy.AbstractStrategy;
 import org.chocosolver.solver.variables.IntVar;
 import org.chocosolver.solver.variables.VariableFactory;
 
+/**
+ * Incomplete German Tank Problem.
+ * 
+ * @author Roberto Rossi
+ * @see <a href="http://dx.doi.org/10.3233/978-1-61499-419-0-777">Statistical Constraints</a>; Rossi et al., 2014.
+ */
 public class IncompleteGermanTankProblem extends AbstractProblem {
 
     // input data
