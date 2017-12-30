@@ -79,6 +79,15 @@ public class KolmogorovSmirnov extends Constraint {
     	}
     }
     
+    /**
+     * One sample Kolmogorov-Smirnov statistical constraint with parameterised target distribution.
+     * 
+     * @param observations list of observations
+     * @param distribution parameterised target distribution (one parameter)
+     * @param op operator that defines the comparison to be performed between the two distributions {@link org.chocosolver.solver.constraints.Operator
+ }
+     * @param confidence test confidence level
+     */
     public KolmogorovSmirnov(IntVar[] observations, DistributionVar distribution, Operator op, double confidence) {
     	super("KolmogorovSmirnov_DistVar", createProp(observations, distribution, op, confidence));
     	this.op = op;
@@ -109,6 +118,15 @@ public class KolmogorovSmirnov extends Constraint {
 	    }
     }
     
+    /**
+     * One sample Kolmogorov-Smirnov statistical constraint.
+     * 
+     * @param observations list of observations
+     * @param distribution target distribution
+     * @param op operator that defines the comparison to be performed between the two distributions {@link org.chocosolver.solver.constraints.Operator
+ }
+     * @param confidence test confidence level
+     */
     public KolmogorovSmirnov(IntVar[] observations, Distribution distribution, Operator op, double confidence) {
     	super("KolmogorovSmirnov_Dist", createProp(observations, distribution, op, confidence));
     	this.op = op;
@@ -148,6 +166,15 @@ public class KolmogorovSmirnov extends Constraint {
        }
     }
     
+    /**
+     * Two-sample Kolmogorov-Smirnov statistical constraint.
+     * 
+     * @param observationsA first list of observations
+     * @param observationsB second list of observations
+     * @param op operator that defines the comparison to be performed between the two distributions {@link org.chocosolver.solver.constraints.Operator
+ }
+     * @param confidence test confidence level
+     */
     public KolmogorovSmirnov(IntVar[] observations1, IntVar[] observations2, Operator op, double confidence) {
         super("KolmogorovSmirnov_TwoSample", createProp(observations1, observations2, op, confidence));
         this.op = op;
@@ -156,6 +183,9 @@ public class KolmogorovSmirnov extends Constraint {
         
     }
 
+    /**
+     * Operation undefined for this constraint.
+     */
 	@Override
 	public Constraint makeOpposite(){
 		throw new UnsupportedOperationException();
