@@ -31,11 +31,22 @@ import org.chocosolver.solver.variables.IntVar;
 import umontreal.iro.lecuyer.probdist.ContinuousDistribution;
 import umontreal.iro.lecuyer.probdist.UniformDist;;
 
+/**
+ * An Exponential distribution on {@code [0..M]}, parameterised by {@code M}
+ * 
+ * @author Roberto Rossi
+ *
+ */
 public class UniformDistVar extends ContinuousDistribution implements DistributionVar {
 
 	IntVar M;
 	double curM;
 	
+	/**
+	 * Constructor for an Exponential distribution on {@code [0..M]}, parameterised by {@code M}
+	 * 
+	 * @param M the upper bound of the distribution support
+	 */
 	public UniformDistVar (IntVar M) {
 	      this.M = M;
 	  }

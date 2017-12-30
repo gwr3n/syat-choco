@@ -24,7 +24,7 @@
  * SOFTWARE.
  */
 
-package org.chocosolver.solver.constraints.statistical.kolmogorovsmirnov.propagators;
+package org.chocosolver.solver.constraints.statistical.kolmogorovsmirnov;
 
 import org.chocosolver.solver.constraints.Propagator;
 import org.chocosolver.solver.constraints.PropagatorPriority;
@@ -38,7 +38,7 @@ import org.syat.statistics.KolmogorovSmirnovTestTwoSamples;
 import umontreal.iro.lecuyer.probdist.EmpiricalDist;
 
 @SuppressWarnings("serial")
-public final class PropGreaterOrEqualX_YStDist extends Propagator<IntVar> {
+class PropGreaterOrEqualX_YStDist extends Propagator<IntVar> {
 
     final IntVar[] x;
     final IntVar[] y;

@@ -29,11 +29,32 @@ package org.chocosolver.solver.constraints.statistical.kolmogorovsmirnov.distrib
 import org.chocosolver.solver.variables.IntVar;
 import umontreal.iro.lecuyer.probdist.Distribution;
 
+/**
+ * Interface for a parameterised distribution
+ * 
+ * @author Roberto Rossi
+ *
+ */
 public interface DistributionVar extends Distribution {
 	
+   /**
+    * Number of distribution parameters
+    * 
+    * @return the number of distribution parameters
+    */
 	public int getNumberOfVarParameters();
 	
+	/**
+	 * Distribution parameters
+	 * 
+	 * @return the distribution parameters
+	 */
 	public IntVar[] getVarParatemers();
 	
+	/**
+	 * Setter for distribution parameters
+	 * 
+	 * @param parameters the distribution parameters
+	 */
 	public void setParameters(double[] parameters);
 }

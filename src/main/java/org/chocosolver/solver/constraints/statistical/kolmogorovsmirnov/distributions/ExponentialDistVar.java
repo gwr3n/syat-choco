@@ -31,11 +31,23 @@ import org.chocosolver.solver.variables.IntVar;
 import umontreal.iro.lecuyer.probdist.ExponentialDist;
 import umontreal.iro.lecuyer.probdist.ContinuousDistribution;
 
+/**
+ * Exponential distribution 
+ * 
+ * @author Roberto Rossi
+ *
+ */
 public class ExponentialDistVar extends ContinuousDistribution implements DistributionVar {
 
 	IntVar mean;
 	double curLambbda;
 	
+	
+	/**
+	 * Constructor for an Exponential distribution parameterised by {@code mean}
+	 * 
+	 * @param mean the exponential distribution mean
+	 */
 	public ExponentialDistVar (IntVar mean) {
 	      this.mean = mean;
 	  }

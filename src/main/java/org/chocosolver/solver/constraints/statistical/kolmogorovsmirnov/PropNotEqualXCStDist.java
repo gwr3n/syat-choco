@@ -24,7 +24,7 @@
  * SOFTWARE.
  */
 
-package org.chocosolver.solver.constraints.statistical.kolmogorovsmirnov.propagators;
+package org.chocosolver.solver.constraints.statistical.kolmogorovsmirnov;
 
 import org.chocosolver.solver.constraints.Propagator;
 import org.chocosolver.solver.constraints.PropagatorPriority;
@@ -32,19 +32,21 @@ import org.chocosolver.solver.exception.ContradictionException;
 import org.chocosolver.solver.exception.SolverException;
 import org.chocosolver.solver.variables.IntVar;
 import org.chocosolver.util.ESat;
-import org.syat.statistics.KolmogorovSmirnovTest;
 
 import umontreal.iro.lecuyer.probdist.ContinuousDistribution;
 import umontreal.iro.lecuyer.probdist.Distribution;
 import umontreal.iro.lecuyer.probdist.EmpiricalDist;
 
-@SuppressWarnings("serial")
-public class PropGreaterOrEqualXCStDist extends Propagator<IntVar> {
+import org.chocosolver.util.iterators.DisposableValueIterator;
+import org.syat.statistics.KolmogorovSmirnovTest;
 
-    private final Distribution dist;
+@SuppressWarnings("serial")
+class PropNotEqualXCStDist extends Propagator<IntVar> {
+
+	private final Distribution dist;
     private final double confidence;
 
-    public PropGreaterOrEqualXCStDist(IntVar[] var, Distribution dist, double confidence) {
+    public PropNotEqualXCStDist(IntVar[] var, Distribution dist, double confidence) {
         super(var, PropagatorPriority.UNARY, true);
         if(!(dist instanceof ContinuousDistribution)) 
 			throw new SolverException("Theoretical distribution should not be discrete");
@@ -59,30 +61,39 @@ public class PropGreaterOrEqualXCStDist extends Propagator<IntVar> {
             this.setPassive();
         }*/
         
-    	//int counter = 0;
         for(int i = 0; i < vars.length; i++){
-        	double[] samples = new double[vars.length];
-        	IntVar pivotVar = vars[i];
-        	int k = 0;
-        	samples[k++] = pivotVar.getLB();
+        	double[] samplesLB = new double[vars.length];
+        	int k = 1;
         	for(int j = 0; j < vars.length; j++){
         		if(j==i) 
         			continue;
         		else
-        			samples[k++] = vars[j].getUB();
+        			samplesLB[k++] = vars[j].getLB();
         	}
-        	EmpiricalDist emp = new EmpiricalDist(samples);
-			KolmogorovSmirnovTest ksTest = new KolmogorovSmirnovTest(emp, this.dist, this.confidence);
-			while(!ksTest.testE1GeqD1()){
-				pivotVar.updateLowerBound(pivotVar.getLB()+1, this);
-				//counter++;
-				samples[0] = pivotVar.getLB();
-				emp = new EmpiricalDist(samples);
-				ksTest = new KolmogorovSmirnovTest(emp, this.dist, this.confidence);
-			}
+        	double[] samplesUB = new double[vars.length];
+        	k = 1;
+        	for(int j = 0; j < vars.length; j++){
+        		if(j==i) 
+        			continue;
+        		else
+        			samplesUB[k++] = vars[j].getUB();
+        	}
+        	
+        	IntVar pivotVar = vars[i];
+        	DisposableValueIterator iterator = pivotVar.getValueIterator(true);
+        	while(iterator.hasNext()){
+        		int value = iterator.next();
+        		samplesLB[0] = samplesUB[0] = value;
+        		EmpiricalDist empLB = new EmpiricalDist(samplesLB);
+        		KolmogorovSmirnovTest ksTestLB = new KolmogorovSmirnovTest(empLB, this.dist, this.confidence);
+    			EmpiricalDist empUB = new EmpiricalDist(samplesUB);
+    			KolmogorovSmirnovTest ksTestUB = new KolmogorovSmirnovTest(empUB, this.dist, this.confidence);
+    			
+    			if(ksTestLB.testD1GeqE1() && ksTestUB.testE1GeqD1()){
+    				pivotVar.removeValue(value, this);
+    			}
+        	}
         }
-        //if(counter > 0)
-        	//LoggerFactory.getLogger("bench").info("Pruned (GE): "+counter);
     }
 
     @Override
@@ -107,4 +118,5 @@ public class PropGreaterOrEqualXCStDist extends Propagator<IntVar> {
         return vars[0].getName() + " <= " + dist.toString();
     }
 }
+
 
