@@ -118,7 +118,7 @@ Global constraints and modeling tools covered in this library have been original
 		            <configuration>
 		                <filters>
 		                    <filter>
-		                        <artifact>org.bouncycastle:*</artifact>
+		                        <artifact>*:*</artifact>
 		                        <excludes>
 		                            <exclude>META-INF/*.SF</exclude>
 		                            <exclude>META-INF/*.DSA</exclude>
@@ -155,7 +155,7 @@ Global constraints and modeling tools covered in this library have been original
 		        </execution>
 		    </executions>
 		    <configuration>
-		        <keystore>${java-jar-signer}/KeyStore.jks</keystore>
+		        <keystore>${java-jar-signer}</keystore>
 		        <alias>gwr3n.github.io</alias>
 		        <storepass>${java-key-store-password}</storepass>
 		        <keypass>${java-key-password}</keypass>
