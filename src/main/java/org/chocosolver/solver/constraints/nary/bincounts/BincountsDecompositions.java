@@ -115,6 +115,7 @@ public class BincountsDecompositions {
     * @param observations observations
     * @param binCounts bin counts
     * @param binBounds bin bounds expressed as a list of breakpoints
+    * @param precision Ibex precision
     */
    public static void bincountsDecomposition2(RealVar[] observations, IntVar[] binCounts, double[] binBounds, double precision){
       Solver solver = observations[0].getSolver();
@@ -185,6 +186,7 @@ public class BincountsDecompositions {
     * @param observations observations
     * @param binCounts bin counts
     * @param binBounds bin bounds expressed as a list of breakpoints
+    * @param precision Ibex precision
     * @param forceEquality if true, all observations must fall within the given bins
     */
    public static void bincountsDecomposition3(RealVar[] observations, IntVar[] binCounts, double[] binBounds, double precision, boolean forceEquality){

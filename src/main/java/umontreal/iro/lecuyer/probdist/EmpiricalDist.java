@@ -44,6 +44,9 @@ import umontreal.iro.lecuyer.util.PrintfFormat;
  * The distribution is uniform over the <SPAN CLASS="MATH"><I>n</I></SPAN> observations, so the
  * distribution function has a jump of <SPAN CLASS="MATH">1/<I>n</I></SPAN> at each of the <SPAN CLASS="MATH"><I>n</I></SPAN> observations.
  * 
+ * This class corrects a bug in the original ssj class (see below)
+ * 
+ * @author Roberto Rossi
  */
 public class EmpiricalDist extends DiscreteDistribution {
    private int n = 0;
@@ -158,7 +161,12 @@ public class EmpiricalDist extends DiscreteDistribution {
    }
 
    private void init() {
+      /**********BUG FIX***************/
+      /* The arrray must be sorted */
+      
       Arrays.sort (sortedVal);
+      
+      /*******************************/
       double sum = 0.0;
       for (int i = 0; i < sortedVal.length; i++) {
          sum += sortedVal[i];

@@ -37,6 +37,13 @@ import org.chocosolver.solver.variables.RealVar;
 
 import umontreal.iro.lecuyer.probdist.Distribution;
 
+/**
+ * A Factory to declare constraints in the syat library
+ * 
+ * @author Roberto Rossi
+ *
+ */
+
 public class SyatConstraintFactory extends IntConstraintFactory {
 
    public static KolmogorovSmirnov kolmogorov_smirnov(IntVar[] VAR1, IntVar[] VAR2, String OP1, double confidence) {

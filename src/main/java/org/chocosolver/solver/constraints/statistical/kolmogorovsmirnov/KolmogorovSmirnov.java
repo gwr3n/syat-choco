@@ -45,19 +45,12 @@ import org.chocosolver.solver.constraints.statistical.kolmogorovsmirnov.propagat
 import org.chocosolver.solver.constraints.statistical.kolmogorovsmirnov.propagators.PropNotEqualX_YStDist;
 
 /**
- * A constraint dedicated to arithmetic operations.
- * <br/>
- * There are three available definitions:
- * <li>
- * <ul>VAR op CSTE,</ul>
- * <ul>VAR op VAR,</ul>
- * <ul>VAR op VAR op CSTE</ul>
- * </li>
- * where VAR is a variable, CSTE a constant and op is an operator among {"=", "!=","<", ">", "<=, ">="} or{"+", "-"}.
+ * Kolmogorov-Smirnov statistical constraint
+ * 
+ * @author Roberto Rossi
  *
- * @author Charles Prud'homme
- * @since 21/06/12
  */
+
 @SuppressWarnings("serial")
 public class KolmogorovSmirnov extends Constraint {
 

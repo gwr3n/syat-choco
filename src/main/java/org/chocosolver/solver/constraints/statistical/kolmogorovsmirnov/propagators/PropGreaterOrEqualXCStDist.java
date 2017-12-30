@@ -38,13 +38,6 @@ import umontreal.iro.lecuyer.probdist.ContinuousDistribution;
 import umontreal.iro.lecuyer.probdist.Distribution;
 import umontreal.iro.lecuyer.probdist.EmpiricalDist;
 
-/**
- * X <= C
- * <br/>
- *
- * @author Charles Prud'homme
- * @since 16/06/11
- */
 @SuppressWarnings("serial")
 public class PropGreaterOrEqualXCStDist extends Propagator<IntVar> {
 

@@ -40,13 +40,6 @@ import umontreal.iro.lecuyer.probdist.EmpiricalDist;
 import org.chocosolver.util.iterators.DisposableValueIterator;
 import org.syat.statistics.KolmogorovSmirnovTest;
 
-/**
- * X <= C
- * <br/>
- *
- * @author Charles Prud'homme
- * @since 16/06/11
- */
 @SuppressWarnings("serial")
 public class PropNotEqualXCStDist extends Propagator<IntVar> {
 

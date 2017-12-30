@@ -37,14 +37,6 @@ import org.syat.statistics.KolmogorovSmirnovTestTwoSamples;
 
 import umontreal.iro.lecuyer.probdist.EmpiricalDist;
 
-/**
- * X >= Y
- * <p/>
- * <br/>
- *
- * @author Charles Prud'homme
- * @since 1 oct. 2010
- */
 @SuppressWarnings("serial")
 public final class PropGreaterOrEqualX_YStDist extends Propagator<IntVar> {
 

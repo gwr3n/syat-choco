@@ -29,14 +29,28 @@ package umontreal.iro.lecuyer.randvarmulti;
 import umontreal.iro.lecuyer.randvar.UniformGen;
 import umontreal.iro.lecuyer.randvarmulti.RandomMultivariateGen;
 
+/**
+ * Multinomial random variates generator
+ * 
+ * @author Roberto Rossi
+ *
+ */
+
 public class MultinomialGen extends RandomMultivariateGen {
 	
-	UniformGen gen1;
+	UniformGen rng;
 	double p[];
 	int N;
 	
-	public MultinomialGen(UniformGen gen1, double p[], int N){
-		this.gen1 = gen1;
+	/**
+	 * Multinomial random variates generator constructor
+	 * 
+	 * @param rng generator of uniform random numbers
+	 * @param p multinomial probabilities
+	 * @param N multinomial trials
+	 */
+	public MultinomialGen(UniformGen rng, double p[], int N){
+		this.rng = rng;
 		this.p = p;
 		this.N = N;
 	}
@@ -45,7 +59,7 @@ public class MultinomialGen extends RandomMultivariateGen {
 	public void nextPoint(double[] p) {
 		// TODO Auto-generated method stub
 		for(int j = 0; j < this.N; j++){
-			double mass = this.gen1.nextDouble();
+			double mass = this.rng.nextDouble();
 			double cumulative = 0;
 			for(int i = 0; i < this.p.length; i++){
 				cumulative += this.p[i];
