@@ -167,8 +167,8 @@ public class KolmogorovSmirnov extends Constraint {
  }
      * @param confidence test confidence level
      */
-    public KolmogorovSmirnov(IntVar[] observations1, IntVar[] observations2, Operator op, double confidence) {
-        super("KolmogorovSmirnov_TwoSample", createProp(observations1, observations2, op, confidence));
+    public KolmogorovSmirnov(IntVar[] observationsA, IntVar[] observationsB, Operator op, double confidence) {
+        super("KolmogorovSmirnov_TwoSample", createProp(observationsA, observationsB, op, confidence));
         this.op = op;
         this.cste = 0;
         this.isBinary = true;

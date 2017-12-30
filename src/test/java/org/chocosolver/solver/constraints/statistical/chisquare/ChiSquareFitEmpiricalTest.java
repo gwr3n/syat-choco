@@ -139,7 +139,7 @@ public class ChiSquareFitEmpiricalTest {
          
          chiSqstatisticVariable = VF.real("chiSqStatistics", chiSqStatistic[0], chiSqStatistic[1], precision, solver);
          
-         ChiSquareFitEmpirical.decomposition("chiSqConstraint", valueVariables, binVariables, binBounds, targetFrequencyVariables, chiSqstatisticVariable, precision);
+         ChiSquareFitEmpirical.decomposition("chiSqConstraint", valueVariables, binVariables, binBounds, targetFrequencyVariables, chiSqstatisticVariable, precision, false);
       }
       
       @Override
@@ -228,7 +228,7 @@ public class ChiSquareFitEmpiricalTest {
          
          chiSqstatisticVariable = VF.real("chiSqStatistics", chiSqStatistic[0], chiSqStatistic[1], precision, solver);
          
-         ChiSquareFitEmpirical.decomposition("chiSqConstraint", valueVariables, binVariables, binBounds, targetFrequencyVariables, chiSqstatisticVariable, precision);
+         ChiSquareFitEmpirical.decomposition("chiSqConstraint", valueVariables, binVariables, binBounds, targetFrequencyVariables, chiSqstatisticVariable, precision, false);
       }
       
       @Override

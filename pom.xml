@@ -2,12 +2,40 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>org.choco-solver</groupId>
+  <groupId>org.choco-solver.syat</groupId>
   <artifactId>syat-choco</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>1.0.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>syat-choco</name>
+  <url>https://gwr3n.github.io/syat-choco/</url>
+  <description>syāt is a suite of declarative modelling tools for statistical analysis.
+
+Global constraints and modeling tools covered in this library have been originally introduced in Rossi et al., &quot;Declarative Statistics&quot;, 2017 (https://arxiv.org/abs/1708.01829).</description>
+  <inceptionYear>2017</inceptionYear>
+  
+  <licenses>
+	<license>
+		<name>MIT License</name>
+		<url>http://www.opensource.org/licenses/mit-license.php</url>
+		<distribution>repo</distribution>
+	</license>
+  </licenses>
+  
+  <scm>
+  	<url>https://github.com/gwr3n/syat-choco</url>
+	<connection>scm:git:git://github.com/gwr3n/syat-choco.git</connection>
+	<developerConnection>scm:git:git@github.com:gwr3n/syat-choco.git</developerConnection>
+  </scm>
+  
+  <developers>
+	<developer>
+		<email>robros@gmail.com</email>
+		<name>Roberto Rossi</name>
+		<url>https://gwr3n.github.io/</url>
+		<id>gwr3n</id>
+	</developer>
+  </developers>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -43,6 +71,7 @@
     	<version>3.6.1</version>
     </dependency>
   </dependencies>
+  
   <build>
   	<plugins>
   	   <plugin>
@@ -62,9 +91,11 @@
 		  <groupId>org.apache.maven.plugins</groupId>
 		  <artifactId>maven-javadoc-plugin</artifactId>
 		  <version>3.0.0</version>
+		  <!--  
 		  <configuration>
              <doclint>none</doclint>
           </configuration>
+          -->
 		  <executions>
 		    <execution>
 		      <id>attach-javadocs</id>
@@ -141,11 +172,15 @@
       			<enableAssertions>false</enableAssertions>
     			</configuration>
   		</plugin>
-  		<plugin>
-  			<groupId>org.apache.maven.plugins</groupId>
-  			<artifactId>maven-jarsigner-plugin</artifactId>
-  			<version>1.4</version>
-  		</plugin>
   	</plugins>
   </build>
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-project-info-reports-plugin</artifactId>
+        <version>2.8</version>
+      </plugin>
+    </plugins>
+  </reporting>
 </project>

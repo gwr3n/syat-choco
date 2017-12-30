@@ -37,14 +37,25 @@ import org.chocosolver.solver.variables.VF;
 import org.chocosolver.solver.variables.VariableFactory;
 
 /**
- * https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3900058/
+ * Chi squared test of independence statistical constraint decomposition. 
  * 
  * @author Roberto Rossi
- *
+ * @see <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3900058/">The Chi-square test of independence</a>
  */
 
 public class ChiSquareIndependence {
 
+   /**
+    * Chi squared test of independence statistical constraint decomposition for integer valued observations.
+    * 
+    * @param name constraint name
+    * @param seriesA population A observations
+    * @param seriesB population B observations
+    * @param binBounds bin bounds expressed as a list of breakpoints
+    * @param statistic chi squared statistic
+    * @param precision Ibex precision
+    * @param allowOutOfBinObservations allow observations to fall outside bin bounds
+    */
    public static void decomposition(String name,
                                     IntVar[] seriesA,
                                     IntVar[] seriesB,
@@ -106,6 +117,17 @@ public class ChiSquareIndependence {
       solver.post(new RealConstraint(name, chiSqExp, Ibex.HC4_NEWTON, allRealVariables));
    }
    
+   /**
+    * Chi squared test of independence statistical constraint decomposition for real valued observations.
+    * 
+    * @param name constraint name
+    * @param seriesA population A observations
+    * @param seriesB population B observations
+    * @param binBounds bin bounds expressed as a list of breakpoints
+    * @param statistic chi squared statistic
+    * @param precision Ibex precision
+    * @param allowOutOfBinObservations allow observations to fall outside bin bounds
+    */
    public static void decomposition(String name,
                                     RealVar[] seriesA,
                                     RealVar[] seriesB,

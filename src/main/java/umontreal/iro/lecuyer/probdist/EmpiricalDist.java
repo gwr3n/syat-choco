@@ -62,6 +62,7 @@ public class EmpiricalDist extends DiscreteDistribution {
     *   to have been sorted in increasing numerical order. <A NAME="tex2html1"
     *   HREF="#foot62"><SUP><SPAN CLASS="arabic">1</SPAN></SUP></A>  These observations are copied into an internal array.
     * 
+    * @param obs the observations sorted in increasing numerical order
     */
    public EmpiricalDist (double[] obs) {
       if (obs.length <= 1)
@@ -83,6 +84,8 @@ public class EmpiricalDist extends DiscreteDistribution {
     *   This format is the same as in UNURAN. The observations read are  assumed
     *   to have been sorted in increasing numerical order.
     * 
+    * @param in the observations {@link java.io.Reader}
+    * @throws IOException if an IO error occurs
     */
    public EmpiricalDist (Reader in) throws IOException {
       BufferedReader inb = new BufferedReader (in);
@@ -206,6 +209,7 @@ public class EmpiricalDist extends DiscreteDistribution {
     *    
     * <SPAN CLASS="MATH">(<I>n</I>/2 + 1)<SUP>th</SUP></SPAN> items when the number of items is even.
     * 
+    * @return the median
     */
    public double getMedian () {
       if ((n % 2) == 0)
@@ -254,6 +258,8 @@ public class EmpiricalDist extends DiscreteDistribution {
     * Returns the value of <SPAN CLASS="MATH"><I>X</I><SUB>(i)</SUB></SPAN>, for 
     * <SPAN CLASS="MATH"><I>i</I> = 0, 1,&#8230;, <I>n</I> - 1</SPAN>.
     * 
+    * @param i observation index
+    * @return observation {@code i}
     */
    public double getObs (int i) {
       return sortedVal[i];
@@ -263,6 +269,7 @@ public class EmpiricalDist extends DiscreteDistribution {
    /**
     * Returns the sample mean of the observations.
     * 
+    * @return the sample mean
     */
    public double getSampleMean() {
       return sampleMean;
@@ -272,6 +279,7 @@ public class EmpiricalDist extends DiscreteDistribution {
    /**
     * Returns the sample variance of the observations.
     * 
+    * @return the sample variance
     */
    public double getSampleVariance() {
       return sampleVariance;
@@ -281,6 +289,7 @@ public class EmpiricalDist extends DiscreteDistribution {
    /**
     * Returns the sample standard deviation of the observations.
     * 
+    * @return the sample standard deviation
     */
    public double getSampleStandardDeviation() {
       return sampleStandardDeviation;
@@ -291,6 +300,7 @@ public class EmpiricalDist extends DiscreteDistribution {
     * Returns the <SPAN  CLASS="textit">interquartile range</SPAN> of the observations,
     *    defined as the difference between the third and first quartiles.
     * 
+    * @return the inter quartile range
     */
    public double getInterQuartileRange() {
       int j = n/2;

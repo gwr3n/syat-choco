@@ -37,19 +37,31 @@ import org.chocosolver.solver.variables.IntVar;
 import org.chocosolver.solver.variables.RealVar;
 import org.chocosolver.solver.variables.VF;
 
+/**
+ * Chi square goodness-of-fit statistical constraint decomposition. 
+ * The goodness-of-fit is computed against target frequencies obtained 
+ * from a 'binned' normal distribution.
+ * 
+ * Normal approximation by <a href="https://www.hindawi.com/journals/mpe/2012/124029/">Vazquez-Leal, et al.</a>; Eq. 4.5.
+ * 
+ * @author Roberto Rossi
+ *
+ */
 public class ChiSquareFitNormal {
 
    /**
-    * Normal approximation {@link https://www.hindawi.com/journals/mpe/2012/124029/} Eq. 4.5.
+    * Chi square goodness-of-fit statistical constraint decomposition; 
+    * normal distribution with real valued observations. 
     * 
-    * @param name
-    * @param observations
-    * @param binCounts
-    * @param binBounds
-    * @param meanVariable
-    * @param stdVariable
-    * @param statistic
-    * @param precision
+    * @param name constraint name
+    * @param observations observations
+    * @param binCounts bin counts
+    * @param binBounds bin bounds expressed as a list of breakpoints
+    * @param meanVariable normal distribution mean
+    * @param stdVariable normal distribution standard deviation
+    * @param statistic chi squared statistic
+    * @param precision Ibex precision
+    * @param allowOutOfBinObservations allow observations to fall outside bin bounds
     */
    public static void decomposition(String name, 
                                     RealVar[] observations, 

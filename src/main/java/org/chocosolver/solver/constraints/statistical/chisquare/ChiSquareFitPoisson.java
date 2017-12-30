@@ -37,19 +37,31 @@ import org.chocosolver.solver.variables.IntVar;
 import org.chocosolver.solver.variables.RealVar;
 import org.chocosolver.solver.variables.VF;
 
+/**
+ * Chi square goodness-of-fit statistical constraint decomposition. 
+ * The goodness-of-fit is computed against target frequencies obtained 
+ * from a Poisson distribution. 
+ * 
+ * These decompositions exploits Stirling's approximation to the factorial.
+ * 
+ * @author Roberto Rossi
+ *
+ */
+
 public class ChiSquareFitPoisson {
    
    /**
-    * This decomposition exploits Stirling's approximation to the factorial
+    * Chi square goodness-of-fit statistical constraint decomposition;
+    * Poisson distribution with real valued observations. 
     * 
-    * @param name
-    * @param observations
-    * @param binCounts
-    * @param binBounds
-    * @param lambda
-    * @param statistic
-    * @param precision
-    * @param allowOutOfBinObservations
+    * @param name constraint name
+    * @param observations observations
+    * @param binCounts bin counts
+    * @param binBounds bin bounds expressed as a list of breakpoints
+    * @param lambda Poisson mean
+    * @param statistic chi squared statistic
+    * @param precision Ibex precision
+    * @param allowOutOfBinObservations allow observations to fall outside bin bounds
     */
    public static void decomposition(String name,
                                     RealVar[] observations, 
@@ -102,14 +114,14 @@ public class ChiSquareFitPoisson {
    /**
     * This decomposition exploits Stirling's approximation to the factorial
     * 
-    * @param name
-    * @param observations
-    * @param binCounts
-    * @param binBounds
-    * @param lambda
-    * @param statistic
-    * @param precision
-    * @param allowOutOfBinObservations
+    * @param name constraint name
+    * @param observations observations
+    * @param binCounts bin counts
+    * @param binBounds bin bounds expressed as a list of breakpoints
+    * @param lambda Poisson mean
+    * @param statistic chi squared statistic
+    * @param precision Ibex precision
+    * @param allowOutOfBinObservations allow observations to fall outside bin bounds
     */
    public static void decomposition(String name,
                                     IntVar[] observations, 

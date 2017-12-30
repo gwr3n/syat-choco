@@ -103,7 +103,7 @@ public class PooledVariance {
     * @param observationsA population A observations
     * @param observationsB population B observations
     * @param pooledVariance pooled variance
-    * @param precision
+    * @param precision Ibex precision
     */
    
    public static void decompose(String name,

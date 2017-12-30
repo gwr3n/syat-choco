@@ -35,20 +35,48 @@ import org.chocosolver.solver.variables.IntVar;
 import org.chocosolver.solver.variables.RealVar;
 import org.chocosolver.solver.variables.VF;
 
+/**
+ * Chi square goodness-of-fit statistical constraint decomposition. 
+ * The goodness-of-fit is computed against an empirical discrete distribution 
+ * expressed in terms of target frequencies
+ * 
+ * @author Roberto Rossi
+ *
+ */
 public class ChiSquareFitEmpirical {
+   
+   /**
+    * Chi square goodness-of-fit statistical constraint decomposition for real valued observations.
+    * 
+    * @param name constraint name
+    * @param observations observations
+    * @param binCounts bin counts
+    * @param binBounds bin bounds expressed as a list of breakpoints
+    * @param targetFrequencies target distribution frequencies
+    * @param statistic chi squared statistic
+    * @param precision Ibex precision
+    * @param allowOutOfBinObservations allow observations to fall outside bin bounds
+    */
    public static void decomposition(String name,
                                     RealVar[] observations, 
                                     IntVar[] binCounts, 
                                     double[] binBounds, 
                                     IntVar[] targetFrequencies,
                                     RealVar statistic, 
-                                    double precision){
+                                    double precision,
+                                    boolean allowOutOfBinObservations){
       
       Solver solver = statistic.getSolver();
 
       //RealVar[] realBinViews = VF.real(binCounts, precision);
       //solver.post(IntConstraintFactorySt.bincounts(observations, realBinViews, binBounds, BincountsPropagatorType.EQFast));
-      SyatConstraintFactory.bincountsDecomposition(observations, binCounts, binBounds, precision, BincountsDecompositionType.Agkun2016_1);
+      //SyatConstraintFactory.bincountsDecomposition(observations, binCounts, binBounds, precision, BincountsDecompositionType.Agkun2016_1);
+      SyatConstraintFactory.bincountsDecomposition(observations, 
+                                                   binCounts, 
+                                                   binBounds, 
+                                                   precision, 
+                                                   allowOutOfBinObservations ? BincountsDecompositionType.Agkun2016_2_LE :
+                                                                               BincountsDecompositionType.Agkun2016_1);
 
       RealVar[] realBinCounts = VF.real(binCounts, precision);
       RealVar[] realTargetFrequencies = VF.real(targetFrequencies, precision);
@@ -67,18 +95,36 @@ public class ChiSquareFitEmpirical {
       solver.post(new RealConstraint(name, chiSqExp, Ibex.HC4_NEWTON, allRealVariables));
    }
    
+   /**
+    * Chi square goodness-of-fit statistical constraint decomposition for integer valued observations.
+    * 
+    * @param name constraint name
+    * @param observations observations
+    * @param binCounts bin counts
+    * @param binBounds bin bounds expressed as a list of breakpoints
+    * @param targetFrequencies target distribution frequencies
+    * @param statistic chi squared statistic
+    * @param precision Ibex precision
+    * @param allowOutOfBinObservations allow observations to fall outside bin bounds
+    */
    public static void decomposition(String name,
                                     IntVar[] observations, 
                                     IntVar[] binCounts, 
                                     int[] binBounds, 
                                     IntVar[] targetFrequencies,
                                     RealVar statistic, 
-                                    double precision){
+                                    double precision,
+                                    boolean allowOutOfBinObservations){
       
       Solver solver = statistic.getSolver();
 
       //solver.post(IntConstraintFactorySt.bincounts(observations, binCounts, binBounds, BincountsPropagatorType.EQFast));
-      SyatConstraintFactory.bincountsDecomposition(observations, binCounts, binBounds, BincountsDecompositionType.Agkun2016_1);
+      //SyatConstraintFactory.bincountsDecomposition(observations, binCounts, binBounds, BincountsDecompositionType.Agkun2016_1);
+      SyatConstraintFactory.bincountsDecomposition(observations, 
+                                                   binCounts, 
+                                                   binBounds, 
+                                                   allowOutOfBinObservations ? BincountsDecompositionType.Agkun2016_2_LE :
+                                                                               BincountsDecompositionType.Agkun2016_1);
 
       RealVar[] realBinCounts = VF.real(binCounts, precision);
       RealVar[] realTargetFrequencies = VF.real(targetFrequencies, precision);

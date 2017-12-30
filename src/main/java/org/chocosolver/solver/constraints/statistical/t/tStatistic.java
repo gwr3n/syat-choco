@@ -43,11 +43,11 @@ public class tStatistic {
     * The one-sample t-test statistical constraint is used to determined 
     * mean values are compatible with the observed realisations.
     * 
-    * @param name
-    * @param observations
-    * @param mean
-    * @param t
-    * @param precision
+    * @param name constraint name
+    * @param observations observations
+    * @param mean mean
+    * @param t t statistic
+    * @param precision Ibex precision
     */
    
    public static void decompose(String name,
@@ -75,11 +75,11 @@ public class tStatistic {
     * The one-sample t-test statistical constraint is used to determined 
     * mean values are compatible with the observed realisations.
     * 
-    * @param name
-    * @param observations
-    * @param mean
-    * @param t
-    * @param precision
+    * @param name constraint name
+    * @param observations observations
+    * @param mean mean
+    * @param t t statistic
+    * @param precision Ibex precision
     */
    
    public static void decompose(String name,
@@ -111,11 +111,11 @@ public class tStatistic {
     * 
     * This test is used only when it can be assumed that the two distributions have the same variance. 
     * 
-    * @param name
-    * @param observationsA
-    * @param observationsB
-    * @param t
-    * @param precision
+    * @param name constraint name
+    * @param observationsA population A observations
+    * @param observationsB population B observations
+    * @param t t statistic
+    * @param precision Ibex precision
     */
    
    public static void decompose(String name,
@@ -154,11 +154,11 @@ public class tStatistic {
     * 
     * This test is used only when it can be assumed that the two distributions have the same variance. 
     * 
-    * @param name
-    * @param observationsA
-    * @param observationsB
-    * @param t
-    * @param precision
+    * @param name constraint name
+    * @param observationsA population A observations
+    * @param observationsB population B observations
+    * @param t t statistic
+    * @param precision Ibex precision
     */
    
    public static void decompose(String name,

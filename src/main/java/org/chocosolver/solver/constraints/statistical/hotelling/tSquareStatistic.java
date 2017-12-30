@@ -37,10 +37,10 @@ import org.la4j.inversion.GaussJordanInverter;
 import org.la4j.matrix.dense.Basic2DMatrix;
 
 /**
- * https://en.wikipedia.org/wiki/Hotelling%27s_T-squared_distribution
+ * Decompositions of the Hotelling t squared statistical constraint
  * 
  * @author Roberto Rossi
- *
+ * @see <a href="https://en.wikipedia.org/wiki/Hotelling%27s_T-squared_distribution">Hotelling T squared distribution</a>
  */
 
 public class tSquareStatistic {
@@ -49,6 +49,18 @@ public class tSquareStatistic {
    /* Observations are scalar */
    /***************************/
    
+   /**
+    * This decomposition of the Hotelling t squared statistical constraint 
+    * assumes the variance-covariance matrix is known and both this matrix and 
+    * observations are scalar values 
+    * 
+    * @param name constraint name
+    * @param mu mean array
+    * @param sigma variance-covariance matrix
+    * @param observations observations matrix
+    * @param statistic t squared statistic
+    * @param precision Ibex precision
+    */
    public static void decompose(String name,
                                 RealVar[] mu, 
                                 double[][] sigma, 
@@ -80,6 +92,17 @@ public class tSquareStatistic {
       solver.post(new RealConstraint(name, statisticString, Ibex.HC4_NEWTON, allVars));
    }
    
+   /**
+    * This decomposition of the Hotelling t squared statistical constraint 
+    * assumes observations are scalar and the variance-covariance matrix 
+    * has been estimated from these observations 
+    * 
+    * @param name constraint name
+    * @param mu mean array
+    * @param observations observations matrix
+    * @param statistic t squared statistic
+    * @param precision Ibex precision
+    */
    public static void decompose(String name,
                                 RealVar[] mu, 
                                 double[][] observations,
@@ -144,6 +167,18 @@ public class tSquareStatistic {
    /* Observations are decision variables */
    /***************************************/
    
+   /**
+    * This decomposition of the Hotelling t squared statistical constraint 
+    * assumes the variance-covariance matrix is known and both this matrix and 
+    * observations are decision variables
+    * 
+    * @param name constraint name
+    * @param mu mean array
+    * @param observations observations array
+    * @param sigma variance-covariance matrix
+    * @param statistic t squared statistic
+    * @param precision Ibex precision
+    */
    public static void decompose(String name,
                                 RealVar[] mu, 
                                 RealVar[][] observations,
@@ -191,6 +226,17 @@ public class tSquareStatistic {
       solver.post(new RealConstraint(name+"_chiSq", statisticString, Ibex.HC4_NEWTON, allVars));
    }
    
+   /**
+    * This decomposition of the Hotelling t squared statistical constraint 
+    * assumes observations are decision variables and the variance-covariance matrix 
+    * has been estimated from these observations 
+    * 
+    * @param name constraint name
+    * @param mu mean array
+    * @param observations observations matrix
+    * @param statistic t squared statistic
+    * @param precision Ibex precision
+    */
    public static void decompose(String name,
                                 RealVar[] mu, 
                                 RealVar[][] observations,
