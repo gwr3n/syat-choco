@@ -22,4 +22,11 @@ Assuming Ibex libraries have been installed in
 
 download [jsdp-1.0.0-SNAPSHOT with dependencies](jar/syat-choco-1.0.0-SNAPSHOT-shaded.jar) and run
 
-    java -cp ./syat-choco-1.0.0-SNAPSHOT-shaded.jar -Djava.library.path=~/ibex/ibex-2.3.4/lib/lib/ org.chocosolver.samples.statistical.ttest.TTest
+    java -cp ./syat-choco-1.0.0-SNAPSHOT-shaded.jar -Djava.library.path=/Users/[username]/ibex/ibex-2.3.4/lib/lib/ org.chocosolver.samples.statistical.ttest.TTest
+    
+You should obtain the following output
+
+    TTest example [8, 14, 6, 12, 12, 9, 10, 9, 10, 5]
+    Confidence interval for the mean: [8, 9, 10, 11]
+    
+You must provide an __absolute path__ as `-Djava.library.path=` argument.
