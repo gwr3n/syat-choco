@@ -7,10 +7,10 @@ syat-choco is a [Choco](http://www.choco-solver.org/) extension for [Declarative
 For more information, please consult our [Wiki](https://github.com/gwr3n/syat-choco/wiki).
 
 Current snapshots:
-* [jsdp-1.0.0-SNAPSHOT with dependencies](jar/syat-choco-1.0.0-SNAPSHOT-shaded.jar)
-* [jsdp-1.0.0-SNAPSHOT without dependencies](jar/syat-choco-1.0.0-SNAPSHOT.jar)
-* [jsdp-1.0.0-SNAPSHOT sources](jar/syat-choco-1.0.0-SNAPSHOT-sources.jar)
-* [jsdp-1.0.0-SNAPSHOT javadoc](jar/syat-choco-1.0.0-SNAPSHOT-javadoc.jar)
+* [syat-choco-1.0.0-SNAPSHOT with dependencies](jar/syat-choco-1.0.0-SNAPSHOT-shaded.jar)
+* [syat-choco-1.0.0-SNAPSHOT without dependencies](jar/syat-choco-1.0.0-SNAPSHOT.jar)
+* [syat-choco-1.0.0-SNAPSHOT sources](jar/syat-choco-1.0.0-SNAPSHOT-sources.jar)
+* [syat-choco-1.0.0-SNAPSHOT javadoc](jar/syat-choco-1.0.0-SNAPSHOT-javadoc.jar)
 
 ### Quick start
 
