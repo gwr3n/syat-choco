@@ -134,7 +134,7 @@ public class TTest extends AbstractProblem {
 
     @Override
     public void prettyOut() {
-        System.out.println("TTest example " + Arrays.toString(data));
+        System.out.println("TTest example - observations: " + Arrays.toString(data));
     }
 
     public static void main(String[] args) {

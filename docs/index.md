@@ -26,7 +26,7 @@ download [jsdp-1.0.0-SNAPSHOT with dependencies](jar/syat-choco-1.0.0-SNAPSHOT-s
     
 You should obtain the following output
 
-    TTest example [8, 14, 6, 12, 12, 9, 10, 9, 10, 5]
+    TTest example - observations: [8, 14, 6, 12, 12, 9, 10, 9, 10, 5]
     Confidence interval for the mean: [8, 9, 10, 11]
     
 You must provide an __absolute path__ as `-Djava.library.path=` argument.
