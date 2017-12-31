@@ -12,7 +12,7 @@ Current snapshots:
 * [jsdp-1.0.0-SNAPSHOT sources](jar/syat-choco-1.0.0-SNAPSHOT-sources.jar)
 * [jsdp-1.0.0-SNAPSHOT javadoc](jar/syat-choco-1.0.0-SNAPSHOT-javadoc.jar)
 
-## Quick start
+### Quick start
 
 Install Ibex as discussed [here](https://github.com/gwr3n/syat-choco/wiki/Ibex-quick-installation-notes).
 
