@@ -48,7 +48,7 @@ import org.chocosolver.util.ESat;
 import umontreal.iro.lecuyer.probdist.ChiSquareDist;
 import umontreal.iro.lecuyer.probdist.NormalDist;
 
-public class RegressionNormalBatch extends AbstractProblem {
+public class LinearModelFitNormalCI extends AbstractProblem {
    
    private RealVar slope;
    private RealVar intercept;
@@ -70,10 +70,10 @@ public class RegressionNormalBatch extends AbstractProblem {
    
    private ChiSquareDist chiSqDist;
    
-   public RegressionNormalBatch(double[] observations,
-                                double[] residualBounds,
-                                double[] binBounds,
-                                double significance){
+   public LinearModelFitNormalCI(double[] observations,
+                             double[] residualBounds,
+                             double[] binBounds,
+                             double significance){
       this.observations = observations;
       this.residualBounds = residualBounds;
       this.binBounds = binBounds;
@@ -87,10 +87,10 @@ public class RegressionNormalBatch extends AbstractProblem {
    
    @Override
    public void buildModel() {
-      slope = VariableFactory.real("Slope", -2, 2, precision, solver);
-      intercept = VariableFactory.real("Intercept", -10, 10, precision, solver);
+      slope = VariableFactory.real("Slope", -5, 5, precision, solver);
+      intercept = VariableFactory.real("Intercept", -20, 20, precision, solver);
       mean = VariableFactory.real("Mean", 0, 0, precision, solver);
-      stDeviation = VariableFactory.real("stDeviation", 0, 10, precision, solver);
+      stDeviation = VariableFactory.real("stDeviation", 0, 20, precision, solver);
       
       residual = new RealVar[this.observations.length];
       for(int i = 0; i < this.residual.length; i++){
@@ -110,7 +110,7 @@ public class RegressionNormalBatch extends AbstractProblem {
       this.chiSqDist = new ChiSquareDist(this.binVariables.length-1);
       
       chiSqStatistics = VF.real("chiSqStatistics", 0, this.chiSqDist.inverseF(1-significance), precision, solver);
-      ChiSquareFitNormal.decomposition("chiSqTest", residual, binVariables, binBounds, mean, stDeviation, chiSqStatistics, precision, false);
+      ChiSquareFitNormal.decomposition("chiSqTest", residual, binVariables, binBounds, mean, stDeviation, chiSqStatistics, precision, true);
    }
    
    @Override
@@ -126,15 +126,25 @@ public class RegressionNormalBatch extends AbstractProblem {
    @Override
    public void solve() {
      StringBuilder st = new StringBuilder();
-     solver.findOptimalSolution(ResolutionPolicy.MINIMIZE, chiSqStatistics, precision);
+     solver.findOptimalSolution(ResolutionPolicy.MAXIMIZE, stDeviation, precision);
      //do{
+        st.append("---\n");
         if(solver.isFeasible() == ESat.TRUE) {
-           st.append(slope.getLB()+", "+intercept.getLB()+", "+mean.toString()+", "+stDeviation.getLB());
+           st.append(slope.toString()+", "+intercept.toString()+", "+mean.toString()+", "+stDeviation.toString()+"\n");
+           for(int i = 0; i < residual.length; i++){
+              st.append(residual[i].toString()+", ");
+           }
+           st.append("\n");
+           for(int i = 0; i < binVariables.length; i++){
+              st.append(binVariables[i].toString()+", ");
+           }
+           st.append("\n");
+           st.append(chiSqStatistics.getLB()+" "+chiSqStatistics.getUB());
+           st.append("\n");
         }else{
            st.append("No solution!");
         }
      //}while(solution = solver.nextSolution());
-     //LoggerFactory.getLogger("bench").info(st.toString());
      System.out.println(st.toString());
    }
 
@@ -149,9 +159,9 @@ public class RegressionNormalBatch extends AbstractProblem {
    }
    
    public static void fitMostLikelyParameters(){
-      String[] str={"-log","SILENT"};
+      String[] str={"-log","SOLUTION"};
       
-      int nbObservations = 25;
+      int nbObservations = 20;
       
       double slope = 1;
       double intercept = 5;
@@ -161,39 +171,16 @@ public class RegressionNormalBatch extends AbstractProblem {
       double[] residualBounds = {normalMean-4*normalstd,normalMean+4*normalstd};
       
       Random rnd = new Random(1234);
+      double[] observations = generateObservations(rnd, slope, intercept, normalMean, normalstd, nbObservations);
+      Arrays.stream(observations).forEach(k -> System.out.print(k+", "));
+      System.out.println();
       
-      int batchSize = 30;
-      double[][] observations = new double[batchSize][];
-      
-      for(int i = 0; i < batchSize; i++){
-         observations[i] = generateObservations(rnd, slope, intercept, normalMean, normalstd, nbObservations);
-         Arrays.stream(observations[i]).forEach(k -> System.out.print(k+", "));
-         System.out.println();
-      }
-      
-      for(int i = 0; i < batchSize; i++){
-         int bins = 5;
-         double[] binBounds = DoubleStream.iterate(-10, a -> a + 4).limit(bins + 1).toArray();                                 
-         double significance = 0.05;
-      
-         RegressionNormalBatch regression = new RegressionNormalBatch(observations[i], residualBounds, binBounds, significance);
-         regression.execute(str);
-         try {
-            regression.finalize();
-         } catch (Throwable e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-         }
-         regression = null;
-         System.gc();
-         
-         try {
-            Thread.sleep(100);
-         } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-         }
-      }
+      int bins = 5;
+      double[] binBounds = DoubleStream.iterate(-10, i -> i + 4).limit(bins + 1).toArray();                                 
+      double significance = 0.05;
+   
+      LinearModelFitNormalCI regression = new LinearModelFitNormalCI(observations, residualBounds, binBounds, significance);
+      regression.execute(str);
    }
    
    public static void main(String[] args) {

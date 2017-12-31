@@ -48,7 +48,7 @@ import org.chocosolver.util.ESat;
 import umontreal.iro.lecuyer.probdist.ChiSquareDist;
 import umontreal.iro.lecuyer.probdist.PoissonDist;
 
-public class RegressionParametersFit extends AbstractProblem {
+public class TwoLinearModelsFitPoisson extends AbstractProblem {
    
    public RealVar slope1;
    //public RealVar poissonRate1;
@@ -71,7 +71,7 @@ public class RegressionParametersFit extends AbstractProblem {
    
    double significance;
    
-   public RegressionParametersFit(double[] observations1,
+   public TwoLinearModelsFitPoisson(double[] observations1,
                                   double[] binBounds1,
                                   double[] observations2,
                                   double[] binBounds2,
@@ -220,7 +220,7 @@ public class RegressionParametersFit extends AbstractProblem {
       double[] binBounds2 = DoubleStream.iterate(0, i -> i + 2).limit(bins).toArray();
       double significance = 0.05;
    
-      RegressionParametersFit regression = new RegressionParametersFit(observations1, binBounds1, observations2, binBounds2, significance);
+      TwoLinearModelsFitPoisson regression = new TwoLinearModelsFitPoisson(observations1, binBounds1, observations2, binBounds2, significance);
       regression.execute(str);
    }
    

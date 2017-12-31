@@ -48,7 +48,7 @@ import org.chocosolver.util.ESat;
 import umontreal.iro.lecuyer.probdist.ChiSquareDist;
 import umontreal.iro.lecuyer.probdist.NormalDist;
 
-public class RegressionNormalCI extends AbstractProblem {
+public class LinearModelFitNormal extends AbstractProblem {
    
    private RealVar slope;
    private RealVar intercept;
@@ -70,10 +70,10 @@ public class RegressionNormalCI extends AbstractProblem {
    
    private ChiSquareDist chiSqDist;
    
-   public RegressionNormalCI(double[] observations,
-                             double[] residualBounds,
-                             double[] binBounds,
-                             double significance){
+   public LinearModelFitNormal(double[] observations,
+                           double[] residualBounds,
+                           double[] binBounds,
+                           double significance){
       this.observations = observations;
       this.residualBounds = residualBounds;
       this.binBounds = binBounds;
@@ -87,10 +87,10 @@ public class RegressionNormalCI extends AbstractProblem {
    
    @Override
    public void buildModel() {
-      slope = VariableFactory.real("Slope", -5, 5, precision, solver);
-      intercept = VariableFactory.real("Intercept", -20, 20, precision, solver);
+      slope = VariableFactory.real("Slope", -2, 2, precision, solver);
+      intercept = VariableFactory.real("Intercept", -10, 10, precision, solver);
       mean = VariableFactory.real("Mean", 0, 0, precision, solver);
-      stDeviation = VariableFactory.real("stDeviation", 0, 20, precision, solver);
+      stDeviation = VariableFactory.real("stDeviation", 0, 10, precision, solver);
       
       residual = new RealVar[this.observations.length];
       for(int i = 0; i < this.residual.length; i++){
@@ -110,7 +110,7 @@ public class RegressionNormalCI extends AbstractProblem {
       this.chiSqDist = new ChiSquareDist(this.binVariables.length-1);
       
       chiSqStatistics = VF.real("chiSqStatistics", 0, this.chiSqDist.inverseF(1-significance), precision, solver);
-      ChiSquareFitNormal.decomposition("chiSqTest", residual, binVariables, binBounds, mean, stDeviation, chiSqStatistics, precision, true);
+      ChiSquareFitNormal.decomposition("chiSqTest", residual, binVariables, binBounds, mean, stDeviation, chiSqStatistics, precision, false);
    }
    
    @Override
@@ -126,7 +126,7 @@ public class RegressionNormalCI extends AbstractProblem {
    @Override
    public void solve() {
      StringBuilder st = new StringBuilder();
-     solver.findOptimalSolution(ResolutionPolicy.MAXIMIZE, stDeviation, precision);
+     solver.findOptimalSolution(ResolutionPolicy.MINIMIZE, chiSqStatistics, precision);
      //do{
         st.append("---\n");
         if(solver.isFeasible() == ESat.TRUE) {
@@ -179,7 +179,7 @@ public class RegressionNormalCI extends AbstractProblem {
       double[] binBounds = DoubleStream.iterate(-10, i -> i + 4).limit(bins + 1).toArray();                                 
       double significance = 0.05;
    
-      RegressionNormalCI regression = new RegressionNormalCI(observations, residualBounds, binBounds, significance);
+      LinearModelFitNormal regression = new LinearModelFitNormal(observations, residualBounds, binBounds, significance);
       regression.execute(str);
    }
    

@@ -47,7 +47,7 @@ import org.chocosolver.solver.variables.VariableFactory;
 import umontreal.iro.lecuyer.probdist.ChiSquareDist;
 import umontreal.iro.lecuyer.probdist.PoissonDist;
 
-public class RegressionPoissonCIBatch extends AbstractProblem {
+public class LinearModelFitPoissonCIBatch extends AbstractProblem {
    
    public RealVar slope;
    public RealVar quadratic;
@@ -61,7 +61,7 @@ public class RegressionPoissonCIBatch extends AbstractProblem {
    double[] binBounds;
    double significance;
    
-   public RegressionPoissonCIBatch(double[] observations,
+   public LinearModelFitPoissonCIBatch(double[] observations,
                                       double[] binBounds,
                                       double significance){
       this.observations = observations;
@@ -179,7 +179,7 @@ public class RegressionPoissonCIBatch extends AbstractProblem {
          double[] binBounds = DoubleStream.iterate(0, i -> i + 2).limit(bins).toArray();                                 
          double significance = 0.05;
       
-         RegressionPoissonCIBatch regression = new RegressionPoissonCIBatch(observations, binBounds, significance);
+         LinearModelFitPoissonCIBatch regression = new LinearModelFitPoissonCIBatch(observations, binBounds, significance);
          regression.execute(str);
          try {
             regression.finalize();
