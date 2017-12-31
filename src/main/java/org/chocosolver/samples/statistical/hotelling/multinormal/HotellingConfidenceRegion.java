@@ -24,11 +24,16 @@
  * SOFTWARE.
  */
 
-package org.chocosolver.samples.statistical.means;
+package org.chocosolver.samples.statistical.hotelling.multinormal;
+
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 
 import org.chocosolver.samples.AbstractProblem;
 import org.chocosolver.solver.ResolutionPolicy;
 import org.chocosolver.solver.Solver;
+import org.chocosolver.solver.constraints.real.Ibex;
+import org.chocosolver.solver.constraints.real.RealConstraint;
 import org.chocosolver.solver.constraints.statistical.hotelling.tSquareStatistic;
 import org.chocosolver.solver.search.strategy.selectors.values.RealDomainMiddle;
 import org.chocosolver.solver.search.strategy.selectors.variables.Cyclic;
@@ -38,7 +43,7 @@ import org.chocosolver.solver.variables.VF;
 import org.chocosolver.solver.variables.VariableFactory;
 import org.chocosolver.util.ESat;
 
-public class Hotelling extends AbstractProblem {
+public class HotellingConfidenceRegion extends AbstractProblem {
    public RealVar[] muVariable;
    public RealVar[][] observationVariable;
    public RealVar statisticVariable;
@@ -49,7 +54,7 @@ public class Hotelling extends AbstractProblem {
 
    double precision = 1.e-2;
 
-   public Hotelling(
+   public HotellingConfidenceRegion(
          double[][] muDomains,
          double[][] observations,
          double[] statistic){
@@ -77,16 +82,16 @@ public class Hotelling extends AbstractProblem {
          }
       }
       
-      /*solver.post(new RealConstraint("mean equality ",
+      solver.post(new RealConstraint("mean equality 1",
             "{0}={1}",
             Ibex.HC4_NEWTON, 
             new RealVar[]{muVariable[1],muVariable[2]}
-            ));*/
+            ));
       
-      /*solver.post(new RealConstraint("mean equality ",
-      "{0}={1}",
-      Ibex.HC4_NEWTON, 
-      new RealVar[]{muVariable[1],muVariable[2]}
+      /*solver.post(new RealConstraint("mean equality 2",
+            "{0}={1}",
+            Ibex.HC4_NEWTON, 
+            new RealVar[]{muVariable[0],muVariable[1]}
       ));*/
       
       statisticVariable = VF.real("T2", statistic[0], statistic[1], precision, solver);
@@ -117,19 +122,21 @@ public class Hotelling extends AbstractProblem {
       StringBuilder st = new StringBuilder();
       solver.findOptimalSolution(ResolutionPolicy.MINIMIZE, statisticVariable, precision);
       //do{
-      st.append("---\n");
+      //st.append("---\n");
       if(solver.isFeasible() == ESat.TRUE) {
          for(int i = 0; i < muVariable.length; i++){
-            st.append("("+muVariable[i].getLB()+","+muVariable[i].getUB()+"), ");
+            //st.append("("+muVariable[i].getLB()+","+muVariable[i].getUB()+"), ");
+            st.append(muVariable[i].getLB()+"\t");
          }
-         st.append("\n");
-         st.append(statisticVariable.getLB()+" "+statisticVariable.getUB());
-         st.append("\n");
+         st.append("*");
+         //st.append(statisticVariable.getLB()+" "+statisticVariable.getUB());
+         //st.append("\n");
       }else{
-         st.append("No solution!");
+         //st.append("No solution!");
       }
       //}while(solution = solver.nextSolution());
-      System.out.println(st.toString());
+      //LoggerFactory.getLogger("bench").info(st.toString());
+      out += st.toString() + "\n";
    }
 
    @Override
@@ -148,16 +155,41 @@ public class Hotelling extends AbstractProblem {
             {3.05632, 7.19737, 8.50685}, 
             {5.54063, 9.19586, 9.22433}};
       
-      double[][] muDomains = {{0,20},{0,20},{0,20}};
       double[] statistic = {0,26.9539};
       
-      Hotelling scoreReal = new Hotelling(muDomains, observations, statistic);
-      scoreReal.execute(str);
+      for(double i = -8; i < 12; i+=0.5){
+         for(double j = 4; j < 13; j+=0.5){
+            for(double k = 5; k < 15; k+=0.5){
+               double[][] muDomains = new double[][]{{i,i},{j,j},{k,k}};
+               HotellingConfidenceRegion scoreReal = new HotellingConfidenceRegion(muDomains, observations, statistic);
+               scoreReal.execute(str);
+               scoreReal = null;
+               System.gc();
+               try {
+                  Thread.sleep(10);
+               } catch (InterruptedException e) {
+                  // TODO Auto-generated catch block
+                  e.printStackTrace();
+               }
+            }
+         }
+      }
    }
+   
+   static String out = "";
    
    public static void main(String[] args) {
       
       hotelling();
       
+      PrintWriter pw;
+      try {
+         pw = new PrintWriter("out.txt");
+         pw.println(out);
+         pw.close();
+      } catch (FileNotFoundException e) {
+         // TODO Auto-generated catch block
+         e.printStackTrace();
+      }
    }
 }

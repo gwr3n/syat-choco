@@ -24,7 +24,7 @@
  * SOFTWARE.
  */
 
-package org.chocosolver.samples.statistical.regression.poisson;
+package org.chocosolver.samples.statistical.modelfit.linear.normal;
 
 import java.util.Arrays;
 import java.util.Random;
@@ -35,7 +35,7 @@ import org.chocosolver.solver.ResolutionPolicy;
 import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.constraints.real.Ibex;
 import org.chocosolver.solver.constraints.real.RealConstraint;
-import org.chocosolver.solver.constraints.statistical.chisquare.ChiSquareFitPoisson;
+import org.chocosolver.solver.constraints.statistical.chisquare.ChiSquareFitNormal;
 import org.chocosolver.solver.search.strategy.selectors.values.RealDomainMiddle;
 import org.chocosolver.solver.search.strategy.selectors.variables.Cyclic;
 import org.chocosolver.solver.search.strategy.strategy.RealStrategy;
@@ -46,56 +46,60 @@ import org.chocosolver.solver.variables.VariableFactory;
 import org.chocosolver.util.ESat;
 
 import umontreal.iro.lecuyer.probdist.ChiSquareDist;
-import umontreal.iro.lecuyer.probdist.PoissonDist;
+import umontreal.iro.lecuyer.probdist.NormalDist;
 
-public class RegressionPoisson extends AbstractProblem {
+public class RegressionNormal extends AbstractProblem {
    
-   public RealVar slope;
-   public RealVar quadratic;
-   public RealVar poissonRate;
+   private RealVar slope;
+   private RealVar intercept;
+   private RealVar mean;
+   private RealVar stDeviation;
    
-   public RealVar[] residual;
-   public IntVar[] binVariables;
-   public RealVar[] realBinViews;
+   private RealVar[] residual;
+   private IntVar[] binVariables;
    
-   double[] observations;
-   double[] binBounds;
-   double significance;
+   private RealVar chiSqStatistics;
    
-   public RegressionPoisson(double[] observations,
-                     double[] binBounds,
-                     double significance){
+   private double[] residualBounds;
+   
+   private double[] observations;
+   private double[] binBounds;
+   private double significance;
+   
+   private double precision = 1.e-2;
+   
+   private ChiSquareDist chiSqDist;
+   
+   public RegressionNormal(double[] observations,
+                           double[] residualBounds,
+                           double[] binBounds,
+                           double significance){
       this.observations = observations;
-      this.binBounds = binBounds.clone();
+      this.residualBounds = residualBounds;
+      this.binBounds = binBounds;
       this.significance = significance;
    }
    
-   RealVar chiSqStatistics;
-   RealVar[] allRV;
-   
-   double precision = 0.01;
-   
-   ChiSquareDist chiSqDist;
-   
    @Override
    public void createSolver() {
-       solver = new Solver("Regression");
+       solver = new Solver("Regression Normal");
    }
    
    @Override
    public void buildModel() {
-      slope = VariableFactory.real("Slope", 0, 10, precision, solver);
-      quadratic = VariableFactory.real("Quadratic", 0, 10, precision, solver);
-      poissonRate = VariableFactory.real("Rate", 0, 50, precision, solver);
+      slope = VariableFactory.real("Slope", -2, 2, precision, solver);
+      intercept = VariableFactory.real("Intercept", -10, 10, precision, solver);
+      mean = VariableFactory.real("Mean", 0, 0, precision, solver);
+      stDeviation = VariableFactory.real("stDeviation", 0, 10, precision, solver);
       
       residual = new RealVar[this.observations.length];
       for(int i = 0; i < this.residual.length; i++){
-         residual[i] = VariableFactory.real("Residual "+(i+1), 0, this.binBounds[this.binBounds.length-2], precision, solver);
-         String residualExp = "{0}="+this.observations[i]+"-{1}*"+(i+1.0)+"-"+(i+1.0)+"^{2}";
+         residual[i] = VariableFactory.real("Residual "+(i+1), this.residualBounds[0], this.residualBounds[1], precision, solver);
+         String residualExp = "{0}="+this.observations[i]+"-{1}*"+(i+1)+"+{2}";
          solver.post(new RealConstraint("residual "+i,
                residualExp,
                Ibex.HC4_NEWTON, 
-               new RealVar[]{residual[i],slope,quadratic}
+               new RealVar[]{residual[i],slope,intercept}
                ));
       }
       
@@ -106,18 +110,15 @@ public class RegressionPoisson extends AbstractProblem {
       this.chiSqDist = new ChiSquareDist(this.binVariables.length-1);
       
       chiSqStatistics = VF.real("chiSqStatistics", 0, this.chiSqDist.inverseF(1-significance), precision, solver);
-      ChiSquareFitPoisson.decomposition("chiSqTest", residual, binVariables, binBounds, poissonRate, chiSqStatistics, precision, false);
+      ChiSquareFitNormal.decomposition("chiSqTest", residual, binVariables, binBounds, mean, stDeviation, chiSqStatistics, precision, false);
    }
    
    @Override
    public void configureSearch() {
       
       solver.set(
-            new RealStrategy(new RealVar[]{slope,quadratic}, new Cyclic(), new RealDomainMiddle()),
-            //new RealStrategy(residual, new Cyclic(), new RealDomainMiddle()),
-            new RealStrategy(new RealVar[]{poissonRate}, new Cyclic(), new RealDomainMiddle())
-            //IntStrategyFactory.minDom_LB(binVariables),
-            //new RealStrategy(new RealVar[]{chiSqStatistics}, new Cyclic(), new RealDomainMiddle())
+            new RealStrategy(new RealVar[]{slope,intercept,stDeviation}, new Cyclic(), new RealDomainMiddle()),
+            new RealStrategy(new RealVar[]{chiSqStatistics}, new Cyclic(), new RealDomainMiddle())
        );
        //SearchMonitorFactory.limitTime(solver,10000);
    }
@@ -129,7 +130,7 @@ public class RegressionPoisson extends AbstractProblem {
      //do{
         st.append("---\n");
         if(solver.isFeasible() == ESat.TRUE) {
-           st.append(slope.toString()+", "+quadratic.toString()+", "+poissonRate.toString()+"\n");
+           st.append(slope.toString()+", "+intercept.toString()+", "+mean.toString()+", "+stDeviation.toString()+"\n");
            for(int i = 0; i < residual.length; i++){
               st.append(residual[i].toString()+", ");
            }
@@ -152,32 +153,33 @@ public class RegressionPoisson extends AbstractProblem {
        
    }
    
-   public static double[] generateObservations(Random rnd, double truePoissonRate, int nbObservations){
-      PoissonDist dist = new PoissonDist(truePoissonRate);
-      return DoubleStream.iterate(1, i -> i + 1).map(i -> i+Math.pow(i, 0.5)).map(i -> i + dist.inverseF(rnd.nextDouble())).limit(nbObservations).toArray();
+   public static double[] generateObservations(Random rnd, double slope, double intercept, double normalMean, double normalstd, int nbObservations){
+      NormalDist dist = new NormalDist(normalMean, normalstd);
+      return DoubleStream.iterate(1, i -> i + 1).map(i -> slope*i - intercept + dist.inverseF(rnd.nextDouble())).limit(nbObservations).toArray();
    }
    
    public static void fitMostLikelyParameters(){
       String[] str={"-log","SOLUTION"};
       
-      double[] observations = {4, 6, 10, 6, 10, 11, 16, 19, 18, 15, 16, 17, 16, 17, 20, 19, 24, 24, 
-            26, 25, 23, 26, 25, 30, 28, 32, 32, 35, 32, 31, 37, 37, 40, 41, 39, 
-            42, 42, 45, 42, 50, 46, 47, 49, 48, 49, 52, 53, 53, 55, 54};
+      int nbObservations = 20;
       
-      int nbObservations = 100;
+      double slope = 1;
+      double intercept = 5;
+      double normalMean = 0;
+      double normalstd = 5;
       
-      double truePoissonRate = 30;
+      double[] residualBounds = {normalMean-4*normalstd,normalMean+4*normalstd};
       
-      Random rnd = new Random(123);
-      observations = generateObservations(rnd, truePoissonRate, nbObservations);
-      Arrays.stream(observations).forEach(k -> System.out.print(k+"\t"));
+      Random rnd = new Random(1234);
+      double[] observations = generateObservations(rnd, slope, intercept, normalMean, normalstd, nbObservations);
+      Arrays.stream(observations).forEach(k -> System.out.print(k+", "));
       System.out.println();
       
-      int bins = 10;
-      double[] binBounds = DoubleStream.iterate(0, i -> i + 5).limit(bins+1).toArray();                                 
+      int bins = 5;
+      double[] binBounds = DoubleStream.iterate(-10, i -> i + 4).limit(bins + 1).toArray();                                 
       double significance = 0.05;
    
-      RegressionPoisson regression = new RegressionPoisson(observations, binBounds, significance);
+      RegressionNormal regression = new RegressionNormal(observations, residualBounds, binBounds, significance);
       regression.execute(str);
    }
    

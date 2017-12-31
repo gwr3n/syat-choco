@@ -24,7 +24,7 @@
  * SOFTWARE.
  */
 
-package org.chocosolver.samples.statistical.ttest;
+package org.chocosolver.samples.statistical.t;
 
 import java.util.ArrayList;
 import java.util.stream.IntStream;

@@ -24,7 +24,7 @@
  * SOFTWARE.
  */
 
-package org.chocosolver.samples.statistical.regression.poisson;
+package org.chocosolver.samples.statistical.modelfit.linear.poisson;
 
 import java.util.Random;
 import java.util.stream.DoubleStream;

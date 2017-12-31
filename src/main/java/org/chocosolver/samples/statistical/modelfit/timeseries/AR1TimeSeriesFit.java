@@ -24,7 +24,7 @@
  * SOFTWARE.
  */
 
-package org.chocosolver.samples.statistical.timeseries;
+package org.chocosolver.samples.statistical.modelfit.timeseries;
 
 import java.util.Arrays;
 import java.util.Random;
@@ -35,7 +35,7 @@ import org.chocosolver.solver.ResolutionPolicy;
 import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.constraints.real.Ibex;
 import org.chocosolver.solver.constraints.real.RealConstraint;
-import org.chocosolver.solver.constraints.statistical.chisquare.ChiSquareIndependence;
+import org.chocosolver.solver.constraints.statistical.chisquare.ChiSquareFitPoisson;
 import org.chocosolver.solver.search.strategy.selectors.values.RealDomainMiddle;
 import org.chocosolver.solver.search.strategy.selectors.variables.Cyclic;
 import org.chocosolver.solver.search.strategy.strategy.RealStrategy;
@@ -48,103 +48,80 @@ import org.chocosolver.util.ESat;
 import umontreal.iro.lecuyer.probdist.ChiSquareDist;
 import umontreal.iro.lecuyer.probdist.PoissonDist;
 
-public class TwoAR1 extends AbstractProblem {
+public class AR1TimeSeriesFit extends AbstractProblem {
    
-   public RealVar parameter1;
-   public RealVar constant1;
+   public RealVar parameter;
+   public RealVar constant;
    
-   public RealVar parameter2;
-   public RealVar constant2;
+   public RealVar lambda;
    
-   public RealVar[] residual1;
-   public RealVar[] residual2;
+   public RealVar[] residual;
    
-   public IntVar[] binVariables1;
-   public IntVar[] binVariables2;
+   public IntVar[] binVariable;
    
-   double[] observations1;
-   double[] binBounds1;
-   
-   double[] observations2;
-   double[] binBounds2;
+   double[] observation;
+   double[] binBound;
    
    double significance;
    
-   public TwoAR1(double[] observations1,
-                 double[] binBounds1,
-                 double[] observations2,
-                 double[] binBounds2,
+   public AR1TimeSeriesFit(double[] observation,
+                 double[] binBound,
                  double significance){
-      this.observations1 = observations1;
-      this.binBounds1 = binBounds1.clone();
-      
-      this.observations2 = observations2;
-      this.binBounds2 = binBounds2.clone();
-      
+      this.observation = observation;
+      this.binBound = binBound;
       this.significance = significance;
    }
    
-   RealVar chiSqStatistics;
+   RealVar chiSqStatistic;
    
    RealVar[] allRV;
    
-   double precision = 0.2;
+   double precision = 0.05;
    
    ChiSquareDist chiSqDist;
    
    @Override
    public void createSolver() {
-       solver = new Solver("Two AR(1)");
+       solver = new Solver("AR(1)");
    }
    
    @Override
    public void buildModel() {
-      parameter1 = VariableFactory.real("Parameter 1", 0, 2, precision, solver);
-      constant1 = VariableFactory.real("Constant 1", 0, 10, precision, solver);
+      parameter = VariableFactory.real("Parameter", 0, 2, precision, solver);
+      constant = VariableFactory.real("Constant", 0, 20, precision, solver);
       
-      residual1 = new RealVar[this.observations1.length];
-      for(int i = 0; i < this.residual1.length; i++){
-         residual1[i] = VariableFactory.real("Residual 1 "+(i+1), 0, Arrays.stream(observations1).max().getAsDouble(), precision, solver);
-         String residualExp = "{0}="+this.observations1[i]+"-{1}" + ((i > 0) ? "-{2}*"+this.observations1[i-1] : "");
-         solver.post(new RealConstraint("residual 1 "+(i+1),
+      residual = new RealVar[this.observation.length];
+      for(int i = 0; i < this.residual.length; i++){
+         residual[i] = VariableFactory.real("Residual "+(i+1), 0, Arrays.stream(observation).max().getAsDouble(), precision, solver);
+         String residualExp = "{0}="+this.observation[i]+"-{1}" + ((i > 0) ? "-{2}*"+this.observation[i-1] : "");
+         solver.post(new RealConstraint("residual constraint "+(i+1),
                residualExp,
                Ibex.HC4_NEWTON, 
-               new RealVar[]{residual1[i],constant1,parameter1}
+               new RealVar[]{residual[i],constant,parameter}
                ));
       }
       
-      parameter2 = VariableFactory.real("Parameter 2", 0, 2, precision, solver);
-      constant2 = VariableFactory.real("Constant 2", 0, 10, precision, solver);
+      binVariable = new IntVar[this.binBound.length-1];
+      for(int i = 0; i < this.binVariable.length; i++)
+         binVariable[i] = VariableFactory.bounded("Bin "+(i+1), 0, this.observation.length, solver);
       
-      residual2 = new RealVar[this.observations2.length];
-      for(int i = 0; i < this.residual2.length; i++){
-         residual2[i] = VariableFactory.real("Residual 2 "+(i+1), 0, Arrays.stream(observations2).max().getAsDouble(), precision, solver);
-         String residualExp = "{0}="+this.observations2[i]+"-{1}" + ((i > 0) ? "-{2}*"+this.observations2[i-1] : "");
-         solver.post(new RealConstraint("residual 2 "+(i+1),
-               residualExp,
-               Ibex.HC4_NEWTON, 
-               new RealVar[]{residual2[i],constant2,parameter2}
-               ));
-      }
+      this.chiSqDist = new ChiSquareDist(this.binBound.length - 1);
       
-      this.chiSqDist = new ChiSquareDist((this.binBounds1.length - 1)*(this.binBounds2.length - 1));
-      
-      double[][] binBounds = new double[2][];
-      binBounds[0] = this.binBounds1;
-      binBounds[1] = this.binBounds2;
-      
-      chiSqStatistics = VF.real("chiSqStatistics", 0, this.chiSqDist.inverseF(1-significance), precision, solver);
-      ChiSquareIndependence.decomposition("chiSqTest", residual1, residual2, binBounds, chiSqStatistics, precision, true);
+      lambda = VariableFactory.real("lambda 1", 0, 20, precision, solver);
+      chiSqStatistic = VF.real("chiSqStatistic", 0, this.chiSqDist.inverseF(1-significance), precision, solver);
+      ChiSquareFitPoisson.decomposition("chiSqTest", residual, binVariable, binBound, lambda, chiSqStatistic, precision, false);
    }
    
    @Override
    public void configureSearch() {
-      
+      /*solver.plugMonitor(new IMonitorSolution() {
+         public void onSolution() {
+            // DO SOMETHING
+         }
+      });*/
       solver.set(
-            new RealStrategy(new RealVar[]{constant1,parameter1,constant2,parameter2}, new Cyclic(), new RealDomainMiddle()),
-            //new RealStrategy(new RealVar[]{parameter1,parameter2,constant1,constant2,lambda1,lambda2}, new Cyclic(), new RealDomainMiddle()),
-            new RealStrategy(new RealVar[]{chiSqStatistics}, new Cyclic(), new RealDomainMiddle())
-            //new RealStrategy(residual1, new Cyclic(), new RealDomainMiddle())
+            new RealStrategy(new RealVar[]{constant,parameter,lambda}, new Cyclic(), new RealDomainMiddle()),
+            new RealStrategy(new RealVar[]{chiSqStatistic}, new Cyclic(), new RealDomainMiddle())
        );
        //SearchMonitorFactory.limitTime(solver,10000);
    }
@@ -152,15 +129,15 @@ public class TwoAR1 extends AbstractProblem {
    @Override
    public void solve() {
      StringBuilder st = new StringBuilder();
-     solver.findOptimalSolution(ResolutionPolicy.MINIMIZE, chiSqStatistics, precision);
+     solver.findOptimalSolution(ResolutionPolicy.MAXIMIZE, lambda, precision);
      //do{
         st.append("---\n");
         if(solver.isFeasible() == ESat.TRUE) {
-           st.append("Curve 1: "+parameter1.toString()+" "+constant1.toString());
+           st.append("Curve: "+parameter.toString()+" "+constant.toString());
            st.append("\n");
-           st.append("Curve 2: "+parameter2.toString()+" "+constant2.toString());
+           st.append("Lambda: "+lambda.toString());
            st.append("\n");
-           st.append(chiSqStatistics.getLB()+" "+chiSqStatistics.getUB());
+           st.append(chiSqStatistic.getLB()+" "+chiSqStatistic.getUB());
            st.append("\n");
            feasibleCount++;
         }else{
@@ -193,9 +170,7 @@ public class TwoAR1 extends AbstractProblem {
    public static void fitMostLikelyParameters(){
       String[] str={"-log","SOLUTION"};
       
-      double[] observations1;
-      
-      double[] observations2;
+      double[] observations;
       
       int nbObservations = 100;
       
@@ -207,18 +182,13 @@ public class TwoAR1 extends AbstractProblem {
       
          double truePoissonRate = 5;
          
-         observations1 = generateObservations(rnd, 5, 0.5, truePoissonRate, nbObservations);
-         //Arrays.stream(observations1).forEach(k -> System.out.print(k+"\t"));
-         observations2 = generateObservations(rnd, 5, 0.5, truePoissonRate, nbObservations);
-         //Arrays.stream(observations2).forEach(k -> System.out.print(k+"\t"));
-         System.out.println();
+         observations = generateObservations(rnd, 5, 0.5, truePoissonRate, nbObservations);
          
-         int bins = 4;
-         double[] binBounds1 = DoubleStream.iterate(0, i -> i + 3).limit(bins).toArray();
-         double[] binBounds2 = DoubleStream.iterate(0, i -> i + 3).limit(bins).toArray();
+         int bins = 15;
+         double[] binBounds = DoubleStream.iterate(0, i -> i + 1).limit(bins).toArray();
          double significance = 0.05;
       
-         TwoAR1 regression = new TwoAR1(observations1, binBounds1, observations2, binBounds2, significance);
+         AR1TimeSeriesFit regression = new AR1TimeSeriesFit(observations, binBounds, significance);
          regression.execute(str);
          try {
             regression.finalize();

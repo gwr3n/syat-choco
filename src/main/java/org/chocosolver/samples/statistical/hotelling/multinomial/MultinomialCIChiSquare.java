@@ -24,7 +24,7 @@
  * SOFTWARE.
  */
 
-package org.chocosolver.samples.statistical.multinomial;
+package org.chocosolver.samples.statistical.hotelling.multinomial;
 
 import java.util.Arrays;
 

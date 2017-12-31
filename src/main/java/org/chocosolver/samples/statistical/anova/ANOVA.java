@@ -24,7 +24,7 @@
  * SOFTWARE.
  */
 
-package org.chocosolver.samples.statistical.means;
+package org.chocosolver.samples.statistical.anova;
 
 import java.util.Arrays;
 import java.util.Random;
