@@ -9,7 +9,7 @@ For more information, please consult our [Wiki](https://github.com/gwr3n/syat-ch
 Maven:
 
     <groupId>com.github.gwr3n</groupId>
-	<artifactId>jsdp</artifactId>
+	<artifactId>syat-choco</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
 
 Current snapshots:
