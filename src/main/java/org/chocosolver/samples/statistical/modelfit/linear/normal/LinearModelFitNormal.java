@@ -70,14 +70,18 @@ public class LinearModelFitNormal extends AbstractProblem {
    
    private ChiSquareDist chiSqDist;
    
+   private boolean verboseOutput;
+   
    public LinearModelFitNormal(double[] observations,
-                           double[] residualBounds,
-                           double[] binBounds,
-                           double significance){
+                                    double[] residualBounds,
+                                    double[] binBounds,
+                                    double significance,
+                                    boolean verboseOutput){
       this.observations = observations;
       this.residualBounds = residualBounds;
       this.binBounds = binBounds;
       this.significance = significance;
+      this.verboseOutput = verboseOutput;
    }
    
    @Override
@@ -128,24 +132,26 @@ public class LinearModelFitNormal extends AbstractProblem {
      StringBuilder st = new StringBuilder();
      solver.findOptimalSolution(ResolutionPolicy.MINIMIZE, chiSqStatistics, precision);
      //do{
-        st.append("---\n");
         if(solver.isFeasible() == ESat.TRUE) {
-           st.append(slope.toString()+", "+intercept.toString()+", "+mean.toString()+", "+stDeviation.toString()+"\n");
-           for(int i = 0; i < residual.length; i++){
-              st.append(residual[i].toString()+", ");
+           st.append(slope.getLB()+", "+intercept.getLB()+", "+mean.toString()+", "+stDeviation.getLB()+"\n");
+           if(verboseOutput) {
+              for(int i = 0; i < residual.length; i++){
+                 st.append(residual[i].toString()+", ");
+              }
+              st.append("\n");
+              for(int i = 0; i < binVariables.length; i++){
+                 st.append(binVariables[i].toString()+", ");
+              }
+              st.append("\n");
+              st.append(chiSqStatistics.getLB()+" "+chiSqStatistics.getUB());
+              st.append("\n");
            }
-           st.append("\n");
-           for(int i = 0; i < binVariables.length; i++){
-              st.append(binVariables[i].toString()+", ");
-           }
-           st.append("\n");
-           st.append(chiSqStatistics.getLB()+" "+chiSqStatistics.getUB());
-           st.append("\n");
         }else{
            st.append("No solution!");
         }
      //}while(solution = solver.nextSolution());
-     System.out.println(st.toString());
+     //LoggerFactory.getLogger("bench").info(st.toString());
+     System.out.print(st.toString());
    }
 
    @Override
@@ -158,10 +164,10 @@ public class LinearModelFitNormal extends AbstractProblem {
       return DoubleStream.iterate(1, i -> i + 1).map(i -> slope*i - intercept + dist.inverseF(rnd.nextDouble())).limit(nbObservations).toArray();
    }
    
-   public static void fitMostLikelyParameters(){
-      String[] str={"-log","SOLUTION"};
+   public static void fitMostLikelyParameters(int batchSize, boolean verboseOutput){
+      String[] str={"-log", verboseOutput ? "SOLUTION" : "SILENT"};
       
-      int nbObservations = 20;
+      int nbObservations = 30;
       
       double slope = 1;
       double intercept = 5;
@@ -171,21 +177,31 @@ public class LinearModelFitNormal extends AbstractProblem {
       double[] residualBounds = {normalMean-4*normalstd,normalMean+4*normalstd};
       
       Random rnd = new Random(1234);
-      double[] observations = generateObservations(rnd, slope, intercept, normalMean, normalstd, nbObservations);
-      Arrays.stream(observations).forEach(k -> System.out.print(k+", "));
-      System.out.println();
       
-      int bins = 5;
-      double[] binBounds = DoubleStream.iterate(-10, i -> i + 4).limit(bins + 1).toArray();                                 
-      double significance = 0.05;
-   
-      LinearModelFitNormal regression = new LinearModelFitNormal(observations, residualBounds, binBounds, significance);
-      regression.execute(str);
+      double[][] observations = new double[batchSize][];
+      
+      for(int i = 0; i < batchSize; i++){
+         observations[i] = generateObservations(rnd, slope, intercept, normalMean, normalstd, nbObservations);
+         Arrays.stream(observations[i]).forEach(k -> System.out.print(k+", "));
+         System.out.println();
+      }
+      
+      for(int i = 0; i < batchSize; i++){
+         int bins = 5;
+         double[] binBounds = DoubleStream.iterate(-10, a -> a + 4).limit(bins + 1).toArray();                                 
+         double significance = 0.05;
+      
+         LinearModelFitNormal regression = new LinearModelFitNormal(observations[i], residualBounds, binBounds, significance, verboseOutput);
+         regression.execute(str);
+         regression.getSolver().getIbex().release();
+      }
    }
    
    public static void main(String[] args) {
       
-      fitMostLikelyParameters();
+      int batchSize = 1;
+      boolean verboseOutput = true;
+      fitMostLikelyParameters(batchSize, verboseOutput);
       
    }
 }
