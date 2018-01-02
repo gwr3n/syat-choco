@@ -36,6 +36,7 @@ import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.constraints.real.Ibex;
 import org.chocosolver.solver.constraints.real.RealConstraint;
 import org.chocosolver.solver.constraints.statistical.chisquare.ChiSquareFitPoisson;
+import org.chocosolver.solver.search.loop.monitors.SearchMonitorFactory;
 import org.chocosolver.solver.search.strategy.selectors.values.RealDomainMiddle;
 import org.chocosolver.solver.search.strategy.selectors.variables.Cyclic;
 import org.chocosolver.solver.search.strategy.strategy.RealStrategy;
@@ -49,18 +50,23 @@ import umontreal.iro.lecuyer.probdist.ChiSquareDist;
 import umontreal.iro.lecuyer.probdist.PoissonDist;
 
 /**
- * We consider an AR(1) stochastic process and try to fit its parameters.
+ * We consider an AR(1) stochastic process.
  * 
  * This problem is discussed in 
  * 
  * R. Rossi, O. Agkun, S. Prestwich, A. Tarim, 
  * "Declarative Statistics," arxiv:1708.01829, Section 5.2
  * 
+ * Our aim is to determine nominal coverage probability for AR(1)
+ * model parameter confidence intervals 
+ * represented by the declarative statistics model given a 
+ * random error e_t (Poisson)
+ * 
  * @author Roberto Rossi
  *
  */
 
-public class AR1TimeSeriesFit extends AbstractProblem {
+public class AR1TimeSeriesFitCI extends AbstractProblem {
    
    public RealVar parameter; // AR(1) parameter
    public RealVar constant;  // AR(1) constant
@@ -76,7 +82,7 @@ public class AR1TimeSeriesFit extends AbstractProblem {
    
    double significance;
    
-   public AR1TimeSeriesFit(double[] observation,
+   public AR1TimeSeriesFitCI(double[] observation,
                  double[] binBound,
                  double significance){
       this.observation = observation;
@@ -88,7 +94,7 @@ public class AR1TimeSeriesFit extends AbstractProblem {
    
    RealVar[] allRV;
    
-   double precision = 0.1;
+   double precision = 0.05;
    
    ChiSquareDist chiSqDist;
    
@@ -99,8 +105,8 @@ public class AR1TimeSeriesFit extends AbstractProblem {
    
    @Override
    public void buildModel() {
-      parameter = VariableFactory.real("Parameter", 0, 2, precision, solver);
-      constant = VariableFactory.real("Constant", 0, 20, precision, solver);
+      parameter = VariableFactory.real("Parameter", trueParameter, trueParameter, precision, solver);
+      constant = VariableFactory.real("Constant", trueConstant, trueConstant, precision, solver);
       
       error = new RealVar[this.observation.length];
       for(int i = 0; i < this.error.length; i++){
@@ -120,7 +126,7 @@ public class AR1TimeSeriesFit extends AbstractProblem {
       
       this.chiSqDist = new ChiSquareDist(this.binBound.length - 1);
       
-      lambda = VariableFactory.real("lambda 1", 0, 20, precision, solver);
+      lambda = VariableFactory.real("lambda 1", truePoissonRate, truePoissonRate, precision, solver);
       chiSqStatistic = VF.real("chiSqStatistic", 0, this.chiSqDist.inverseF(1-significance), precision, solver);
       ChiSquareFitPoisson.decomposition("chiSqTest", error, binVariable, binBound, lambda, chiSqStatistic, precision, false);
    }
@@ -140,7 +146,7 @@ public class AR1TimeSeriesFit extends AbstractProblem {
        );
       
        // Uncomment if a time limit is necessary
-       //SearchMonitorFactory.limitTime(solver,10000);
+       SearchMonitorFactory.limitTime(solver,5000);
    }
    
    @Override
@@ -156,6 +162,7 @@ public class AR1TimeSeriesFit extends AbstractProblem {
            st.append("\n");
            st.append(chiSqStatistic.getLB()+" "+chiSqStatistic.getUB());
            st.append("\n");
+           feasibleCount++;
         }else{
            st.append("No solution!");
         }
@@ -174,12 +181,18 @@ public class AR1TimeSeriesFit extends AbstractProblem {
       double[] poisson = new double[nbObservations];
       double zt = 0;
       for(int i = 0; i < nbObservations; i++){
-         poisson[i] = dist.inverseF(rnd.nextDouble());
+         poisson[i] = dist.inverseF(rnd.nextDouble()) + 0.5;
          zt = c + poisson[i] + phi*zt;
          observations[i] = zt;
       }
       return observations;
    }
+   
+   static int feasibleCount = 0;
+   
+   static double trueConstant = 5;
+   static double trueParameter = 0.5;
+   static double truePoissonRate = 5;
    
    public static void fitParameters(){
       String[] str={"-log","SOLUTION"};
@@ -188,23 +201,33 @@ public class AR1TimeSeriesFit extends AbstractProblem {
       
       int nbObservations = 150;
       
+      double replications = 1000;
+      
       Random rnd = new Random(123);
       
-      double constant = 5;
-      double parameter = 0.5;
-      double truePoissonRate = 5;
+      for(int k = 0; k < replications; k++){
       
-      observations = generateObservations(rnd, constant, parameter, truePoissonRate, nbObservations);
+         observations = generateObservations(rnd, trueConstant, trueParameter, truePoissonRate, nbObservations);
+         
+         int bins = 10;
+         double[] binBounds = DoubleStream.iterate(0, i -> i + 2).limit(bins).toArray();
+         double significance = 0.05;
       
-      int bins = 10;
-      double[] binBounds = DoubleStream.iterate(0, i -> i + 2).limit(bins).toArray();
-      double significance = 0.05;
-   
-      AR1TimeSeriesFit fit = new AR1TimeSeriesFit(observations, binBounds, significance);
-      fit.execute(str);
-      fit.getSolver().getIbex().release();
-      fit = null;
-      System.gc();
+         AR1TimeSeriesFitCI fit = new AR1TimeSeriesFitCI(observations, binBounds, significance);
+         fit.execute(str);
+         fit.getSolver().getIbex().release();
+         fit = null;
+         System.gc();
+         
+         System.out.println(feasibleCount/(k+1.0) + "(" + k + ")");
+         try {
+            Thread.sleep(100);
+         } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+         }
+      }
+      System.out.println(feasibleCount/replications);
    }
    
    public static void main(String[] args) {
@@ -213,3 +236,4 @@ public class AR1TimeSeriesFit extends AbstractProblem {
       
    }
 }
+

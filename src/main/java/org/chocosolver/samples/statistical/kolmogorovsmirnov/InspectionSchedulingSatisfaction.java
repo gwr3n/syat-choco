@@ -81,11 +81,6 @@ public class InspectionSchedulingSatisfaction extends AbstractProblem {
 			tasks[iTask] = VariableFactory.task(starts[iTask], duration, ends[iTask]);
 			res[iTask] = VariableFactory.fixed(1 , solver);
 		}
-
-		//for(int i = 0; i < NUM_OF_INSPECTIONS; i++){
-			//int[] assignment = {0,1,2,3,4,5,6,7,9,12,16,20,25,31,38,46,54,63,73,84,96,109,123,138,155,173,192,212,234,257,281,307,335,364,395,428,463,501,541,584,630,679,731,788,849,16,20,25,31,38,46,54,63,73,84,96,109,123,138,155,173,192,212,234,257,281,307,335,364,395,428,463,501,541,584,630,679,731,788,849,850,851,852,853,854,855,856,858,861,865};
-			//solver.post(IntConstraintFactory.arithm(starts[i], "=", assignment[i]));
-		//}
 		
 		// post a cumulative constraint
 		solver.post(IntConstraintFactory.cumulative(tasks, res, VariableFactory.fixed(INSPECTORS, solver), false));
@@ -115,12 +110,7 @@ public class InspectionSchedulingSatisfaction extends AbstractProblem {
 	}
 
 	@Override
-	public void configureSearch(){
-		/*IntVar[] intervalsArray = new IntVar[UNITS_TO_INSPECT*(NUM_OF_INSPECTIONS/UNITS_TO_INSPECT-1)];
-		for(int i = 0; i < UNITS_TO_INSPECT; i++){
-			System.arraycopy(intervals[i], 0, intervalsArray,i*(NUM_OF_INSPECTIONS/UNITS_TO_INSPECT-1), intervals[i].length);
-		}*/
-		
+	public void configureSearch(){		
 		solver.set(IntStrategyFactory.impact(starts,2211));
 	}
 

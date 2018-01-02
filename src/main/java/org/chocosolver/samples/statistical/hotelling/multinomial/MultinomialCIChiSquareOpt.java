@@ -45,11 +45,19 @@ import umontreal.iro.lecuyer.randvar.UniformGen;
 import umontreal.iro.lecuyer.randvarmulti.MultinomialGen;
 import umontreal.iro.lecuyer.rng.MRG32k3a;
 
+/**
+ * Computation of multinomial proportions confidence intervals.
+ * 
+ * This class is concerned with determining interval bounds.
+ * 
+ * @author Roberto Rossi
+ * @see R. Rossi, O. Agkun, S. Prestwich, A. Tarim, "Declarative Statistics," arxiv:1708.01829, Section 5.4
+ */
+
 public class MultinomialCIChiSquareOpt extends AbstractProblem{
 
    public double[][] observations;
    public RealVar[] p;
-   //public double[] actualP;
    public RealVar[][] observationVariable;
    public RealVar[][] covarianceMatrix;
 
@@ -95,27 +103,6 @@ public class MultinomialCIChiSquareOpt extends AbstractProblem{
       p = new RealVar[this.categories];
       for(int i = 0; i < this.categories; i++)
          p[i] = VariableFactory.real("p "+(i+1), 0+precision, 1-precision, precision, solver);
-      //p[0] = VariableFactory.real("p "+(0+1), 0+precision, 1-precision, precision, solver);
-      //p[1] = VariableFactory.real("p "+(1+1), 0.3, 0.3, precision, solver);
-      //p[2] = VariableFactory.real("p "+(2+1), 0.3, 0.3, precision, solver);
-      
-      /*covarianceMatrix = new RealVar[this.categories][this.categories];
-      for(int i = 0; i < this.covarianceMatrix.length; i++){
-         for(int j = 0; j < this.covarianceMatrix[i].length; j++){
-            covarianceMatrix[i][j] = VariableFactory.real("Sigma_"+(i+1)+"_"+(j+1), -1, 1, precision, solver);
-            if(i==j){
-               solver.post(new RealConstraint("cov_"+i+"_"+j,"{0}*(1-{0})={1}",
-                                              Ibex.HC4_NEWTON,
-                                              new RealVar[]{p[i],covarianceMatrix[i][j]})
-                     );
-            }else{
-               solver.post(new RealConstraint("cov_"+i+"_"+j,"-{0}*{1}={2}",
-                                              Ibex.HC4_NEWTON,
-                                              new RealVar[]{p[i],p[j],covarianceMatrix[i][j]})
-                     );
-            }
-         }
-      }*/
       
       observationVariable = new RealVar[this.observations.length][this.observations[0].length];
       for(int i = 0; i < this.observations.length; i++){
@@ -132,9 +119,8 @@ public class MultinomialCIChiSquareOpt extends AbstractProblem{
    @Override
    public void configureSearch() {
       RealStrategy strat1 = new RealStrategy(p, new Cyclic(), new RealDomainMiddle());
-      //RealStrategy strat2 = new RealStrategy(flatten(covarianceMatrix), new Cyclic(), new RealDomainMiddle());
-      RealStrategy strat4 = new RealStrategy(new RealVar[]{statisticVariable}, new Cyclic(), new RealDomainMiddle());
-      solver.set(strat1, strat4);
+      RealStrategy strat2 = new RealStrategy(new RealVar[]{statisticVariable}, new Cyclic(), new RealDomainMiddle());
+      solver.set(strat1, strat2);
    }
    
    @SuppressWarnings("unused")
@@ -150,24 +136,29 @@ public class MultinomialCIChiSquareOpt extends AbstractProblem{
    
    @Override
    public void solve() {
-     StringBuilder st = new StringBuilder();
-     solver.findOptimalSolution(ResolutionPolicy.MINIMIZE, statisticVariable, precision);
-     //do{
-        st.append("---\n");
-        if(solver.isFeasible() == ESat.TRUE) {
-           for(int i = 0; i < p.length; i++){
-              st.append("("+p[i].getLB()+","+p[i].getUB()+"), ");
-           }
-           st.append("\n");
-           st.append(statisticVariable.getLB()+" "+statisticVariable.getUB());
-           st.append("\n");
-           
-           coverageProbability++;
-        }else{
-           st.append("No solution!");
-        }
-     //}while(solution = solver.nextSolution());
-     System.out.println(st.toString());
+      StringBuilder st = new StringBuilder();
+      
+      // This computes the upper bound for p[0]
+      solver.findOptimalSolution(ResolutionPolicy.MAXIMIZE, p[0], precision);
+      
+      // This computes the lower bound for p[0]
+      //solver.findOptimalSolution(ResolutionPolicy.MINIMIZE, p[0], precision);
+      
+      st.append("---\n");
+      st.append("Optimal solution\n");
+      st.append("---\n");
+      if(solver.isFeasible() == ESat.TRUE) {
+         for(int i = 0; i < p.length; i++){
+            st.append("p["+i+"]("+p[i].getLB()+","+p[i].getUB()+"), ");
+         }
+         st.append("\n");
+         st.append(statisticVariable.getLB()+" "+statisticVariable.getUB());
+         st.append("\n");
+
+      }else{
+         st.append("No solution!");
+      }
+      System.out.println(st.toString());
    }
    
    @Override
@@ -175,35 +166,31 @@ public class MultinomialCIChiSquareOpt extends AbstractProblem{
        
    }
    
-   static double coverageProbability = 0;
-   
    public static void main(String[] args) {
       String[] str={"-log","SOLUTION"};
       
       double confidence = 0.9;
       double[] p = {0.3,0.3,0.3}; 
-      /** CAREFUL this is actually a ChiSquareDist with n-1 DOF. There is a bug in the library **/
-      //double[] statistic = {0,(new ChiSquareDist(p.length)).inverseF(confidence)};
       
       int sampleSize = 50;
       
-      double[] statistic = {0, (new umontreal.iro.lecuyer.probdist.FisherFDist(p.length, sampleSize - p.length)).inverseF(confidence)};
+      double[] statistic = {
+            (new umontreal.iro.lecuyer.probdist.FisherFDist(p.length, sampleSize - p.length)).inverseF(confidence), 
+            (new umontreal.iro.lecuyer.probdist.FisherFDist(p.length, sampleSize - p.length)).inverseF(confidence)
+            };
       
       MRG32k3a rng = new MRG32k3a();
       UniformGen gen1 = new UniformGen(rng);
       MultinomialGen multinomial = new MultinomialGen(gen1, p, 1);
       double[][] observations = new double[sampleSize][p.length];
       multinomial.nextArrayOfPoints(observations, 0, sampleSize);
-      //Original
-      //observations = new double[][]{{0,1,0},{0,1,0},{0,0,1},{0,1,0},{0,1,0},{0,1,0},{1,0,0},{0,0,1},{1,0,0},{0,0,0}};
-      //Reduced
-      //observations = new double[][]{{0,1},{0,1},{0,0},{0,1},{0,1},{0,1},{1,0},{0,0},{1,0},{1,0}};
-      //observations = new double[][]{{0,1},{0,1},{1,0},{0,1},{0,1},{0,1},{0,0},{1,0},{0,0},{0,0}};
       MultinomialCIChiSquareOpt cs = new MultinomialCIChiSquareOpt(observations, statistic);
       cs.execute(str);
+      cs.getSolver().getIbex().release();
+      cs = null;
       System.gc();
       try {
-         Thread.sleep(50);
+         Thread.sleep(100);
       } catch (InterruptedException e) {
          // TODO Auto-generated catch block
          e.printStackTrace();
@@ -211,6 +198,8 @@ public class MultinomialCIChiSquareOpt extends AbstractProblem{
       
       int[] frequencies = {3,5,2};
       double[][] intervals = computeQuesenberryHurstCI(confidence, frequencies);
+      
+      System.out.println("Quesenberry-Hurst Confidence Intervals");
       System.out.println(Arrays.deepToString(intervals));
    }
    

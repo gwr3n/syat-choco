@@ -38,6 +38,13 @@ import org.chocosolver.solver.variables.VF;
 import org.chocosolver.solver.variables.VariableFactory;
 import org.chocosolver.util.ESat;
 
+/**
+ * Hotelling t^2 statistical constraint to to compare means of two or more samples.
+ *  
+ * @author Roberto Rossi
+ * @see R. Rossi, O. Agkun, S. Prestwich, A. Tarim, "Declarative Statistics," arxiv:1708.01829, Section 5.3.
+ */
+
 public class Hotelling extends AbstractProblem {
    public RealVar[] muVariable;
    public RealVar[][] observationVariable;
@@ -61,7 +68,7 @@ public class Hotelling extends AbstractProblem {
 
    @Override
    public void createSolver() {
-      solver = new Solver("ChiSquare");
+      solver = new Solver("Hotelling");
    }
 
    @Override
@@ -77,17 +84,21 @@ public class Hotelling extends AbstractProblem {
          }
       }
       
-      /*solver.post(new RealConstraint("mean equality ",
+      /**
+       * Additional constraints as discussed in the research paper. Uncomment to post.
+       *
+      solver.post(new RealConstraint("mean equality ",
             "{0}={1}",
             Ibex.HC4_NEWTON, 
             new RealVar[]{muVariable[1],muVariable[2]}
-            ));*/
+            ));
       
-      /*solver.post(new RealConstraint("mean equality ",
+      solver.post(new RealConstraint("mean equality ",
       "{0}={1}",
       Ibex.HC4_NEWTON, 
       new RealVar[]{muVariable[1],muVariable[2]}
-      ));*/
+      ));
+      *********************************************************************************/
       
       statisticVariable = VF.real("T2", statistic[0], statistic[1], precision, solver);
 
@@ -116,7 +127,6 @@ public class Hotelling extends AbstractProblem {
    public void solve() {
       StringBuilder st = new StringBuilder();
       solver.findOptimalSolution(ResolutionPolicy.MINIMIZE, statisticVariable, precision);
-      //do{
       st.append("---\n");
       if(solver.isFeasible() == ESat.TRUE) {
          for(int i = 0; i < muVariable.length; i++){
@@ -128,7 +138,6 @@ public class Hotelling extends AbstractProblem {
       }else{
          st.append("No solution!");
       }
-      //}while(solution = solver.nextSolution());
       System.out.println(st.toString());
    }
 

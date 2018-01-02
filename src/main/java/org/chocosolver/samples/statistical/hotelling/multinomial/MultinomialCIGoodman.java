@@ -55,6 +55,16 @@ import umontreal.iro.lecuyer.randvar.UniformGen;
 import umontreal.iro.lecuyer.randvarmulti.MultinomialGen;
 import umontreal.iro.lecuyer.rng.MRG32k3a;
 
+/**
+ * Choco implementation of Goodman's multinomial proportions confidence intervals.
+ * 
+ * Please note that this class has a purely academic scope. It does not serve any specific purpose
+ * other than reimplementing Goodman's and QuesenberryHurst's confidence intervals.
+ * 
+ * @author Roberto Rossi
+ * @see <a href="http://www.jstor.org/stable/1266673?seq=1">http://www.jstor.org/stable/1266673?seq=1</a>
+ */
+
 public class MultinomialCIGoodman extends AbstractProblem {
    
    public IntVar[] valueVariables;
@@ -93,7 +103,7 @@ public class MultinomialCIGoodman extends AbstractProblem {
    
    @Override
    public void createSolver() {
-       solver = new Solver("Frequency");
+       solver = new Solver("MultinomialProportions Goodman");
    }
    
    @Override
@@ -110,7 +120,6 @@ public class MultinomialCIGoodman extends AbstractProblem {
       
       chiSqStatistics = VF.real("chiSqStatistics", this.chiSqDist.inverseF(confidence), this.chiSqDist.inverseF(confidence), precision, solver);
       
-      //solver.post(IntConstraintFactorySt.bincounts(valueVariables, binVariables, binBounds, BincountsPropagatorType.EQFast));
       SyatConstraintFactory.bincountsDecomposition(valueVariables, binVariables, binBounds, BincountsDecompositionType.Agkun2016_2_EQ);
       
       RealVar[] realViews = VF.real(binVariables, precision);
@@ -131,7 +140,7 @@ public class MultinomialCIGoodman extends AbstractProblem {
          propagators[i] = new RealPropagator(chiSqExp, new RealVar[]{allRV[i],allRV[realViews.length+i],allRV[realViews.length+targetFrequencies.length]}, Ibex.HC4_NEWTON);
                
          /**
-          * Closed form solution
+          * Closed form solution (for reference)
           */
          //(A + 2*n[i] - Math.sqrt(A*(A+4*n[i]*(N-n[i])/N)))/(2*(N+A));
          /*chiSqExp = "{1} >= ({2} + 2*{0} - sqrt({2}*({2}+4*{0}*("+this.nObs+"-{0})/"+this.nObs+")))/(2*("+this.nObs+"+{2}))";
@@ -197,27 +206,12 @@ public class MultinomialCIGoodman extends AbstractProblem {
               st.append("\n");
            }
         });
-        solver.findAllSolutions();
+        //solver.findAllSolutions();
      } catch (ContradictionException e) {
         // TODO Auto-generated catch block
         e.printStackTrace();
         st.append("No solution!");
      }
-     /*st.append("-------------NEW SOLUTION----------------");
-     for(int i = 0; i < valueVariables.length; i++){
-        st.append(valueVariables[i]+"\n");
-     }
-     st.append("\n");
-     for(int i = 0; i < binVariables.length; i++){
-        st.append(binVariables[i]+"\n");
-     }
-     st.append("\n");
-     for(int i = 0; i < targetFrequencies.length; i++){
-        st.append(targetFrequencies[i]+"\n");
-     }
-     st.append("\n");
-     st.append(chiSqStatistics.getLB()+" "+chiSqStatistics.getUB());
-     st.append("\n");*/
      System.out.println(st.toString());
    }
    

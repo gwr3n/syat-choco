@@ -119,56 +119,11 @@ public class IncompleteGermanTankProblem extends AbstractProblem {
         
     }
     
-    /*
-Last figure missing																			
-11	12	13	14	15	16	17	18	19	20	21	22	23							
-11	12	13	14	15	16	17	18	19	20	21	22	23	24	25					
-11	12	13	14	15	16	17	18	19	20	21	22	23	24	25	26				
-11	12	13	14	15	16	17	18	19	20	21	22	23	24	25	26				
-11	12	13	14	15	16	17	18	19	20	21	22	23	24	25	26				
-11	12	13	14	15	16	17	18	19	20	21	22	23	24	25	26				
-11	12	13	14	15	16	17	18	19	20	21	22	23	24	25	26				
-11	12	13	14	15	16	17	18	19	20	21	22	23	24	25	26				
-11	12	13	14	15	16	17	18	19	20	21	22	23	24	25	26	27	28		
-11	12	13	14	15	16	17	18	19	20	21	22	23	24	25	26	27	28	29	30
-																			
-																			
-All data known																			
-11	12	13	14	15	16	17	18	19	20	21	22	23	24	25										
-    */
-    
     public static double upperBound = Double.MIN_VALUE;
     public static double lowerBound = Double.MAX_VALUE;
     
     public static int populationXUB[];
     public static int populationXLB[];
-
-    /*public static void main(String[] args) {
-    	String[] str={"-log","SILENT"};
-    	int replications = 500;
-    	int sampleSize = 10;
-    	int UB = 20;
-    	
-    	double coverageProbability = 0;
-    	MRG32k3a rng = new MRG32k3a();
-    	//rng.setSeed(new long[]{System.currentTimeMillis() % 10000, System.currentTimeMillis() % 10000, System.currentTimeMillis() % 10000, System.currentTimeMillis() % 10000, System.currentTimeMillis() % 10000, System.currentTimeMillis() % 10000});
-		UniformIntGen uniform = new UniformIntGen(rng, 0, UB);
-		for(int i = 0; i < replications; i++){
-			upperBound = Double.MIN_VALUE;
-			lowerBound = Double.MAX_VALUE;
-			populationXUB = new int[dataX.length];
-		    populationXLB = new int[dataX.length];
-			Arrays.fill(populationXUB, 0);
-			Arrays.fill(populationXLB, Integer.MAX_VALUE);
-			int[] variates = new int[sampleSize];
-			uniform.nextArrayOfInt(variates, 0, sampleSize);
-			dataX = variates;
-			new IncompleteGermanTankProblem().execute(str);
-			if(UB >= lowerBound && UB <= upperBound) 
-				coverageProbability++;
-		}
-		System.out.println("Frequency: "+coverageProbability/replications);
-    }*/
     
     public static void main(String[] args) {
     	upperBound = Double.MIN_VALUE;
@@ -185,7 +140,7 @@ All data known
     	pb.execute(str);
 		
 		StringBuilder st = new StringBuilder();
-		st.append("\nm: "+lowerBound+"\t"+upperBound+"\n");
+		st.append("\nmean: "+lowerBound+"\t"+upperBound+"\nObservations\n");
 		for(int i = 0; i < dataX.length; i++){
 			st.append(i+": "+populationXLB[i]+"\t"+populationXUB[i]+"\n");
 		}

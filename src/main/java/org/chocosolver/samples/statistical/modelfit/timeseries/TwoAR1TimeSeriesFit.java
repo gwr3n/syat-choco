@@ -48,6 +48,18 @@ import org.chocosolver.util.ESat;
 import umontreal.iro.lecuyer.probdist.ChiSquareDist;
 import umontreal.iro.lecuyer.probdist.PoissonDist;
 
+/**
+ * We consider two AR(1) stochastic process. We post a 
+ * chi square independence statistical constraint on the
+ * errors. This problem is discussed in 
+ * 
+ * R. Rossi, O. Agkun, S. Prestwich, A. Tarim, 
+ * "Declarative Statistics," arxiv:1708.01829, Section 5.2
+ * 
+ * @author Roberto Rossi
+ *
+ */
+
 public class TwoAR1TimeSeriesFit extends AbstractProblem {
    
    public RealVar parameter1;
@@ -88,7 +100,7 @@ public class TwoAR1TimeSeriesFit extends AbstractProblem {
    
    RealVar[] allRV;
    
-   double precision = 0.2;
+   double precision = 0.5;
    
    ChiSquareDist chiSqDist;
    
@@ -99,8 +111,8 @@ public class TwoAR1TimeSeriesFit extends AbstractProblem {
    
    @Override
    public void buildModel() {
-      parameter1 = VariableFactory.real("Parameter 1", 0, 2, precision, solver);
-      constant1 = VariableFactory.real("Constant 1", 0, 10, precision, solver);
+      parameter1 = VariableFactory.real("Parameter 1", -2, 2, precision, solver);
+      constant1 = VariableFactory.real("Constant 1", 0, 20, precision, solver);
       
       residual1 = new RealVar[this.observations1.length];
       for(int i = 0; i < this.residual1.length; i++){
@@ -113,8 +125,8 @@ public class TwoAR1TimeSeriesFit extends AbstractProblem {
                ));
       }
       
-      parameter2 = VariableFactory.real("Parameter 2", 0, 2, precision, solver);
-      constant2 = VariableFactory.real("Constant 2", 0, 10, precision, solver);
+      parameter2 = VariableFactory.real("Parameter 2", -2, 2, precision, solver);
+      constant2 = VariableFactory.real("Constant 2", 0, 20, precision, solver);
       
       residual2 = new RealVar[this.observations2.length];
       for(int i = 0; i < this.residual2.length; i++){
@@ -133,26 +145,25 @@ public class TwoAR1TimeSeriesFit extends AbstractProblem {
       binBounds[0] = this.binBounds1;
       binBounds[1] = this.binBounds2;
       
-      chiSqStatistics = VF.real("chiSqStatistics", 0, this.chiSqDist.inverseF(1-significance), precision, solver);
+      chiSqStatistics = VF.real("chiSqStatistics", this.chiSqDist.inverseF(1-significance), this.chiSqDist.inverseF(1-significance), precision, solver);
       ChiSquareIndependence.decomposition("chiSqTest", residual1, residual2, binBounds, chiSqStatistics, precision, true);
    }
    
    @Override
    public void configureSearch() {
-      
+      // Search strategy
       solver.set(
             new RealStrategy(new RealVar[]{constant1,parameter1,constant2,parameter2}, new Cyclic(), new RealDomainMiddle()),
-            //new RealStrategy(new RealVar[]{parameter1,parameter2,constant1,constant2,lambda1,lambda2}, new Cyclic(), new RealDomainMiddle()),
             new RealStrategy(new RealVar[]{chiSqStatistics}, new Cyclic(), new RealDomainMiddle())
-            //new RealStrategy(residual1, new Cyclic(), new RealDomainMiddle())
        );
+       // Uncomment if a time limit is necessary
        //SearchMonitorFactory.limitTime(solver,10000);
    }
    
    @Override
    public void solve() {
      StringBuilder st = new StringBuilder();
-     solver.findOptimalSolution(ResolutionPolicy.MINIMIZE, chiSqStatistics, precision);
+     solver.findOptimalSolution(ResolutionPolicy.MAXIMIZE, constant1, precision);
      //do{
         st.append("---\n");
         if(solver.isFeasible() == ESat.TRUE) {
@@ -162,7 +173,6 @@ public class TwoAR1TimeSeriesFit extends AbstractProblem {
            st.append("\n");
            st.append(chiSqStatistics.getLB()+" "+chiSqStatistics.getUB());
            st.append("\n");
-           feasibleCount++;
         }else{
            st.append("No solution!");
         }
@@ -188,56 +198,38 @@ public class TwoAR1TimeSeriesFit extends AbstractProblem {
       return observations;
    }
    
-   static int feasibleCount = 0;
-   
    public static void fitMostLikelyParameters(){
       String[] str={"-log","SOLUTION"};
       
       double[] observations1;
-      
       double[] observations2;
       
       int nbObservations = 100;
       
-      double replications = 1;
-      
       Random rnd = new Random(123);
       
-      for(int k = 0; k < replications; k++){
+      double constant = 5;
+      double parameter = 0.5;
+      double truePoissonRate = 5;
       
-         double truePoissonRate = 5;
-         
-         observations1 = generateObservations(rnd, 5, 0.5, truePoissonRate, nbObservations);
-         //Arrays.stream(observations1).forEach(k -> System.out.print(k+"\t"));
-         observations2 = generateObservations(rnd, 5, 0.5, truePoissonRate, nbObservations);
-         //Arrays.stream(observations2).forEach(k -> System.out.print(k+"\t"));
-         System.out.println();
-         
-         int bins = 4;
-         double[] binBounds1 = DoubleStream.iterate(0, i -> i + 3).limit(bins).toArray();
-         double[] binBounds2 = DoubleStream.iterate(0, i -> i + 3).limit(bins).toArray();
-         double significance = 0.05;
+      observations1 = generateObservations(rnd, constant, parameter, truePoissonRate, nbObservations);
+      observations2 = generateObservations(rnd, constant, parameter, truePoissonRate, nbObservations);
       
-         TwoAR1TimeSeriesFit regression = new TwoAR1TimeSeriesFit(observations1, binBounds1, observations2, binBounds2, significance);
-         regression.execute(str);
-         try {
-            regression.finalize();
-         } catch (Throwable e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-         }
-         regression = null;
-         System.gc();
-         
-         System.out.println(feasibleCount/(k+1.0) + "(" + k + ")");
-         try {
-            Thread.sleep(1000);
-         } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-         }
+      int bins = 5;
+      double[] binBounds1 = DoubleStream.iterate(0, i -> i + 3).limit(bins).toArray();
+      double[] binBounds2 = DoubleStream.iterate(0, i -> i + 3).limit(bins).toArray();
+      double significance = 0.05;
+   
+      TwoAR1TimeSeriesFit regression = new TwoAR1TimeSeriesFit(observations1, binBounds1, observations2, binBounds2, significance);
+      regression.execute(str);
+      try {
+         regression.finalize();
+      } catch (Throwable e1) {
+         // TODO Auto-generated catch block
+         e1.printStackTrace();
       }
-      System.out.println(feasibleCount/replications);
+      regression = null;
+      System.gc();
    }
    
    public static void main(String[] args) {

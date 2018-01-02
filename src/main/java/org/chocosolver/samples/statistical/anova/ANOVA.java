@@ -44,6 +44,27 @@ import org.chocosolver.solver.variables.VariableFactory;
 import umontreal.iro.lecuyer.probdist.FisherFDist;
 import umontreal.iro.lecuyer.probdist.NormalDist;
 
+/**
+ * This class follows the discussion  
+ * 
+ * R. Rossi, O. Agkun, S. Prestwich, A. Tarim, 
+ * "Declarative Statistics," arxiv:1708.01829, Section 5.3.
+ * 
+ * It is a declarative implementation of a classical ANOVA analysis.
+ * 
+ * The model is infeasible for the data provided ({@code observations}) 
+ * at significance level 0.05.
+ * 
+ * We recall that in declarative statistics, an infeasibility signifies rejection 
+ * of the null hypothesis. In ANOVA the null hypothesis is that the means of the 
+ * normal distributions that generated the three group realisations are equal, 
+ * we therefore conclude that there is evidence that the expected values in the 
+ * three groups differ at the prescribed significance level.
+ * 
+ * @author Roberto Rossi
+ *
+ */
+
 public class ANOVA extends AbstractProblem {
    
    private RealVar[] meansWithinGroups;

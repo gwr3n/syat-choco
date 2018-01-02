@@ -45,6 +45,15 @@ import umontreal.iro.lecuyer.randvar.UniformGen;
 import umontreal.iro.lecuyer.randvarmulti.MultinomialGen;
 import umontreal.iro.lecuyer.rng.MRG32k3a;
 
+/**
+ * Computation of multinomial proportions confidence intervals.
+ * 
+ * This class is concerned with establishing nominal coverage probabilities.
+ * 
+ * @author Roberto Rossi
+ * @see R. Rossi, O. Agkun, S. Prestwich, A. Tarim, "Declarative Statistics," arxiv:1708.01829, Section 5.4
+ */
+
 public class MultinomialCIChiSquare extends AbstractProblem{
 
    public double[][] observations;
@@ -125,7 +134,7 @@ public class MultinomialCIChiSquare extends AbstractProblem{
       
       statisticVariable = VF.real("chiSquare", statistic[0], statistic[1], precision, solver);
       
-      tSquareStatistic.decompose("scoreConstraint", p, observationVariable, covarianceMatrix, statisticVariable, precision);
+      tSquareStatistic.decompose("Hotelling", p, observationVariable, covarianceMatrix, statisticVariable, precision);
    }
 
    @Override
@@ -148,24 +157,22 @@ public class MultinomialCIChiSquare extends AbstractProblem{
    
    @Override
    public void solve() {
-     StringBuilder st = new StringBuilder();
-     boolean solution = solver.findSolution();
-     //do{
-        st.append("---\n");
-        if(solution) {
-           for(int i = 0; i < p.length; i++){
-              st.append("("+p[i].getLB()+","+p[i].getUB()+"), ");
-           }
-           st.append("\n");
-           st.append(statisticVariable.getLB()+" "+statisticVariable.getUB());
-           st.append("\n");
-           
-           coverageProbability++;
-        }else{
-           st.append("No solution!");
-        }
-     //}while(solution = solver.nextSolution());
-     System.out.println(st.toString());
+      StringBuilder st = new StringBuilder();
+      boolean solution = solver.findSolution();
+      st.append("---\n");
+      if(solution) {
+         for(int i = 0; i < p.length; i++){
+            st.append("("+p[i].getLB()+","+p[i].getUB()+"), ");
+         }
+         st.append("\n");
+         st.append(statisticVariable.getLB()+" "+statisticVariable.getUB());
+         st.append("\n");
+
+         coverageProbability++;
+      }else{
+         st.append("No solution!");
+      }
+      System.out.println(st.toString());
    }
    
    @Override
@@ -180,11 +187,11 @@ public class MultinomialCIChiSquare extends AbstractProblem{
       
       double confidence = 0.9;
       double[] p = {0.3,0.3,0.2}; 
-      /** CAREFUL this is actually a ChiSquareDist with n-1 DOF. There is a bug in the library **/
+      /** CAREFUL: ChiSquareDist is actually a ChiSquareDist with n-1 DOF. There is a bug in the library **/
       double[] statistic = {0,(new ChiSquareDist(p.length)).inverseF(confidence)};
       
       int replications = 200;
-      int sampleSize = 30;
+      int sampleSize = 35;
       
       MRG32k3a rng = new MRG32k3a();
       UniformGen gen1 = new UniformGen(rng);
@@ -194,6 +201,8 @@ public class MultinomialCIChiSquare extends AbstractProblem{
          multinomial.nextArrayOfPoints(observations, 0, sampleSize);
          MultinomialCIChiSquare cs = new MultinomialCIChiSquare(observations, p, statistic);
          cs.execute(str);
+         cs.getSolver().getIbex().release();
+         cs = null;
          System.gc();
          try {
             Thread.sleep(50);

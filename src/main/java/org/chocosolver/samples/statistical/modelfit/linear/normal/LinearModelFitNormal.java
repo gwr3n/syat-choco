@@ -48,37 +48,54 @@ import org.chocosolver.util.ESat;
 import umontreal.iro.lecuyer.probdist.ChiSquareDist;
 import umontreal.iro.lecuyer.probdist.NormalDist;
 
+/**
+ * This class implements the example described in 
+ * 
+ * R. Rossi, O. Agkun, S. Prestwich, A. Tarim, 
+ * "Declarative Statistics," arxiv:1708.01829, Section 5.1
+ * 
+ * We consider a set of random variates v_t generated according to
+ * 
+ * v_t = a*t+b+e_t
+ * 
+ * Our aim is to fit parameters a and b given a random error e_t (normal)
+ * 
+ * @author Roberto Rossi
+ *
+ */
+
 public class LinearModelFitNormal extends AbstractProblem {
    
-   private RealVar slope;
-   private RealVar intercept;
-   private RealVar mean;
-   private RealVar stDeviation;
+   private RealVar slope;           // Linear model slope
+   private RealVar intercept;       // Linear model intercept
    
-   private RealVar[] residual;
-   private IntVar[] binVariables;
+   private RealVar mean;            // Random error mean (assumed 0)
+   private RealVar stDeviation;     // Random error standard deviation
    
-   private RealVar chiSqStatistics;
+   private RealVar[] error;         // Fitting errors
+   private IntVar[] binVariables;   // Fitting errors bin counts
    
-   private double[] residualBounds;
+   private RealVar chiSqStatistics; // Chi square statistics (goodness-of-fit)
    
-   private double[] observations;
-   private double[] binBounds;
-   private double significance;
+   private double[] errorBounds;    // Min and max observable error
    
-   private double precision = 1.e-2;
+   private double[] observations;   // Random variates
+   private double[] binBounds;      // Random error bin bounds
+   private double significance;     // Significance level
    
-   private ChiSquareDist chiSqDist;
+   private double precision = 1.e-2;   // Ibex precision
+   
+   private ChiSquareDist chiSqDist;    
    
    private boolean verboseOutput;
    
    public LinearModelFitNormal(double[] observations,
-                                    double[] residualBounds,
-                                    double[] binBounds,
-                                    double significance,
-                                    boolean verboseOutput){
+                               double[] residualBounds,
+                               double[] binBounds,
+                               double significance,
+                               boolean verboseOutput){
       this.observations = observations;
-      this.residualBounds = residualBounds;
+      this.errorBounds = residualBounds;
       this.binBounds = binBounds;
       this.significance = significance;
       this.verboseOutput = verboseOutput;
@@ -86,27 +103,33 @@ public class LinearModelFitNormal extends AbstractProblem {
    
    @Override
    public void createSolver() {
-       solver = new Solver("Regression Normal");
+       solver = new Solver("Linear model fit - Normal errors");
    }
    
    @Override
    public void buildModel() {
+      
+      // Linear model parameters
       slope = VariableFactory.real("Slope", -2, 2, precision, solver);
       intercept = VariableFactory.real("Intercept", -10, 10, precision, solver);
+      
+      // Random errors
       mean = VariableFactory.real("Mean", 0, 0, precision, solver);
       stDeviation = VariableFactory.real("stDeviation", 0, 10, precision, solver);
       
-      residual = new RealVar[this.observations.length];
-      for(int i = 0; i < this.residual.length; i++){
-         residual[i] = VariableFactory.real("Residual "+(i+1), this.residualBounds[0], this.residualBounds[1], precision, solver);
+      // Linear model
+      error = new RealVar[this.observations.length];
+      for(int i = 0; i < this.error.length; i++){
+         error[i] = VariableFactory.real("Error "+(i+1), this.errorBounds[0], this.errorBounds[1], precision, solver);
          String residualExp = "{0}="+this.observations[i]+"-{1}*"+(i+1)+"+{2}";
-         solver.post(new RealConstraint("residual "+i,
+         solver.post(new RealConstraint("error "+i,
                residualExp,
                Ibex.HC4_NEWTON, 
-               new RealVar[]{residual[i],slope,intercept}
+               new RealVar[]{error[i],slope,intercept}
                ));
       }
       
+      // Chi square goodness-of-fit
       binVariables = new IntVar[this.binBounds.length-1];
       for(int i = 0; i < this.binVariables.length; i++)
          binVariables[i] = VariableFactory.bounded("Bin "+(i+1), 0, this.observations.length, solver);
@@ -114,44 +137,45 @@ public class LinearModelFitNormal extends AbstractProblem {
       this.chiSqDist = new ChiSquareDist(this.binVariables.length-1);
       
       chiSqStatistics = VF.real("chiSqStatistics", 0, this.chiSqDist.inverseF(1-significance), precision, solver);
-      ChiSquareFitNormal.decomposition("chiSqTest", residual, binVariables, binBounds, mean, stDeviation, chiSqStatistics, precision, false);
+      ChiSquareFitNormal.decomposition("chiSqTest", error, binVariables, binBounds, mean, stDeviation, chiSqStatistics, precision, false);
    }
    
    @Override
    public void configureSearch() {
-      
+      // Search strategy
       solver.set(
             new RealStrategy(new RealVar[]{slope,intercept,stDeviation}, new Cyclic(), new RealDomainMiddle()),
             new RealStrategy(new RealVar[]{chiSqStatistics}, new Cyclic(), new RealDomainMiddle())
        );
-       //SearchMonitorFactory.limitTime(solver,10000);
+      
+      // Uncomment if a time limit is necessary
+      //SearchMonitorFactory.limitTime(solver,10000);
    }
    
    @Override
    public void solve() {
-     StringBuilder st = new StringBuilder();
-     solver.findOptimalSolution(ResolutionPolicy.MINIMIZE, chiSqStatistics, precision);
-     //do{
-        if(solver.isFeasible() == ESat.TRUE) {
-           st.append(slope.getLB()+", "+intercept.getLB()+", "+mean.toString()+", "+stDeviation.getLB()+"\n");
-           if(verboseOutput) {
-              for(int i = 0; i < residual.length; i++){
-                 st.append(residual[i].toString()+", ");
-              }
-              st.append("\n");
-              for(int i = 0; i < binVariables.length; i++){
-                 st.append(binVariables[i].toString()+", ");
-              }
-              st.append("\n");
-              st.append(chiSqStatistics.getLB()+" "+chiSqStatistics.getUB());
-              st.append("\n");
-           }
-        }else{
-           st.append("No solution!");
-        }
-     //}while(solution = solver.nextSolution());
-     //LoggerFactory.getLogger("bench").info(st.toString());
-     System.out.print(st.toString());
+      StringBuilder st = new StringBuilder();
+      
+      // Minimise chi squared statistics
+      solver.findOptimalSolution(ResolutionPolicy.MINIMIZE, chiSqStatistics, precision);
+      if(solver.isFeasible() == ESat.TRUE) {
+         st.append(slope.getLB()+", "+intercept.getLB()+", "+mean.toString()+", "+stDeviation.getLB()+"\n");
+         if(verboseOutput) {
+            for(int i = 0; i < error.length; i++){
+               st.append(error[i].toString()+", ");
+            }
+            st.append("\n");
+            for(int i = 0; i < binVariables.length; i++){
+               st.append(binVariables[i].toString()+", ");
+            }
+            st.append("\n");
+            st.append(chiSqStatistics.getLB()+" "+chiSqStatistics.getUB());
+            st.append("\n");
+         }
+      }else{
+         st.append("No solution!");
+      }
+      System.out.print(st.toString());
    }
 
    @Override
@@ -159,12 +183,29 @@ public class LinearModelFitNormal extends AbstractProblem {
        
    }
    
+   /**
+    * Random variate generation
+    * 
+    * @param rnd random seed
+    * @param slope linear model slope
+    * @param intercept linear model intercept
+    * @param normalMean random error mean
+    * @param normalstd random error standard deviation
+    * @param nbObservations number of variates
+    * @return the random variates
+    */
    public static double[] generateObservations(Random rnd, double slope, double intercept, double normalMean, double normalstd, int nbObservations){
       NormalDist dist = new NormalDist(normalMean, normalstd);
       return DoubleStream.iterate(1, i -> i + 1).map(i -> slope*i - intercept + dist.inverseF(rnd.nextDouble())).limit(nbObservations).toArray();
    }
    
-   public static void fitMostLikelyParameters(int batchSize, boolean verboseOutput){
+   /**
+    * Linear model fitting
+    * 
+    * @param batchSize number of linear models to be fit
+    * @param verboseOutput print detailed information
+    */
+   public static void fitParameters(int batchSize, boolean verboseOutput){
       String[] str={"-log", verboseOutput ? "SOLUTION" : "SILENT"};
       
       int nbObservations = 30;
@@ -187,21 +228,25 @@ public class LinearModelFitNormal extends AbstractProblem {
       }
       
       for(int i = 0; i < batchSize; i++){
+         
+         // Bin bounds for random error (5 bins of size 4 starting from -10)
          int bins = 5;
-         double[] binBounds = DoubleStream.iterate(-10, a -> a + 4).limit(bins + 1).toArray();                                 
+         double[] binBounds = DoubleStream.iterate(-10, a -> a + 4).limit(bins + 1).toArray(); 
+         
          double significance = 0.05;
       
-         LinearModelFitNormal regression = new LinearModelFitNormal(observations[i], residualBounds, binBounds, significance, verboseOutput);
-         regression.execute(str);
-         regression.getSolver().getIbex().release();
+         LinearModelFitNormal fit = new LinearModelFitNormal(observations[i], residualBounds, binBounds, significance, verboseOutput);
+         fit.execute(str);
+         fit.getSolver().getIbex().release();
       }
    }
    
    public static void main(String[] args) {
       
-      int batchSize = 1;
-      boolean verboseOutput = true;
-      fitMostLikelyParameters(batchSize, verboseOutput);
+      int batchSize = 1;               // Number of linear models to fit
+      boolean verboseOutput = true;    // Print detailed information
+      
+      fitParameters(batchSize, verboseOutput);
       
    }
 }

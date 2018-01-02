@@ -171,6 +171,9 @@ public class TwoSampleTTest extends AbstractProblem {
           
        TwoSampleTTest t = new TwoSampleTTest(dataX, dataY);
        t.execute(str);
+       t.getSolver().getIbex().release();
+       t = null;
+       System.gc();
     }
     
     public static void testDifferentPopulations(){
@@ -183,6 +186,9 @@ public class TwoSampleTTest extends AbstractProblem {
        
        TwoSampleTTest t = new TwoSampleTTest(dataX, dataY);
        t.execute(str);
+       t.getSolver().getIbex().release();
+       t = null;
+       System.gc();
     }
 
     public static void main(String[] args) {

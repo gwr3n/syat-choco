@@ -24,7 +24,7 @@
  * SOFTWARE.
  */
 
-package org.chocosolver.samples.statistical.modelfit.linear.poisson;
+package org.chocosolver.samples.statistical.modelfit.nonlinear.poisson;
 
 import java.util.Arrays;
 import java.util.Random;
@@ -48,21 +48,37 @@ import org.chocosolver.util.ESat;
 import umontreal.iro.lecuyer.probdist.ChiSquareDist;
 import umontreal.iro.lecuyer.probdist.PoissonDist;
 
-public class LinearModelFitPoisson extends AbstractProblem {
+/**
+ * We consider a set of random variates v_t generated according to
+ * 
+ * v_t = a*t+t^b+e_t
+ * 
+ * Our aim is to fit parameters a (slope) and b (exponent) given 
+ * a random error e_t (Poisson)
+ * 
+ * @author Roberto Rossi
+ *
+ */
+
+public class NonlinearModelFitPoisson extends AbstractProblem {
    
-   public RealVar slope;
-   public RealVar quadratic;
-   public RealVar poissonRate;
+   static double truePoissonRate = 30;
+   static double trueSlope = 1;
+   static double trueExponent = 0.5;
    
-   public RealVar[] residual;
-   public IntVar[] binVariables;
+   public RealVar slope;         // Model slope
+   public RealVar exp;           // Model exponent
+   public RealVar poissonRate;   // Poisson error rate
+   
+   public RealVar[] error;       // Model fit errors
+   public IntVar[] binVariables; // Bin counts
    public RealVar[] realBinViews;
    
-   double[] observations;
-   double[] binBounds;
-   double significance;
+   double[] observations;        // Random variates
+   double[] binBounds;           // Random error bin bounds
+   double significance;          // Significance level
    
-   public LinearModelFitPoisson(double[] observations,
+   public NonlinearModelFitPoisson(double[] observations,
                      double[] binBounds,
                      double significance){
       this.observations = observations;
@@ -73,32 +89,38 @@ public class LinearModelFitPoisson extends AbstractProblem {
    RealVar chiSqStatistics;
    RealVar[] allRV;
    
-   double precision = 0.01;
+   double precision = 0.1;
    
    ChiSquareDist chiSqDist;
    
    @Override
    public void createSolver() {
-       solver = new Solver("Regression");
+       solver = new Solver("Nonlinear model fit - Poisson errors");
    }
    
    @Override
    public void buildModel() {
+      
+      // Model parameters
       slope = VariableFactory.real("Slope", 0, 10, precision, solver);
-      quadratic = VariableFactory.real("Quadratic", 0, 10, precision, solver);
+      exp = VariableFactory.real("Exponent", 0, 10, precision, solver);
+      
+      // Random error
       poissonRate = VariableFactory.real("Rate", 0, 50, precision, solver);
       
-      residual = new RealVar[this.observations.length];
-      for(int i = 0; i < this.residual.length; i++){
-         residual[i] = VariableFactory.real("Residual "+(i+1), 0, this.binBounds[this.binBounds.length-2], precision, solver);
+      // Nonlinear model
+      error = new RealVar[this.observations.length];
+      for(int i = 0; i < this.error.length; i++){
+         error[i] = VariableFactory.real("Error "+(i+1), 0, this.binBounds[this.binBounds.length-2], precision, solver);
          String residualExp = "{0}="+this.observations[i]+"-{1}*"+(i+1.0)+"-"+(i+1.0)+"^{2}";
-         solver.post(new RealConstraint("residual "+i,
+         solver.post(new RealConstraint("error "+i,
                residualExp,
                Ibex.HC4_NEWTON, 
-               new RealVar[]{residual[i],slope,quadratic}
+               new RealVar[]{error[i],slope,exp}
                ));
       }
       
+      // Chi square goodness-of-fit
       binVariables = new IntVar[this.binBounds.length-1];
       for(int i = 0; i < this.binVariables.length; i++)
          binVariables[i] = VariableFactory.bounded("Bin "+(i+1), 0, this.observations.length, solver);
@@ -106,45 +128,46 @@ public class LinearModelFitPoisson extends AbstractProblem {
       this.chiSqDist = new ChiSquareDist(this.binVariables.length-1);
       
       chiSqStatistics = VF.real("chiSqStatistics", 0, this.chiSqDist.inverseF(1-significance), precision, solver);
-      ChiSquareFitPoisson.decomposition("chiSqTest", residual, binVariables, binBounds, poissonRate, chiSqStatistics, precision, false);
+      ChiSquareFitPoisson.decomposition("chiSqTest", error, binVariables, binBounds, poissonRate, chiSqStatistics, precision, false);
    }
    
    @Override
    public void configureSearch() {
-      
+      // Search strategy
       solver.set(
-            new RealStrategy(new RealVar[]{slope,quadratic}, new Cyclic(), new RealDomainMiddle()),
-            //new RealStrategy(residual, new Cyclic(), new RealDomainMiddle()),
+            new RealStrategy(new RealVar[]{slope,exp}, new Cyclic(), new RealDomainMiddle()),
             new RealStrategy(new RealVar[]{poissonRate}, new Cyclic(), new RealDomainMiddle())
-            //IntStrategyFactory.minDom_LB(binVariables),
-            //new RealStrategy(new RealVar[]{chiSqStatistics}, new Cyclic(), new RealDomainMiddle())
        );
+      
+       // Uncomment if a time limit is necessary
        //SearchMonitorFactory.limitTime(solver,10000);
    }
    
    @Override
    public void solve() {
-     StringBuilder st = new StringBuilder();
-     solver.findOptimalSolution(ResolutionPolicy.MINIMIZE, chiSqStatistics, precision);
-     //do{
-        st.append("---\n");
-        if(solver.isFeasible() == ESat.TRUE) {
-           st.append(slope.toString()+", "+quadratic.toString()+", "+poissonRate.toString()+"\n");
-           for(int i = 0; i < residual.length; i++){
-              st.append(residual[i].toString()+", ");
-           }
-           st.append("\n");
-           for(int i = 0; i < binVariables.length; i++){
-              st.append(binVariables[i].toString()+", ");
-           }
-           st.append("\n");
-           st.append(chiSqStatistics.getLB()+" "+chiSqStatistics.getUB());
-           st.append("\n");
-        }else{
-           st.append("No solution!");
-        }
-     //}while(solution = solver.nextSolution());
-     System.out.println(st.toString());
+      StringBuilder st = new StringBuilder();
+
+      // Minimise chi squared statistics
+      solver.findOptimalSolution(ResolutionPolicy.MINIMIZE, chiSqStatistics, precision);
+
+      st.append("---\n");
+      if(solver.isFeasible() == ESat.TRUE) {
+         st.append(slope.toString()+", "+exp.toString()+", "+poissonRate.toString()+"\n");
+         for(int i = 0; i < error.length; i++){
+            st.append(error[i].toString()+", ");
+         }
+         st.append("\n");
+         for(int i = 0; i < binVariables.length; i++){
+            st.append(binVariables[i].toString()+", ");
+         }
+         st.append("\n");
+         st.append(chiSqStatistics.getLB()+" "+chiSqStatistics.getUB());
+         st.append("\n");
+      }else{
+         st.append("No solution!");
+      }
+
+      System.out.println(st.toString());
    }
 
    @Override
@@ -152,24 +175,31 @@ public class LinearModelFitPoisson extends AbstractProblem {
        
    }
    
-   public static double[] generateObservations(Random rnd, double truePoissonRate, int nbObservations){
+   /**
+    * Random variate generation
+    * 
+    * @param rnd random seed
+    * @param slope model slope
+    * @param exp model exponent
+    * @param truePoissonRate Poisson rate
+    * @param nbObservations number of variates
+    * @return the random variates
+    */
+   public static double[] generateObservations(Random rnd, double slope, double exp, double truePoissonRate, int nbObservations){
       PoissonDist dist = new PoissonDist(truePoissonRate);
-      return DoubleStream.iterate(1, i -> i + 1).map(i -> i+Math.pow(i, 0.5)).map(i -> i + dist.inverseF(rnd.nextDouble())).limit(nbObservations).toArray();
+      return DoubleStream.iterate(1, i -> i + 1).map(i -> i*slope+Math.pow(i, exp)).map(i -> i + dist.inverseF(rnd.nextDouble())).limit(nbObservations).toArray();
    }
    
+   /** 
+    * Nonlinear model fitting
+    */
    public static void fitMostLikelyParameters(){
       String[] str={"-log","SOLUTION"};
       
-      double[] observations = {4, 6, 10, 6, 10, 11, 16, 19, 18, 15, 16, 17, 16, 17, 20, 19, 24, 24, 
-            26, 25, 23, 26, 25, 30, 28, 32, 32, 35, 32, 31, 37, 37, 40, 41, 39, 
-            42, 42, 45, 42, 50, 46, 47, 49, 48, 49, 52, 53, 53, 55, 54};
-      
       int nbObservations = 100;
       
-      double truePoissonRate = 30;
-      
       Random rnd = new Random(123);
-      observations = generateObservations(rnd, truePoissonRate, nbObservations);
+      double[] observations = generateObservations(rnd, trueSlope, trueExponent, truePoissonRate, nbObservations);
       Arrays.stream(observations).forEach(k -> System.out.print(k+"\t"));
       System.out.println();
       
@@ -177,8 +207,11 @@ public class LinearModelFitPoisson extends AbstractProblem {
       double[] binBounds = DoubleStream.iterate(0, i -> i + 5).limit(bins+1).toArray();                                 
       double significance = 0.05;
    
-      LinearModelFitPoisson regression = new LinearModelFitPoisson(observations, binBounds, significance);
-      regression.execute(str);
+      NonlinearModelFitPoisson fit = new NonlinearModelFitPoisson(observations, binBounds, significance);
+      fit.execute(str);
+      fit.getSolver().getIbex().release();
+      fit = null;
+      System.gc();
    }
    
    public static void main(String[] args) {

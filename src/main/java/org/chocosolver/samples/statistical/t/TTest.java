@@ -142,5 +142,8 @@ public class TTest extends AbstractProblem {
     	TTest t = new TTest();
     	t.prettyOut();
     	t.execute(str);
+    	t.getSolver().getIbex().release();
+      t = null;
+      System.gc();
     }
 }
