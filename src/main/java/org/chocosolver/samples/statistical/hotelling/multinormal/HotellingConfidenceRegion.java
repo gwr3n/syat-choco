@@ -49,7 +49,7 @@ import org.chocosolver.util.ESat;
  * This code can be used to generate a plot of the confidence region.
  *  
  * @author Roberto Rossi
- * @see R. Rossi, O. Agkun, S. Prestwich, A. Tarim, "Declarative Statistics," arxiv:1708.01829, Section 5.3.
+ * @see <a>R. Rossi, O. Agkun, S. Prestwich, A. Tarim, "Declarative Statistics," arxiv:1708.01829, Section 5.3.</a>
  */
 
 public class HotellingConfidenceRegion extends AbstractProblem {

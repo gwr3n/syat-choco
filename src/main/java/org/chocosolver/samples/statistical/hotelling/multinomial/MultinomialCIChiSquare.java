@@ -51,7 +51,7 @@ import umontreal.iro.lecuyer.rng.MRG32k3a;
  * This class is concerned with establishing nominal coverage probabilities.
  * 
  * @author Roberto Rossi
- * @see R. Rossi, O. Agkun, S. Prestwich, A. Tarim, "Declarative Statistics," arxiv:1708.01829, Section 5.4
+ * @see <a>R. Rossi, O. Agkun, S. Prestwich, A. Tarim, "Declarative Statistics," arxiv:1708.01829, Section 5.4</a>
  */
 
 public class MultinomialCIChiSquare extends AbstractProblem{

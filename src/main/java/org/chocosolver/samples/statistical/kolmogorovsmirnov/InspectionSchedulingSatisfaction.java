@@ -43,7 +43,7 @@ import org.chocosolver.util.ESat;
  * Inspection scheduling problem.
  * 
  * @author Roberto Rossi
- * @see <a href="http://dx.doi.org/10.3233/978-1-61499-419-0-777">Statistical Constraints</a>; Rossi et al., 2014.
+ * @see <a href="http://dx.doi.org/10.3233/978-1-61499-419-0-777">Rossi et al., 2014; Statistical Constraints.</a>
  */
 public class InspectionSchedulingSatisfaction extends AbstractProblem {
 

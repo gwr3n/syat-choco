@@ -42,7 +42,7 @@ import org.chocosolver.util.ESat;
  * Hotelling t^2 statistical constraint to to compare means of two or more samples.
  *  
  * @author Roberto Rossi
- * @see R. Rossi, O. Agkun, S. Prestwich, A. Tarim, "Declarative Statistics," arxiv:1708.01829, Section 5.3.
+ * @see <a>R. Rossi, O. Agkun, S. Prestwich, A. Tarim, "Declarative Statistics," arxiv:1708.01829, Section 5.3.</a>
  */
 
 public class Hotelling extends AbstractProblem {
