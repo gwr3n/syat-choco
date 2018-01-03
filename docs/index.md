@@ -11,6 +11,8 @@ __Maven:__
     <groupId>com.github.gwr3n</groupId>
 	<artifactId>syat-choco</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
+	
+[How to download SNAPSHOT version from maven SNAPSHOT repository?](https://stackoverflow.com/questions/7715321/how-to-download-snapshot-version-from-maven-snapshot-repository)
 
 __Current snapshots:__
 * [syat-choco-1.0.0-SNAPSHOT with dependencies](jar/syat-choco-1.0.0-SNAPSHOT-shaded.jar)
