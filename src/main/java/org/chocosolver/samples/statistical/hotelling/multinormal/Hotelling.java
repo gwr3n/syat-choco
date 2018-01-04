@@ -29,6 +29,8 @@ package org.chocosolver.samples.statistical.hotelling.multinormal;
 import org.chocosolver.samples.AbstractProblem;
 import org.chocosolver.solver.ResolutionPolicy;
 import org.chocosolver.solver.Solver;
+import org.chocosolver.solver.constraints.real.Ibex;
+import org.chocosolver.solver.constraints.real.RealConstraint;
 import org.chocosolver.solver.constraints.statistical.hotelling.tSquareStatistic;
 import org.chocosolver.solver.search.strategy.selectors.values.RealDomainMiddle;
 import org.chocosolver.solver.search.strategy.selectors.variables.Cyclic;
@@ -88,17 +90,17 @@ public class Hotelling extends AbstractProblem {
        * Additional constraints as discussed in the research paper. Uncomment to post.
        *
       solver.post(new RealConstraint("mean equality ",
-            "{0}={1}",
-            Ibex.HC4_NEWTON, 
-            new RealVar[]{muVariable[1],muVariable[2]}
-            ));
+                                     "{0}={1}",
+                                     Ibex.HC4_NEWTON, 
+                                     new RealVar[]{muVariable[0],muVariable[1]}
+                                    ));
       
       solver.post(new RealConstraint("mean equality ",
-      "{0}={1}",
-      Ibex.HC4_NEWTON, 
-      new RealVar[]{muVariable[1],muVariable[2]}
-      ));
-      *********************************************************************************/
+                                     "{0}={1}",
+                                     Ibex.HC4_NEWTON, 
+                                     new RealVar[]{muVariable[1],muVariable[2]}
+                                    ));
+      /*********************************************************************************/
       
       statisticVariable = VF.real("T2", statistic[0], statistic[1], precision, solver);
 
