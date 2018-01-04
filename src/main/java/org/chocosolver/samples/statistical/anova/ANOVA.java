@@ -125,6 +125,7 @@ public class ANOVA extends AbstractProblem {
             overallMeanRV
             ));
       
+      
       ssdBetweenGroups = VariableFactory.real("ssdBetweenGroups", 0, 1000, precision, solver);
       
       String ssdBetweenGroupsExp = "";
@@ -138,11 +139,9 @@ public class ANOVA extends AbstractProblem {
       ssdBetweenGroupsRV[groups] = overallMean;
       ssdBetweenGroupsRV[groups+1] = ssdBetweenGroups;
       
-      solver.post(new RealConstraint("overallMean ",
-            ssdBetweenGroupsExp,
-            Ibex.HC4_NEWTON, 
-            ssdBetweenGroupsRV
-            ));
+      /* "between groups" mean squared differences */
+      solver.post(new RealConstraint("ssdBetweenGroups", ssdBetweenGroupsExp, Ibex.HC4_NEWTON, ssdBetweenGroupsRV));
+      
       
       ssdWithinGroups = VariableFactory.real("ssdWithinGroups", 0, 1000, precision, solver);
       
@@ -158,20 +157,19 @@ public class ANOVA extends AbstractProblem {
       System.arraycopy(meansWithinGroups, 0, ssdWithinGroupsRV, 0, groups);
       ssdWithinGroupsRV[groups] = ssdWithinGroups;
       
-      solver.post(new RealConstraint("overallMean ",
-            ssdWithinGroupsExp,
-            Ibex.HC4_NEWTON, 
-            ssdWithinGroupsRV
-            ));
+      /* "within groups" mean squared differences */
+      solver.post(new RealConstraint("ssdWithinGroups", ssdWithinGroupsExp, Ibex.HC4_NEWTON, ssdWithinGroupsRV));
+      
       
       this.fDist = new FisherFDist(groups-1,(samples-1)*groups);
-      
       fStatistics = VF.real("fStatistics", 0, this.fDist.inverseF(1-significance), precision, solver);
+      
+      /* Fisher's F-ratio statistic */
       solver.post(new RealConstraint("fStatistics ",
-            "({0}/"+(groups-1)+")/({1}/"+((samples-1)*groups)+")={2}",
-            Ibex.HC4_NEWTON, 
-            new RealVar[]{ssdBetweenGroups, ssdWithinGroups, fStatistics}
-            ));
+                                     "({0}/"+(groups-1)+")/({1}/"+((samples-1)*groups)+")={2}",
+                                     Ibex.HC4_NEWTON, 
+                                     new RealVar[]{ssdBetweenGroups, ssdWithinGroups, fStatistics}
+                                    ));
    }
    
    @Override
