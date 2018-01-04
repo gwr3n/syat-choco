@@ -163,6 +163,7 @@ public class HotellingConfidenceRegion extends AbstractProblem {
             {3.05632, 7.19737, 8.50685}, 
             {5.54063, 9.19586, 9.22433}};
       
+      // 26.9539 is the 0.9-quantile of the inverse Hotelling's T^2 distribution for m=3 and n=6-1=5
       double[] statistic = {0,26.9539};
       
       for(double i = -8; i < 12; i+=0.5){

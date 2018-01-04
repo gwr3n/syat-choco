@@ -160,6 +160,8 @@ public class Hotelling extends AbstractProblem {
             {5.54063, 9.19586, 9.22433}};
       
       double[][] muDomains = {{0,20},{0,20},{0,20}};
+      
+      // 26.9539 is the 0.9-quantile of the inverse Hotelling's T^2 distribution for m=3 and n=6-1=5 
       double[] statistic = {0,26.9539};
       
       Hotelling scoreReal = new Hotelling(muDomains, observations, statistic);
