@@ -38,7 +38,7 @@ import org.chocosolver.solver.variables.RealVar;
  * @see <a href="https://en.wikipedia.org/wiki/Gaussian_elimination">Gaussian elimination</a>
  */
 
-public class GaussJordan {
+public class MatrixInversion {
    
    /**
     * MATRIX constraint decomposition; {@code inverse} is the  

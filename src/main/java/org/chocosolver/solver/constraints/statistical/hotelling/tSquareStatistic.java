@@ -27,7 +27,7 @@
 package org.chocosolver.solver.constraints.statistical.hotelling;
 
 import org.chocosolver.solver.Solver;
-import org.chocosolver.solver.constraints.nary.matrix.GaussJordan;
+import org.chocosolver.solver.constraints.nary.matrix.MatrixInversion;
 import org.chocosolver.solver.constraints.real.Ibex;
 import org.chocosolver.solver.constraints.real.RealConstraint;
 import org.chocosolver.solver.variables.RealVar;
@@ -206,7 +206,7 @@ public class tSquareStatistic {
 
       decomposeMeans(observations, means);
 
-      GaussJordan.decompose(name+"_GaussJordan", matrix, inverseVariable);
+      MatrixInversion.decompose(name+"_GaussJordan", matrix, inverseVariable);
 
       String statisticString = M+"*(";
       for(int i = 0; i < mu.length; i++){
@@ -266,7 +266,7 @@ public class tSquareStatistic {
       
       decomposeMeans(observations, means);
 
-      GaussJordan.decompose(name+"_GaussJordan", matrix, inverseVariable);
+      MatrixInversion.decompose(name+"_GaussJordan", matrix, inverseVariable);
 
       String statisticString = M+"*(";
       for(int i = 0; i < mu.length; i++){

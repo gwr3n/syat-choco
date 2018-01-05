@@ -28,7 +28,7 @@ package org.chocosolver.solver.constraints.nary.matrix;
 
 import org.chocosolver.samples.AbstractProblem;
 import org.chocosolver.solver.Solver;
-import org.chocosolver.solver.constraints.nary.matrix.GaussJordan;
+import org.chocosolver.solver.constraints.nary.matrix.MatrixInversion;
 import org.chocosolver.solver.search.strategy.selectors.values.RealDomainMiddle;
 import org.chocosolver.solver.search.strategy.selectors.variables.Cyclic;
 import org.chocosolver.solver.search.strategy.strategy.RealStrategy;
@@ -38,7 +38,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class GaussJordanTest {
+public class MatrixInversionTest {
 
    @Before
    public void setUp() throws Exception {
@@ -67,11 +67,11 @@ public class GaussJordanTest {
          { 0.1, 1.0, 0.1 },
          { 0.2, 0.1, 1.0 }
       };*/
-      GaussJordanReal gjreal = new GaussJordanReal(matrix);
+      MatrixInversionReal gjreal = new MatrixInversionReal(matrix);
       gjreal.execute(str);
    }
 
-   class GaussJordanReal extends AbstractProblem {
+   class MatrixInversionReal extends AbstractProblem {
       public RealVar[][] matrixVariable;
       public RealVar[][] inverseVariable;
       
@@ -79,7 +79,7 @@ public class GaussJordanTest {
       
       double precision = 1.e-4;
       
-      public GaussJordanReal(double[][] matrix){
+      public MatrixInversionReal(double[][] matrix){
          this.matrix = matrix;
       }
       
@@ -100,7 +100,7 @@ public class GaussJordanTest {
             }
          }
          
-         GaussJordan.decompose("GaussJordan", matrixVariable, inverseVariable);
+         MatrixInversion.decompose("GaussJordan", matrixVariable, inverseVariable);
       }
       
       public RealVar[] flatten(RealVar[][] matrix){
