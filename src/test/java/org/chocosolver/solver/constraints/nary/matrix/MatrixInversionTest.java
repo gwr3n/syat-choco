@@ -47,7 +47,7 @@ public class MatrixInversionTest {
    @After
    public void tearDown() throws Exception {
       System.gc();
-      Thread.sleep(3000);
+      Thread.sleep(1000);
    }
 
    @Test
@@ -67,8 +67,8 @@ public class MatrixInversionTest {
          { 0.1, 1.0, 0.1 },
          { 0.2, 0.1, 1.0 }
       };*/
-      MatrixInversionReal gjreal = new MatrixInversionReal(matrix);
-      gjreal.execute(str);
+      MatrixInversionReal matrixInversionReal = new MatrixInversionReal(matrix);
+      matrixInversionReal.execute(str);
    }
 
    class MatrixInversionReal extends AbstractProblem {
@@ -85,7 +85,7 @@ public class MatrixInversionTest {
       
       @Override
       public void createSolver() {
-          solver = new Solver("GaussJordan");
+          solver = new Solver("MatrixInversion");
       }
       
       @Override

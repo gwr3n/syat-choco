@@ -158,7 +158,7 @@ public class tStatisticTest {
               assertTrue(tVariable.getUB() >= (5-5.5)/(Math.sqrt(7.5)/Math.sqrt(9)));
            }else{
               st.append("No solution!");
-              assertTrue(false);
+              fail("No solution!");
            }
         //}while(solution = solver.nextSolution());
         System.out.println(st.toString());
@@ -228,7 +228,7 @@ public class tStatisticTest {
               assertTrue(tVariable.getUB() >= (5-5.5)/(Math.sqrt(7.5)/Math.sqrt(9)));
            }else{
               st.append("No solution!");
-              assertTrue(false);
+              fail("No solution!");
            }
         //}while(solution = solver.nextSolution());
         System.out.println(st.toString());
@@ -306,7 +306,7 @@ public class tStatisticTest {
               assertTrue(tVariable.getUB() >= 0.65);
            }else{
               st.append("No solution!");
-              assertTrue(false);
+              fail("No solution!");
            }
         //}while(solution = solver.nextSolution());
         System.out.println(st.toString());
@@ -384,7 +384,7 @@ public class tStatisticTest {
               assertTrue(tVariable.getUB() >= 0.65);
            }else{
               st.append("No solution!");
-              assertTrue(false);
+              fail("No solution!");
            }
         //}while(solution = solver.nextSolution());
         System.out.println(st.toString());

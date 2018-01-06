@@ -32,7 +32,7 @@ import org.chocosolver.solver.constraints.real.RealConstraint;
 import org.chocosolver.solver.variables.RealVar;
 
 /**
- * Decomposition of the {@code MATRIX} constraint
+ * Decomposition of the {@code MATRIX_INVERSION} constraint
  * 
  * @author Roberto Rossi
  * @see <a href="https://en.wikipedia.org/wiki/Gaussian_elimination">Gaussian elimination</a>
