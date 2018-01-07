@@ -91,14 +91,40 @@ public class Eigendecomposition {
          }
       }
       
-      for(int j = 0; j < InverseQ[0].length; j++) {
-         for(int i = j+1; i < InverseQ[0].length; i++) {
+      for(int j = 0; j < QTransposed[0].length; j++) {
+         for(int i = j+1; i < QTransposed[0].length; i++) {
             RealVar[][] evi = new RealVar[1][]; 
-            evi[0] = extractColumnAsRow(InverseQ, i);
-            RealVar[][] evj = extractColumnAsColumn(InverseQ, j);
+            evi[0] = extractColumnAsRow(QTransposed, i);
+            RealVar[][] evj = extractColumnAsColumn(QTransposed, j);
             DotProduct.decompose("Orthogonality"+i, evi, evj, new RealVar[][] {{zeroReal}});
          }
       }*/
+      
+      /***Rayleigh quotient***/
+      String template = "(";
+      for(int i = 0; i < A.length; i++) {
+         template += "{"+i+"}*{"+i+"}"+((i < A.length - 1) ? "+" : "");
+      }
+      template+=")";
+      
+      for(int k = 0; k < Lambda.length; k++) {
+         String statisticString = "(";
+         for(int i = 0; i < A.length; i++){
+            statisticString += "({"+i+"})*(";
+            for(int j = 0; j < A.length; j++){
+               statisticString += "({"+j+"})*({"+(A.length + i*A.length+j)+(j == A.length - 1 ? "})" : "})+");
+            }
+            statisticString += (i == A.length - 1) ? "))/"+template+"={"+(A.length+A.length*A.length)+"}" : ")+";
+         }
+
+         RealVar[] lambdaVars = new RealVar[A.length + A.length*A.length + 1];
+         System.arraycopy(Q[k], 0, lambdaVars, 0, A.length);
+         System.arraycopy(flatten(A), 0, lambdaVars, A.length, A.length*A.length);
+         lambdaVars[lambdaVars.length - 1] = Lambda[k][k];
+
+         //solver.post(new RealConstraint(name+"Lambda_"+k, statisticString, Ibex.HC4_NEWTON, lambdaVars));
+      }
+      
    }
    
    private static RealVar[] extractColumnAsRow(RealVar[][] matrix, int j) {
@@ -115,5 +141,16 @@ public class Eigendecomposition {
          column[i][0] = matrix[i][j];
       }
       return column;
+   }
+   
+   private static RealVar[] flatten(RealVar[][] matrix){
+      int n = matrix.length;
+      RealVar[] array = new RealVar[n*n];
+      for(int i = 0; i < n; i++){
+         for(int j = 0; j < n; j++){
+            array[i*n+j] = matrix[i][j];
+         }
+      }
+      return array;
    }
 }
