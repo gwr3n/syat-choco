@@ -34,7 +34,7 @@ Assuming Ibex libraries have been installed in
 
     ~/ibex/ibex-2.3.4/lib/lib/
 
-download [jsdp-1.0.0 with dependencies](jar/syat-choco-1.0.0-shaded.jar) and run
+download [syat-choco-1.0.0 with dependencies](jar/syat-choco-1.0.0-shaded.jar) and run
 
     java -cp ./syat-choco-1.0.0-shaded.jar -Djava.library.path=/Users/[username]/ibex/ibex-2.3.4/lib/lib/ org.chocosolver.samples.statistical.t.TTest
     
