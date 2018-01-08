@@ -12,7 +12,7 @@ __Maven release:__
 	<artifactId>syat-choco</artifactId>
 	<version>1.0.0</version>
 
-__Maven snapshot:__
+__Maven latest snapshot:__
 
     <groupId>com.github.gwr3n</groupId>
 	<artifactId>syat-choco</artifactId>
