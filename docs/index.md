@@ -6,15 +6,13 @@ syat-choco is a [Choco](http://www.choco-solver.org/) extension for [Declarative
 
 For more information, please consult our [Wiki](https://github.com/gwr3n/syat-choco/wiki).
 
-__Maven__ 
-
-_Latest release:_
+__Maven release:__
 
     <groupId>com.github.gwr3n</groupId>
 	<artifactId>syat-choco</artifactId>
 	<version>1.0.0</version>
 
-_Latest snapshot:_
+__Maven snapshot:__
 
     <groupId>com.github.gwr3n</groupId>
 	<artifactId>syat-choco</artifactId>
