@@ -44,3 +44,7 @@ You should obtain the following output for the [Student t test](https://github.c
     Confidence interval for the mean: [8, 9, 10, 11]
 
 You must provide an __absolute path__ as `-Djava.library.path=` argument.
+
+### About the author
+
+syat-choco is maintained by [Roberto Rossi](https://gwr3n.github.io), Reader at the University of Edinburgh.
