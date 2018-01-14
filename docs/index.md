@@ -45,6 +45,13 @@ You should obtain the following output for the [Student t test](https://github.c
 
 You must provide an __absolute path__ as `-Djava.library.path=` argument.
 
+### Acknowledgements
+
+This project has been supported by
+* Volvo [Construction Climate Challenge Fund](http://constructionclimatechallenge.com/) - Project [CITT](http://constructionclimatechallenge.com/research-call-2016-2/ccc-research-citt-project/)
+* the UK Engineering and Physical Research Council ([EPSRC](https://www.epsrc.ac.uk/))
+* [Innovate UK](https://www.gov.uk/government/organisations/innovate-uk)
+
 ### About the author
 
 syat-choco is maintained by [Roberto Rossi](https://gwr3n.github.io), Reader at the University of Edinburgh.
