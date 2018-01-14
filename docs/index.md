@@ -48,7 +48,7 @@ You must provide an __absolute path__ as `-Djava.library.path=` argument.
 ### Acknowledgements
 
 This project has been supported by
-* Volvo [Construction Climate Challenge Fund](http://constructionclimatechallenge.com/) - Project [CITT](http://constructionclimatechallenge.com/research-call-2016-2/ccc-research-citt-project/)
+* Volvo [Construction Climate Challenge Fund](http://constructionclimatechallenge.com/) - project [CITT](http://constructionclimatechallenge.com/research-call-2016-2/ccc-research-citt-project/)
 * The UK Engineering and Physical Research Council ([EPSRC](https://www.epsrc.ac.uk/))
 * [Innovate UK](https://www.gov.uk/government/organisations/innovate-uk)
 
