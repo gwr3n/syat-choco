@@ -100,7 +100,7 @@ public class Eigendecomposition {
          }
       }*/
       
-      /***Rayleigh quotient***/
+      /***Rayleigh quotient***
       String template = "(";
       for(int i = 0; i < A.length; i++) {
          template += "{"+i+"}*{"+i+"}"+((i < A.length - 1) ? "+" : "");
@@ -122,8 +122,8 @@ public class Eigendecomposition {
          System.arraycopy(flatten(A), 0, lambdaVars, A.length, A.length*A.length);
          lambdaVars[lambdaVars.length - 1] = Lambda[k][k];
 
-         //solver.post(new RealConstraint(name+"Lambda_"+k, statisticString, Ibex.HC4_NEWTON, lambdaVars));
-      }
+         solver.post(new RealConstraint(name+"Lambda_"+k, statisticString, Ibex.HC4_NEWTON, lambdaVars));
+      }*/
       
    }
    
@@ -135,6 +135,7 @@ public class Eigendecomposition {
       return column;
    }
    
+   @SuppressWarnings("unused")
    private static RealVar[][] extractColumnAsColumn(RealVar[][] matrix, int j) {
       RealVar[][] column = new RealVar[matrix.length][1];
       for(int i = 0; i < matrix.length; i++) {
@@ -143,6 +144,7 @@ public class Eigendecomposition {
       return column;
    }
    
+   @SuppressWarnings("unused")
    private static RealVar[] flatten(RealVar[][] matrix){
       int n = matrix.length;
       RealVar[] array = new RealVar[n*n];
