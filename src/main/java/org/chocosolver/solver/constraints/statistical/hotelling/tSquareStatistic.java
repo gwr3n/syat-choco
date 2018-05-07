@@ -55,9 +55,9 @@ public class tSquareStatistic {
     * observations are scalar values 
     * 
     * @param name constraint name
-    * @param mu mean array
-    * @param sigma variance-covariance matrix
-    * @param observations observations matrix
+    * @param mu mean array [nbFactors]
+    * @param sigma variance-covariance matrix [nbFactors][nbFactors]
+    * @param observations observations matrix [nbObservations][nbFactors]
     * @param statistic t squared statistic
     * @param precision Ibex precision
     */
@@ -98,8 +98,8 @@ public class tSquareStatistic {
     * has been estimated from these observations 
     * 
     * @param name constraint name
-    * @param mu mean array
-    * @param observations observations matrix
+    * @param mu mean array [nbFactors]
+    * @param observations observations matrix [nbObservations][nbFactors]
     * @param statistic t squared statistic
     * @param precision Ibex precision
     */
@@ -173,9 +173,9 @@ public class tSquareStatistic {
     * observations are decision variables
     * 
     * @param name constraint name
-    * @param mu mean array
-    * @param observations observations array
-    * @param sigma variance-covariance matrix
+    * @param mu mean array [nbFactors]
+    * @param observations observations matrix [nbObservations][nbFactors]
+    * @param sigma variance-covariance matrix [nbFactors][nbFactors]
     * @param statistic t squared statistic
     * @param precision Ibex precision
     */
@@ -232,8 +232,8 @@ public class tSquareStatistic {
     * has been estimated from these observations 
     * 
     * @param name constraint name
-    * @param mu mean array
-    * @param observations observations matrix
+    * @param mu mean array [nbFactors]
+    * @param observations observations matrix [nbObservations][nbFactors]
     * @param statistic t squared statistic
     * @param precision Ibex precision
     */
