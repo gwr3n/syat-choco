@@ -54,6 +54,7 @@ import umontreal.iro.lecuyer.rng.MRG32k3a;
 
 /***
  * https://people.richland.edu/james/lecture/m170/ch13-2wy.html
+ * https://en.wikipedia.org/wiki/Two-way_analysis_of_variance
  * 
  * @author Roberto Rossi
  *
