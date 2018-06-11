@@ -135,10 +135,11 @@ public class HotellingTwoWay extends AbstractProblem {
          observationVariable[a] = extract_i(a, error);
       
       // https://pdfs.semanticscholar.org/96d5/80ccf7c2c15426231efd5c4bb8327317cf72.pdf
+      // https://en.wikipedia.org/wiki/Hotelling%27s_T-squared_distribution
       
       int p = A;
       int m = B*K;
-      double[] statistic = {0,((p*m)/(m-p+1))*FisherFDist.inverseF(p, m-p+1, 1-significance)};
+      double[] statistic = {0,((p*m)/(m-p+1))*FisherFDist.inverseF(p, m-p+1, 1-significance)}; // Approximation of Hotelling T^2 distribution
       
       tSquareStatistic.decompose("scoreConstraint", muVariable, transpose(observationVariable), 
             VF.real("T2A", statistic[0], statistic[1], precision, solver), precision);
