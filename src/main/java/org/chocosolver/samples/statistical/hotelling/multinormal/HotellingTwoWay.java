@@ -60,6 +60,7 @@ import umontreal.iro.lecuyer.rng.MRG32k3a;
  *
  */
 
+@SuppressWarnings("unused")
 public class HotellingTwoWay extends AbstractProblem {
    
    public RealVar muVar; //Grand mean
@@ -197,6 +198,7 @@ public class HotellingTwoWay extends AbstractProblem {
       return flattened.stream().toArray(RealVar[]::new);
    }
    
+   @SuppressWarnings("unused")
    private RealVar[] flatten(RealVar[][][] matrix) {
       ArrayList<RealVar> flattened = new ArrayList<RealVar>();
       for(int i = 0; i < matrix.length; i++) {
