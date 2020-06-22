@@ -33,7 +33,6 @@ import java.util.Arrays;
 import org.chocosolver.samples.AbstractProblem;
 import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.constraints.SyatConstraintFactory;
-import org.chocosolver.solver.constraints.nary.bincounts.BincountsDecompositionType;
 import org.chocosolver.solver.exception.ContradictionException;
 import org.chocosolver.solver.search.strategy.IntStrategyFactory;
 import org.chocosolver.solver.search.strategy.strategy.AbstractStrategy;

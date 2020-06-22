@@ -26,7 +26,6 @@
 
 package org.chocosolver.solver.constraints;
 
-import org.chocosolver.solver.constraints.Operator;
 import org.chocosolver.solver.constraints.nary.contingency.ContingencyDecompositions;
 import org.chocosolver.solver.constraints.nary.bincounts.BincountsDecompositionType;
 import org.chocosolver.solver.constraints.nary.bincounts.BincountsDecompositions;

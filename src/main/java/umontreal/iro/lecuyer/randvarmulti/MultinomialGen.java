@@ -27,7 +27,6 @@
 package umontreal.iro.lecuyer.randvarmulti;
 
 import umontreal.iro.lecuyer.randvar.UniformGen;
-import umontreal.iro.lecuyer.randvarmulti.RandomMultivariateGen;
 
 /**
  * Multinomial random variates generator

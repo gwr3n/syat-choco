@@ -123,7 +123,7 @@ public class TTest extends AbstractProblem {
     	ArrayList<Integer> solutionList = new ArrayList<Integer>();
     	do{
     		if(solution) {
-    		   solutionList.add(new Integer(mean.getValue()));
+    		   solutionList.add(Integer.valueOf(mean.getValue()));
     		}else{
     			st.append("No solution!");
     		}
