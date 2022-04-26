@@ -1,6 +1,6 @@
 theme: jekyll-theme-slate
 title: syat-choco
 description: a Choco extension for Declarative Statistics
-google_analytics: UA-5801036-10
+google_analytics: G-9ELNMQM9M5
 gems:
   - jekyll-sitemap
