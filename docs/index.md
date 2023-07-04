@@ -54,4 +54,4 @@ This project has been supported by
 
 ### About the author
 
-syat-choco is maintained by [Roberto Rossi](https://gwr3n.github.io), Reader at the University of Edinburgh.
+syat-choco is maintained by [Roberto Rossi](https://gwr3n.github.io), Chair in Uncertainty Modelling at the University of Edinburgh.
