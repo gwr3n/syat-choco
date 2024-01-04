@@ -198,7 +198,6 @@ public class TwoAR1TimeSeriesFit extends AbstractProblem {
       return observations;
    }
    
-   @SuppressWarnings("deprecation")
    public static void fitMostLikelyParameters(){
       String[] str={"-log","SOLUTION"};
       
